@@ -1,0 +1,6 @@
+#Untracked Files
+src/application/Siren/bin/*
+src/application/Siren/obj/*
+
+src/test/SirenTest/bin/*
+src/test/SirenTest/obj/*
