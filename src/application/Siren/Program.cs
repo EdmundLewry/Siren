@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Siren
+namespace PBS.Siren
 {
     class Program
     {
