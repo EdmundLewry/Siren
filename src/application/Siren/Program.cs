@@ -23,32 +23,51 @@ namespace PBS.Siren
             @ The Device will then report playing the media at the Fixed Start Time, with the positional properties required
             */
 
+            MediaInstance demoMedia = createDemoMediaInstance();
+
+            DateTime startTime = DateTime.Now.AddSeconds(30);
+            List<TransmissionEvent> events = generateTransmissionEvents(demoMedia, startTime);
+            
+            TransmissionList list = new TransmissionList(events);
+
+            Channel demoChannel = generateChannel(list);
+            
+
+            Console.WriteLine("Channel Created");
+            PrintChannelListContent(demoChannel);
+        }
+
+        private static Channel generateChannel(TransmissionList list)
+        {
+            List<IDevice> devices = new List<IDevice>();
+            devices.Add(new DemoDevice());
+            PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration(devices);
+
+            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
+
+            return new Channel(chainConfiguration, list, scheduler);
+        }
+
+        private static List<TransmissionEvent> generateTransmissionEvents(MediaInstance demoMedia, DateTime startTime)
+        {
+            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia);
+            PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
+            FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
+            TransmissionEvent transmissionEvent = new TransmissionEvent(sourceStrategy, playoutStrategy, timingStrategy);
+
+            List<TransmissionEvent> events = new List<TransmissionEvent>();
+            events.Add(transmissionEvent);
+            return events;
+        }
+
+        private static MediaInstance createDemoMediaInstance()
+        {
             const int FPS = 25;
             const int mediaDurationSeconds = 30;
             const int secondsAsFrames = FPS * mediaDurationSeconds;
             const String mediaName = "DemoMedia1";
             const String mediaPath = "C:\\Media\\DemoMedia1.txt";
-            MediaInstance instance = new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
-
-            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy();
-            PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
-            FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy();
-            TransmissionEvent transmissionEvent = new TransmissionEvent(sourceStrategy, playoutStrategy, timingStrategy);
-
-            List<TransmissionEvent> events = new List<TransmissionEvent>();
-            events.Add(transmissionEvent);
-
-            TransmissionList list = new TransmissionList(events);
-
-            DemoDevice demoDevice = new DemoDevice();
-            PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration();
-
-            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
-
-            Channel demoChannel = new Channel(chainConfiguration, list, scheduler);
-
-            Console.WriteLine("Channel Created");
-            PrintChannelListContent(demoChannel);
+            return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
         private static void PrintChannelListContent(Channel demoChannel)

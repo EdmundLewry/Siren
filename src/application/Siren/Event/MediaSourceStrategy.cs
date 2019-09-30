@@ -9,7 +9,7 @@ namespace PBS.Siren
     */
     class MediaSourceStrategy : ISourceStrategy
     {
-        public MediaInstance Instance { get; set; }
+        public MediaInstance Instance { get; }
         
         //Will need a timecode for this. Currently in frames
         //SOM = Start of Media
@@ -19,9 +19,9 @@ namespace PBS.Siren
         //EOM = EOM of Media
         public int EOM { get; set; } //Currently in 25 FPS
         
-        public MediaSourceStrategy()
+        public MediaSourceStrategy(MediaInstance instance)
         {
-
+            Instance = instance; 
         }
     }
 }
