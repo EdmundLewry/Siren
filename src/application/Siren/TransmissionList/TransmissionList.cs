@@ -12,7 +12,7 @@ TODO:
  */
 namespace PBS.Siren
 {
-    class TransmissionList : ITransmissionList
+    public class TransmissionList : ITransmissionList
     {
         //Holds a collection of events
         //Validates the collection of events in relation to each other when something changes

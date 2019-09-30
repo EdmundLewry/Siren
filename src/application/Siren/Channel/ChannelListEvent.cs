@@ -11,7 +11,7 @@ namespace PBS.Siren
     but without needing to interact with the device for every event in the list that would
     use it.
     */
-    class ChannelListEvent
+    public class ChannelListEvent
     {
         public ChannelListEventState EventState { get; set; }
         //We may want more human readable identifiers

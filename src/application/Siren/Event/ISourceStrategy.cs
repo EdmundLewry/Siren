@@ -6,7 +6,7 @@ namespace PBS.Siren
     This could be a Media Source, used to play out some kind of Media File(s). It could be a Live Source,
     used to route a particular input to our playout output.
     */
-    interface ISourceStrategy
+    public interface ISourceStrategy
     {
         
     }

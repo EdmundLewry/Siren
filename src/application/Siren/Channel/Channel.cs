@@ -5,7 +5,7 @@ namespace PBS.Siren
     configurations, and a scheduler which is responsible for combining the Playout Chain Configurations
     and transmission list into a Channel List, and triggering event timings to update in the transmission list
      */
-    class Channel
+    public class Channel
     {
         public PlayoutChainConfiguration ChainConfiguration { get; set; }
         public TransmissionList SourceList { get; set; }
@@ -17,6 +17,8 @@ namespace PBS.Siren
             Scheduler = listScheduler;
             SourceList = list;
             ChainConfiguration = channelConfig;
+
+            //GeneratedList = listScheduler.GenerateChannelList(list, channelConfig);
         }
     }
 }

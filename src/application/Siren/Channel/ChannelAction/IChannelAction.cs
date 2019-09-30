@@ -1,6 +1,6 @@
 namespace PBS.Siren
 {
-    interface IChannelAction
+    public interface IChannelAction
     {
         
     }

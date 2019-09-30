@@ -10,7 +10,7 @@ namespace PBS.Siren
     A device should be passed this list and then act based on the list data as it needs to to ensure that
     the event is actioned at the correct time.
     */
-    class PlayoutList
+    public class PlayoutList
     {
         public List<PlayoutListEvent> Events { get; set; }
         

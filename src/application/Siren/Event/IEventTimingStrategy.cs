@@ -9,8 +9,8 @@ namespace PBS.Siren
     The timing of the event could be relative to another event (Sequential being the simplest example of this)
     or could be a fixed point in time. 
     */
-    interface IEventTimingStrategy
+    public interface IEventTimingStrategy
     {
-        
+        DateTime CalculateStartTime();
     }
 }

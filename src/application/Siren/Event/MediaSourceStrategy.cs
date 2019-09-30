@@ -7,7 +7,7 @@ namespace PBS.Siren
     The MediaSourceStrategy may relate to the whole Media Instance (the full duration) that it references
     or it may relate to a segment of that Media instance.
     */
-    class MediaSourceStrategy : ISourceStrategy
+    public class MediaSourceStrategy : ISourceStrategy
     {
         public MediaInstance Instance { get; }
         

@@ -8,7 +8,7 @@ namespace PBS.Siren
     relate to Graphics (what layer, position, and dimensions to use to display the event contents), it could
     relate to audio or subtitles potentially.
     */
-    interface IPlayoutStrategy
+    public interface IPlayoutStrategy
     {
         
     }

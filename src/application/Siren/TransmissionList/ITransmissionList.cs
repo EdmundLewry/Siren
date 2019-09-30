@@ -1,6 +1,6 @@
 namespace PBS.Siren
 {
-    interface ITransmissionList
+    public interface ITransmissionList
     {
         
     }

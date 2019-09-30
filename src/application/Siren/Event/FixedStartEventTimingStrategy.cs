@@ -9,5 +9,10 @@ namespace PBS.Siren
         {
             TargetStartTime = startTime;
         }
+
+        public DateTime CalculateStartTime()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

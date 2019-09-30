@@ -7,7 +7,7 @@ namespace PBS.Siren
 
     By updating the state of the Playout List Events, the device can provide feedback as well.
     */
-    interface IDevice
+    public interface IDevice
     {
 
     }

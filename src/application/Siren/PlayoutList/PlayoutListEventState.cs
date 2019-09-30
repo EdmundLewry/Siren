@@ -1,6 +1,6 @@
 namespace PBS.Siren
 {
-    class PlayoutListEventState
+    public class PlayoutListEventState
     {
         public PlayoutListEventState()
         {

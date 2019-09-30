@@ -7,7 +7,7 @@ namespace PBS.Siren
     for how long, when it should start, where in the channel layout it should be displayed,
     and validates that that data makes sense against the source being represented.
      */
-    class TransmissionEvent
+    public class TransmissionEvent
     {
         public ISourceStrategy SourceStrategy { get; set; }
         public IPlayoutStrategy PlayoutStrategy { get; set; }

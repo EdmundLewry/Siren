@@ -13,9 +13,9 @@ namespace PBS.Siren
     It also has the responsibility of generating the Playout Lists for each device, which will
     be used to actually control the devices.
      */
-    class ChannelList
+    public class ChannelList
     {
-        public List<ChannelListEvent> Events { get; set; }
+        public List<ChannelListEvent> Events { get; }
         public IDevice Device { get; set; }
         
         public ChannelList()

@@ -31,21 +31,18 @@ namespace PBS.Siren
             TransmissionList list = new TransmissionList(events);
 
             Channel demoChannel = generateChannel(list);
-            
 
             Console.WriteLine("Channel Created");
-            PrintChannelListContent(demoChannel);
+            //PrintChannelListContent(demoChannel);
         }
-
-        private static Channel generateChannel(TransmissionList list)
+        private static MediaInstance createDemoMediaInstance()
         {
-            List<IDevice> devices = new List<IDevice>();
-            devices.Add(new DemoDevice());
-            PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration(devices);
-
-            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
-
-            return new Channel(chainConfiguration, list, scheduler);
+            const int FPS = 25;
+            const int mediaDurationSeconds = 30;
+            const int secondsAsFrames = FPS * mediaDurationSeconds;
+            const String mediaName = "DemoMedia1";
+            const String mediaPath = "C:\\Media\\DemoMedia1.txt";
+            return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
         private static List<TransmissionEvent> generateTransmissionEvents(MediaInstance demoMedia, DateTime startTime)
@@ -60,14 +57,15 @@ namespace PBS.Siren
             return events;
         }
 
-        private static MediaInstance createDemoMediaInstance()
+        private static Channel generateChannel(TransmissionList list)
         {
-            const int FPS = 25;
-            const int mediaDurationSeconds = 30;
-            const int secondsAsFrames = FPS * mediaDurationSeconds;
-            const String mediaName = "DemoMedia1";
-            const String mediaPath = "C:\\Media\\DemoMedia1.txt";
-            return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
+            List<IDevice> devices = new List<IDevice>();
+            devices.Add(new DemoDevice());
+            PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration(devices);
+
+            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
+
+            return new Channel(chainConfiguration, list, scheduler);
         }
 
         private static void PrintChannelListContent(Channel demoChannel)

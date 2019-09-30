@@ -8,8 +8,8 @@ namespace PBS.Siren
     The Scheduler is also responsible for handling manual intervention in the Channel, via Channel Actions
     and will trigger Event Timing Strategies on the Transmission Events.
     */
-    interface IScheduler
+    public interface IScheduler
     {
-        
+        ChannelList GenerateChannelList(TransmissionList list, PlayoutChainConfiguration channelConfig);
     }
 }

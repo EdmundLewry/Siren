@@ -13,7 +13,7 @@ namespace PBS.Siren
     A Media Instance represents 1 or more files that relate to a single coherent
     piece of media that can be scheduled for playout in a list
      */
-    class MediaInstance
+    public class MediaInstance
     {
         public String Name { get; } 
 

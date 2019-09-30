@@ -7,7 +7,7 @@ namespace PBS.Siren
     It is used, in combination with a Transmission List, to define what which devices will be used
     to enact each individual Transmission Event.
     */
-    interface IPlayoutChainConfiguration
+    public interface IPlayoutChainConfiguration
     {
 
     }
