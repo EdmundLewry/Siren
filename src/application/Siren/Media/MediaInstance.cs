@@ -3,8 +3,9 @@ using System;
 namespace PBS.Siren
 {
     //Should this be some abstraction for video, graphics, audio, and subtitle file types?
-    enum FileType
+    public enum FileType
     {
+        TEXT,
         MOV,
         IMAGE_SEQUENCE
     }
@@ -14,12 +15,19 @@ namespace PBS.Siren
      */
     class MediaInstance
     {
-        public String Name { get; set; } 
+        public String Name { get; } 
 
         //This will need to become a timecode
-        public int Duration { get; set; } //currently in number of frames (assuming 25FPS)
-        public String FilePath { get; set; }
-        public FileType InstanceFileType { get; set; }
-        
+        public int Duration { get; } //currently in number of frames (assuming 25FPS)
+        public String FilePath { get; }
+        public FileType InstanceFileType { get; }
+
+        public MediaInstance(String instanceName, int totalDurationInFrames, String instanceFilePath, FileType type)
+        {
+            Name = instanceName;
+            Duration = totalDurationInFrames;
+            FilePath = instanceFilePath;
+            InstanceFileType = type;
+        }        
     }
 }

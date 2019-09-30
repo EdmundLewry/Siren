@@ -18,11 +18,11 @@ namespace PBS.Siren
         //Validates the collection of events in relation to each other when something changes
         //Supports adding, removing, reordering events
         //Supports getting events
-        public List<TransmissionEvent> Events { get; set; }
+        public List<TransmissionEvent> Events { get; }
         
-        public TransmissionList()
+        public TransmissionList(List<TransmissionEvent> listEvents)
         {
-
+            Events = listEvents;
         }
     }
 }

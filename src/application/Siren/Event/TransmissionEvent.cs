@@ -23,9 +23,11 @@ namespace PBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
         
-        public TransmissionEvent()
+        public TransmissionEvent(ISourceStrategy source, IPlayoutStrategy playout, IEventTimingStrategy timingStrategy)
         {
-            
+            SourceStrategy = source;
+            PlayoutStrategy = playout;
+            timingStrategy = EventTimingStrategy;
         }
     }
 }
