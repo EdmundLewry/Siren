@@ -34,7 +34,12 @@ namespace PBS.Siren
 
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
+
+            List<PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
+            DeliverPlayoutListsToDevices(playoutLists);
         }
+
+
         private static MediaInstance createDemoMediaInstance()
         {
             const int FPS = 25;
@@ -72,6 +77,10 @@ namespace PBS.Siren
         {
             ChannelList list = demoChannel.GeneratedList;
             list.Events.ForEach(Console.WriteLine);
+        }
+        private static void DeliverPlayoutListsToDevices(List<PlayoutList> playoutLists)
+        {
+            throw new NotImplementedException();
         }
     }
 }
