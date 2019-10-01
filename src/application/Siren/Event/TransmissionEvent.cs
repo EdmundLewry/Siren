@@ -28,6 +28,12 @@ namespace PBS.Siren
             SourceStrategy = source;
             PlayoutStrategy = playout;
             EventTimingStrategy = timingStrategy;
+            Id = Guid.NewGuid();
+        }
+
+        public override String ToString()
+        {
+            return base.ToString() + " Id: " + Id.ToString() + " StartTime: " + StartTime;
         }
     }
 }

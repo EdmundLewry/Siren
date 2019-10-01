@@ -27,7 +27,13 @@ namespace PBS.Siren
             RelatedTransmissionEvent = transmissionEvent;
             Device = deviceForPlayout;
             EventState = new ChannelListEventState();
-            Id = new Guid();
+            Id = Guid.NewGuid();
+        }
+
+        public override String ToString()
+        {
+            //Would like to use Json for this
+            return base.ToString() + ":\nId: " + Id.ToString() + "\nTransmission Event: " + RelatedTransmissionEvent.ToString() + "\nDevice: " + Device.ToString();
         }
     }
 }

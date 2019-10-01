@@ -60,7 +60,7 @@ namespace PBS.Siren
         private static Channel generateChannel(TransmissionList list)
         {
             List<IDevice> devices = new List<IDevice>();
-            devices.Add(new DemoDevice());
+            devices.Add(new DemoDevice("DemoDevice1"));
             PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration(devices);
 
             SimpleChannelScheduler scheduler = new SimpleChannelScheduler();

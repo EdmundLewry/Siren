@@ -1,3 +1,5 @@
+using System;
+
 namespace PBS.Siren
 {
     /*
@@ -6,9 +8,15 @@ namespace PBS.Siren
     */
     public class DemoDevice : IDevice
     {
-        public DemoDevice()
+        public String Name { get; }
+        public DemoDevice(String name)
         {
+            Name = name;
+        }
 
+        public override String ToString()
+        {
+            return base.ToString() + " Name: " + Name;
         }
     }
 }
