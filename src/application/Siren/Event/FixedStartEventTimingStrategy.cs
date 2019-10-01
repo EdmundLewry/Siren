@@ -12,7 +12,8 @@ namespace PBS.Siren
 
         public DateTime CalculateStartTime()
         {
-            throw new NotImplementedException();
+            //Fixed time is really easy! We just send back what we got in
+            return TargetStartTime;
         }
     }
 }

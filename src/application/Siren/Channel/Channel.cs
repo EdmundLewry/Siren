@@ -7,18 +7,18 @@ namespace PBS.Siren
      */
     public class Channel
     {
-        public PlayoutChainConfiguration ChainConfiguration { get; set; }
-        public TransmissionList SourceList { get; set; }
+        public IPlayoutChainConfiguration ChainConfiguration { get; set; }
+        public ITransmissionList SourceList { get; set; }
         public ChannelList GeneratedList { get; set; }
         public IScheduler Scheduler { get; set; }
         
-        public Channel(PlayoutChainConfiguration channelConfig, TransmissionList list, IScheduler listScheduler)
+        public Channel(IPlayoutChainConfiguration channelConfig, ITransmissionList list, IScheduler listScheduler)
         {
             Scheduler = listScheduler;
             SourceList = list;
             ChainConfiguration = channelConfig;
 
-            //GeneratedList = listScheduler.GenerateChannelList(list, channelConfig);
+            GeneratedList = listScheduler.GenerateChannelList(list, channelConfig);
         }
     }
 }

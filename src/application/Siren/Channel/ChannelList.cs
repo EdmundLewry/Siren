@@ -16,11 +16,10 @@ namespace PBS.Siren
     public class ChannelList
     {
         public List<ChannelListEvent> Events { get; }
-        public IDevice Device { get; set; }
         
-        public ChannelList()
+        public ChannelList(List<ChannelListEvent> events)
         {
-            
+            Events = events;
         }
     }
 }

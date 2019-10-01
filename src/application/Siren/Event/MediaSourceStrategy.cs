@@ -19,9 +19,11 @@ namespace PBS.Siren
         //EOM = EOM of Media
         public int EOM { get; set; } //Currently in 25 FPS
         
-        public MediaSourceStrategy(MediaInstance instance)
+        public MediaSourceStrategy(MediaInstance instance, int som, int eom)
         {
-            Instance = instance; 
+            Instance = instance;
+            SOM = som;
+            EOM = eom;
         }
     }
 }

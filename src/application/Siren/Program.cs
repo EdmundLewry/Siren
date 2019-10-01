@@ -33,7 +33,7 @@ namespace PBS.Siren
             Channel demoChannel = generateChannel(list);
 
             Console.WriteLine("Channel Created");
-            //PrintChannelListContent(demoChannel);
+            PrintChannelListContent(demoChannel);
         }
         private static MediaInstance createDemoMediaInstance()
         {
@@ -47,7 +47,7 @@ namespace PBS.Siren
 
         private static List<TransmissionEvent> generateTransmissionEvents(MediaInstance demoMedia, DateTime startTime)
         {
-            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia);
+            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia, 0, demoMedia.Duration);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
             FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
             TransmissionEvent transmissionEvent = new TransmissionEvent(sourceStrategy, playoutStrategy, timingStrategy);

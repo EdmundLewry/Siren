@@ -22,9 +22,12 @@ namespace PBS.Siren
         public TransmissionEvent RelatedTransmissionEvent { get; set; }
         public IDevice Device { get; set; }
 
-        public ChannelListEvent()
+        public ChannelListEvent(TransmissionEvent transmissionEvent, IDevice deviceForPlayout)
         {
-            
+            RelatedTransmissionEvent = transmissionEvent;
+            Device = deviceForPlayout;
+            EventState = new ChannelListEventState();
+            Id = new Guid();
         }
     }
 }

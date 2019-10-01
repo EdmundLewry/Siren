@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace PBS.Siren
 {
     /*
@@ -9,6 +11,6 @@ namespace PBS.Siren
     */
     public interface IPlayoutChainConfiguration
     {
-
+        List<IDevice> ChainDevices { get; }
     }
 }

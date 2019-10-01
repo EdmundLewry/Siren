@@ -27,7 +27,7 @@ namespace PBS.Siren
         {
             SourceStrategy = source;
             PlayoutStrategy = playout;
-            timingStrategy = EventTimingStrategy;
+            EventTimingStrategy = timingStrategy;
         }
     }
 }

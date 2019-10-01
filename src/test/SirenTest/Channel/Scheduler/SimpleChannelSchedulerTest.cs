@@ -23,6 +23,7 @@ namespace SirenTest
             scheduler = new SimpleChannelScheduler();
 
             mockTimingStrategy = new Mock<IEventTimingStrategy>();
+            mockTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Now);
             transmissionEvent = new TransmissionEvent(new Mock<ISourceStrategy>().Object, new Mock<IPlayoutStrategy>().Object, mockTimingStrategy.Object);
             list = new TransmissionList(new List<TransmissionEvent>() {transmissionEvent});
             
@@ -44,8 +45,6 @@ namespace SirenTest
         [Fact]
         public void GenerateList_TriggersEventTimingStrategyInEvents()
         {
-            mockTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Now);
-
             ChannelList generatedList = scheduler.GenerateChannelList(list, config);
 
             Assert.Single(generatedList.Events);
