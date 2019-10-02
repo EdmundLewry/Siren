@@ -12,5 +12,6 @@ namespace PBS.Siren
     public interface IEventTimingStrategy
     {
         DateTime CalculateStartTime();
+        String BuildEventData();
     }
 }

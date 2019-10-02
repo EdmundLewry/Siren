@@ -15,5 +15,10 @@ namespace PBS.Siren
             //Fixed time is really easy! We just send back what we got in
             return TargetStartTime;
         }
+
+        public string BuildEventData()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

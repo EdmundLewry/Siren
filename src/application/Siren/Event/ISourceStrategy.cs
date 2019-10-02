@@ -1,3 +1,4 @@
+using System;
 namespace PBS.Siren
 {
     /*
@@ -8,6 +9,6 @@ namespace PBS.Siren
     */
     public interface ISourceStrategy
     {
-        
+        String BuildEventData();
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace PBS.Siren
 {
     /*
@@ -10,6 +12,6 @@ namespace PBS.Siren
     */
     public interface IPlayoutStrategy
     {
-        
+        String BuildEventData();
     }
 }

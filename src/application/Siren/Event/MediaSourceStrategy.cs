@@ -25,5 +25,10 @@ namespace PBS.Siren
             SOM = som;
             EOM = eom;
         }
+
+        public string BuildEventData()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

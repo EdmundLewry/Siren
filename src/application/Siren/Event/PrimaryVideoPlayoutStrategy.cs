@@ -6,5 +6,10 @@ namespace PBS.Siren
         {
             
         }
+
+        public string BuildEventData()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
