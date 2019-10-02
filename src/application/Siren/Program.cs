@@ -35,7 +35,7 @@ namespace PBS.Siren
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
 
-            List<PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
+            Dictionary<IDevice, PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
             DeliverPlayoutListsToDevices(playoutLists);
         }
 
@@ -78,7 +78,7 @@ namespace PBS.Siren
             ChannelList list = demoChannel.GeneratedList;
             list.Events.ForEach(Console.WriteLine);
         }
-        private static void DeliverPlayoutListsToDevices(List<PlayoutList> playoutLists)
+        private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, PlayoutList> playoutLists)
         {
             throw new NotImplementedException();
         }
