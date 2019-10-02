@@ -29,16 +29,21 @@ namespace PBS.Siren
             List<TransmissionEvent> events = generateTransmissionEvents(demoMedia, startTime);
             
             TransmissionList list = new TransmissionList(events);
-
-            Channel demoChannel = generateChannel(list);
+            PrintTransmissionListContent(list);
+            
+            /*Channel demoChannel = generateChannel(list);
 
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
 
             Dictionary<IDevice, PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
-            DeliverPlayoutListsToDevices(playoutLists);
+            DeliverPlayoutListsToDevices(playoutLists);*/
         }
 
+        private static void PrintTransmissionListContent(TransmissionList list)
+        {
+            list.Events.ForEach((TransmissionEvent e) => Console.WriteLine(TransmissionEventTranslationService.TranslateToString(e)));
+        }
 
         private static MediaInstance createDemoMediaInstance()
         {

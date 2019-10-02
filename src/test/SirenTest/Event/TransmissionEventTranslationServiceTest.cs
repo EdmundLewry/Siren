@@ -1,5 +1,6 @@
 using Xunit;
 using Moq;
+using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,12 @@ namespace SirenTest
             TransmissionEvent transmissionEvent = new TransmissionEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
             
             String translatedEvent = TransmissionEventTranslationService.TranslateToString(transmissionEvent);
-            Assert.Equal("ChangeMe", translatedEvent);
+
+            //Need to create the proper json object here!
+            //Slight problem. How do I handle the fact that the id (and other meta data) might be generated.
+            //I could pass it in. I could use an interface and mock that. I could convert the object a json object
+            //and just query the properties?
+            
         }
     }
 }
