@@ -10,7 +10,6 @@ namespace PBS.Siren
 
         }*/
 
-        //Maybe this should return a hash of playout lists by device name/id?
         public static Dictionary<IDevice, PlayoutList> GeneratePlayoutLists(ChannelList generatedList)
         {
             throw new NotImplementedException();

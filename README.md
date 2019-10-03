@@ -24,3 +24,4 @@ Please let me know if you have any better ideas for this!
 - We need to update the Program (our Application Layer) to take the PlayoutList Dictionary and then deliver it to Devices
 - We probably want to put a device onto it's own thread so that it could simulate playout, which means we then need to start using a time source abstraction and stuff like that
 - Ideally we then throw a "front end" onto it of another thread which can take user input as commands and query the domain objects
+- Handle Event State Updates

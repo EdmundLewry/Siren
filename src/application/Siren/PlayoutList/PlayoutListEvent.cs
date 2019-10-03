@@ -12,10 +12,12 @@ namespace PBS.Siren
         public Guid Id { get; set; }
 
         public PlayoutListEventState EventState { get; set; }
+        public String EventData {get;}
 
-        public PlayoutListEvent()
+        public PlayoutListEvent(String eventData)
         {
-            
+            Id = Guid.NewGuid();
+            EventData = eventData;
         }
     }
 }

@@ -1,5 +1,6 @@
 using Xunit;
 using Moq;
+using Newtonsoft.Json.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -56,20 +57,20 @@ namespace SirenTest
         {
             Dictionary<IDevice,PlayoutList> lists = PlayoutListGenerationService.GeneratePlayoutLists(channelList);
 
-            //I think the next step to have the event data compiled into a single json document. This requires
-            //functions on the strategies and transmission event
-            //This json document can then be passed to the playout list event
-
-            //This won't be ToString eventually. It'll be something like getEventData
             PlayoutList deviceOneList = lists[mockDevice1.Object];
             Assert.Equal(3, deviceOneList.Events.Count);
-            Assert.Equal("Event 1", deviceOneList.Events[0].ToString());
-            Assert.Equal("Event 2", deviceOneList.Events[1].ToString());
-            Assert.Equal("Event 4", deviceOneList.Events[2].ToString());
+
+            JObject eventDataJSON = JObject.Parse(deviceOneList.Events[0].EventData);
+            Assert.Equal(transmissionEvent1.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
+            eventDataJSON = JObject.Parse(deviceOneList.Events[1].EventData);
+            Assert.Equal(transmissionEvent2.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
+            eventDataJSON = JObject.Parse(deviceOneList.Events[2].EventData);
+            Assert.Equal(transmissionEvent4.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
 
             PlayoutList deviceTwoList = lists[mockDevice2.Object];
             Assert.Single(deviceOneList.Events);
-            Assert.Equal("Event 3", deviceOneList.Events[0].ToString());
+            eventDataJSON = JObject.Parse(deviceOneList.Events[0].EventData);
+            Assert.Equal(transmissionEvent3.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
         }
     }
 }
