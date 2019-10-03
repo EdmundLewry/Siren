@@ -9,7 +9,18 @@ My current solution here is that the strategy interfaces will support a generate
 
 Potentially we could go one step further and then create classes which represent the expected data in the document. We could then parse the json document back into a concrete object which we can perform operations on. The aim of this being that we want to leave the data in an abstract form for as little time as possible.
 
+We could also just pass around JObjects, rather than strings. As to do validation on those strings, we have to reconstruct them into JObjects anyway. However, that does tie the data to a particular data format internally (much like Marina is tied to XML).
+
 Please let me know if you have any better ideas for this!
 
 ## Development
 - Please make sure all pull requests into master pass all unit tests!
+
+### To Do
+- Now that we can translate a Transmission event to a JSON data string/object with the TransmissionEventTranslationService, we can add that to the PlayoutListEvent
+- We should update the PlayoutListGenerationServiceTest to cover the expected json data we'd get back from the playout list event
+- We can then implement PlayoutListGenerationService to pass the tests. It should create PlayoutListEvents from the event data, and then assign them to a list hashed on the device it's intended for
+- (We may want to add a PlayoutListEventTranslationService which does this, but that could be overkill to be honest. We have all the event data already.)
+- We need to update the Program (our Application Layer) to take the PlayoutList Dictionary and then deliver it to Devices
+- We probably want to put a device onto it's own thread so that it could simulate playout, which means we then need to start using a time source abstraction and stuff like that
+- Ideally we then throw a "front end" onto it of another thread which can take user input as commands and query the domain objects
