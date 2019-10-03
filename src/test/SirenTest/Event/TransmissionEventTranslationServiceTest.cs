@@ -1,5 +1,6 @@
 using Xunit;
 using Moq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using System;
@@ -19,24 +20,41 @@ namespace SirenTest
         [Fact]
         public void TranslateToString_ShouldMatch()
         {
+            string sourceEventData = "MockStrategy{MockSource=true}";
             var mockSourceStrategy = new Mock<ISourceStrategy>();
-            mockSourceStrategy.Setup(mock => mock.BuildEventData()).Returns("MockStrategy{MockSource=true}");
+            mockSourceStrategy.Setup(mock => mock.BuildEventData()).Returns(sourceEventData);
 
+            string playoutEventData = "MockStrategy{MockPlayout=true}";
             var mockPlayoutStrategy = new Mock<IPlayoutStrategy>();
-            mockPlayoutStrategy.Setup(mock => mock.BuildEventData()).Returns("MockStrategy{MockPlayout=true}");
+            mockPlayoutStrategy.Setup(mock => mock.BuildEventData()).Returns(playoutEventData);
             
+            string timingEventData = "MockStrategy{MockEventTiming=true}";
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
-            mockEventTimingStrategy.Setup(mock => mock.BuildEventData()).Returns("MockStrategy{MockEventTiming=true}");
+            mockEventTimingStrategy.Setup(mock => mock.BuildEventData()).Returns(timingEventData);
 
             TransmissionEvent transmissionEvent = new TransmissionEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
             
             String translatedEvent = TransmissionEventTranslationService.TranslateToString(transmissionEvent);
 
-            //Need to create the proper json object here!
-            //Slight problem. How do I handle the fact that the id (and other meta data) might be generated.
-            //I could pass it in. I could use an interface and mock that. I could convert the object a json object
-            //and just query the properties?
+            JObject rebuiltEvent = JObject.Parse(translatedEvent);
+            Assert.True(rebuiltEvent.ContainsKey("Event"));
+            JObject containedEvent = (JObject)rebuiltEvent["Event"];
             
+            //We don't really care what this is. Just that it's in there
+            Assert.True(containedEvent.ContainsKey("Id"));
+
+            DateTime defaultDateTime = new DateTime();
+            Assert.Equal(defaultDateTime.ToString(), (string)containedEvent["StartTime"]);
+            Assert.Equal(0, (int)containedEvent["Duration"]);
+
+            JObject timingStrategy = (JObject)containedEvent["EventTimingStrategy"];
+            Assert.Equal(timingEventData, (string)timingStrategy["EventData"]);
+
+            JObject playoutStrategy = (JObject)containedEvent["PlayoutStrategy"];
+            Assert.Equal(playoutEventData, (string)playoutStrategy["EventData"]);
+
+            JObject sourceStrategy = (JObject)containedEvent["SourceStrategy"];
+            Assert.Equal(sourceEventData, (string)sourceStrategy["EventData"]);
         }
     }
 }
