@@ -18,7 +18,7 @@ Please let me know if you have any better ideas for this!
 
 ### To Do
 - Now that we can translate a Transmission event to a JSON data string/object with the TransmissionEventTranslationService, we can add that to the PlayoutListEvent
-- We should update the PlayoutListGenerationServiceTest to cover the expected json data we'd get back from the playout list event
+- We should update the PlayoutListGenerationServiceTest to cover the expected json data we'd get back from the playout list event [Done]
 - We can then implement PlayoutListGenerationService to pass the tests. It should create PlayoutListEvents from the event data, and then assign them to a list hashed on the device it's intended for
 - (We may want to add a PlayoutListEventTranslationService which does this, but that could be overkill to be honest. We have all the event data already.)
 - We need to update the Program (our Application Layer) to take the PlayoutList Dictionary and then deliver it to Devices
