@@ -1,5 +1,7 @@
 # Siren
-Siren is a service-based event driven Linear Playout Broadcast Automation system
+Siren currently is an implementation of a particular domain model for Linear Playout Broadcast Automation.
+
+Eventually, I'd like for Siren to become a service-based event driven Linear Playout Broadcast Automation system which expresses this model.
 
 ## Model Implementation Challenges
 ### Disconnect Between Transmission List Events and Playout Events
