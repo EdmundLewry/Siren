@@ -25,5 +25,17 @@ namespace SirenTest
             DateTime startTime = strategy.CalculateStartTime();
             Assert.Equal(target, startTime);
         }
+
+        [Fact]
+        public void BuildEventData_StringShouldBeValidJSON()
+        {
+
+        }
+        
+        [Fact]
+        public void BuildEventData_ShouldContainStartTime()
+        {
+
+        }
     }
 }

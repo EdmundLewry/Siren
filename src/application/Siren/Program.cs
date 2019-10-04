@@ -31,13 +31,13 @@ namespace PBS.Siren
             TransmissionList list = new TransmissionList(events);
             PrintTransmissionListContent(list);
             
-            /*Channel demoChannel = generateChannel(list);
+            Channel demoChannel = generateChannel(list);
 
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
 
             Dictionary<IDevice, PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
-            DeliverPlayoutListsToDevices(playoutLists);*/
+            DeliverPlayoutListsToDevices(playoutLists);
         }
 
         private static void PrintTransmissionListContent(TransmissionList list)
