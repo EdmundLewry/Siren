@@ -68,8 +68,8 @@ namespace SirenTest
             Assert.Equal(transmissionEvent4.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
 
             PlayoutList deviceTwoList = lists[mockDevice2.Object];
-            Assert.Single(deviceOneList.Events);
-            eventDataJSON = JObject.Parse(deviceOneList.Events[0].EventData);
+            Assert.Single(deviceTwoList.Events);
+            eventDataJSON = JObject.Parse(deviceTwoList.Events[0].EventData);
             Assert.Equal(transmissionEvent3.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
         }
     }

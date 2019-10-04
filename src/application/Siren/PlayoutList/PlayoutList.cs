@@ -12,11 +12,11 @@ namespace PBS.Siren
     */
     public class PlayoutList
     {
-        public List<PlayoutListEvent> Events { get; set; }
+        public List<PlayoutListEvent> Events { get; }
         
-        public PlayoutList()
+        public PlayoutList(List<PlayoutListEvent> events)
         {
-            
+            Events = events;
         }
     }
 }
