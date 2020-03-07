@@ -1,0 +1,13 @@
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.exe
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.deps.json
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.runtimeconfig.json
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.runtimeconfig.dev.json
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.dll
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Siren.pdb
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.csprojAssemblyReference.cache
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.AssemblyInfoInputs.cache
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.AssemblyInfo.cs
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.csproj.CopyComplete
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.dll
+C:\Users\ClearBlueSkies\Documents\Programming\Repos\Siren\src\application\Siren\obj\Debug\netcoreapp3.1\Siren.pdb

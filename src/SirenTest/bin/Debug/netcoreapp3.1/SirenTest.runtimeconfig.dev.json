@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\ClearBlueSkies\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\ClearBlueSkies\\.nuget\\packages"
+    ]
+  }
+}
