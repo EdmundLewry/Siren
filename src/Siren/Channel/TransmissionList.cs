@@ -15,10 +15,14 @@ namespace PBS.Siren
      */
     public class TransmissionList
     {
+        public IPlaylist SourceList { get; set; }
+        public IScheduler Scheduler { get; set; }
         public List<TransmissionListEvent> Events { get; }
         
-        public TransmissionList(List<TransmissionListEvent> events)
+        public TransmissionList(List<TransmissionListEvent> events, IPlaylist list, IScheduler listScheduler)
         {
+            Scheduler = listScheduler;
+            SourceList = list;
             Events = events;
         }
     }

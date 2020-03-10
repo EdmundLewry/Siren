@@ -8,17 +8,15 @@ namespace PBS.Siren
     public class Channel
     {
         public IPlayoutChainConfiguration ChainConfiguration { get; set; }
-        public IPlaylist SourceList { get; set; }
         public TransmissionList GeneratedList { get; set; }
-        public IScheduler Scheduler { get; set; }
         
-        public Channel(IPlayoutChainConfiguration channelConfig, IPlaylist list, IScheduler listScheduler)
+        public Channel(IPlayoutChainConfiguration channelConfig, IPlaylist list)
         {
-            Scheduler = listScheduler;
-            SourceList = list;
             ChainConfiguration = channelConfig;
 
-            GeneratedList = listScheduler.GenerateChannelList(list, channelConfig);
+            //TODO:1 This shouldnt be done by the scheduler? I think we want a service that operates on the
+            //playlist separately
+            //GeneratedList = listScheduler.GenerateChannelList(list, channelConfig);
         }
     }
 }

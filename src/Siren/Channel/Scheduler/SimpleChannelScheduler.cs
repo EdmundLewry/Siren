@@ -25,7 +25,7 @@ namespace PBS.Siren
             });
 
             CalculateListTimings(list, channelConfig);
-            return new TransmissionList(events); 
+            return new TransmissionList(events, list, null); 
         }
 
         private TransmissionListEvent TranslateListEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)

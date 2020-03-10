@@ -75,7 +75,7 @@ namespace PBS.Siren
 
             SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
 
-            return new Channel(chainConfiguration, list, scheduler);
+            return new Channel(chainConfiguration, list);
         }
 
         private static void PrintChannelListContent(Channel demoChannel)

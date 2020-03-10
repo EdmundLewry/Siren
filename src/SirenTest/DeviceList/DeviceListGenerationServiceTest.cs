@@ -20,6 +20,7 @@ namespace SirenTest
         PlaylistEvent PlaylistEvent3;
         PlaylistEvent PlaylistEvent4;
 
+        //TODO:1 This should be the scheduler I think
         public DeviceListGenerationServiceTest()
         {
             mockDevice1 = new Mock<IDevice>();
