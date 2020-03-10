@@ -7,10 +7,10 @@ namespace PBS.Siren
      */
     public class Channel
     {
-        public IPlayoutChainConfiguration ChainConfiguration { get; set; }
+        public IVideoChain ChainConfiguration { get; set; }
         public TransmissionList GeneratedList { get; set; }
         
-        public Channel(IPlayoutChainConfiguration channelConfig, IPlaylist list)
+        public Channel(IVideoChain channelConfig, IPlaylist list)
         {
             ChainConfiguration = channelConfig;
 

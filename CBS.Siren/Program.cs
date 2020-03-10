@@ -71,7 +71,7 @@ namespace PBS.Siren
         {
             List<IDevice> devices = new List<IDevice>();
             devices.Add(new DemoDevice("DemoDevice1"));
-            PlayoutChainConfiguration chainConfiguration = new PlayoutChainConfiguration(devices);
+            VideoChain chainConfiguration = new VideoChain(devices);
 
             SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
 

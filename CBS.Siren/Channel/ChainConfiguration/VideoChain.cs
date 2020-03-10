@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 namespace PBS.Siren
 {
-    public class PlayoutChainConfiguration : IPlayoutChainConfiguration
+    public class VideoChain : IVideoChain
     {
         public List<IDevice> ChainDevices { get; }
-        public PlayoutChainConfiguration(List<IDevice> devices)
+        public VideoChain(List<IDevice> devices)
         {
             ChainDevices = devices;
         }
