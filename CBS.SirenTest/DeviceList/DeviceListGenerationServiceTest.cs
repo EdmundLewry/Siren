@@ -41,7 +41,7 @@ namespace SirenTest
             PlaylistEvent4 = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
             TransmissionListEvent event4 = new TransmissionListEvent(PlaylistEvent4, mockDevice1.Object);
             
-            channelList = new TransmissionList(new List<TransmissionListEvent>() {event1, event2, event3, event4});
+            //channelList = new TransmissionList(new List<TransmissionListEvent>() {event1, event2, event3, event4});
         }
 
         [Fact]
