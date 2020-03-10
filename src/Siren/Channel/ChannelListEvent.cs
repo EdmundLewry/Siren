@@ -19,12 +19,12 @@ namespace PBS.Siren
 
 
         //Should it reference a Transmission Event, or be a copy of it's data?
-        public TransmissionEvent RelatedTransmissionEvent { get; set; }
+        public PlaylistEvent RelatedPlaylistEvent { get; set; }
         public IDevice Device { get; set; }
 
-        public ChannelListEvent(TransmissionEvent transmissionEvent, IDevice deviceForPlayout)
+        public ChannelListEvent(PlaylistEvent PlaylistEvent, IDevice deviceForPlayout)
         {
-            RelatedTransmissionEvent = transmissionEvent;
+            RelatedPlaylistEvent = PlaylistEvent;
             Device = deviceForPlayout;
             EventState = new ChannelListEventState();
             Id = Guid.NewGuid();
@@ -33,7 +33,7 @@ namespace PBS.Siren
         public override String ToString()
         {
             //Would like to use Json for this
-            return base.ToString() + ":\nId: " + Id.ToString() + "\nTransmission Event: " + RelatedTransmissionEvent.ToString() + "\nDevice: " + Device.ToString();
+            return base.ToString() + ":\nId: " + Id.ToString() + "\nTransmission Event: " + RelatedPlaylistEvent.ToString() + "\nDevice: " + Device.ToString();
         }
     }
 }

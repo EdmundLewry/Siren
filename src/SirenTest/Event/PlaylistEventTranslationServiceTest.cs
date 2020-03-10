@@ -10,9 +10,9 @@ using PBS.Siren;
 
 namespace SirenTest
 {
-    public class TransmissionEventTranslationServiceTest
+    public class PlaylistEventTranslationServiceTest
     {
-        public TransmissionEventTranslationServiceTest()
+        public PlaylistEventTranslationServiceTest()
         {
             
         }
@@ -32,9 +32,9 @@ namespace SirenTest
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             mockEventTimingStrategy.Setup(mock => mock.BuildEventData()).Returns(timingEventData);
 
-            TransmissionEvent transmissionEvent = new TransmissionEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
+            PlaylistEvent PlaylistEvent = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
             
-            String translatedEvent = TransmissionEventTranslationService.TranslateToString(transmissionEvent);
+            String translatedEvent = PlaylistEventTranslationService.TranslateToString(PlaylistEvent);
 
             JObject rebuiltEvent = JObject.Parse(translatedEvent);
             Assert.True(rebuiltEvent.ContainsKey("Event"));

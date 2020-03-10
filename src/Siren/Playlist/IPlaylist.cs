@@ -4,6 +4,6 @@ namespace PBS.Siren
 {
     public interface IPlaylist
     {
-        List<TransmissionEvent> Events { get; }
+        List<PlaylistEvent> Events { get; }
     }
 }

@@ -18,9 +18,9 @@ namespace PBS.Siren
         //Validates the collection of events in relation to each other when something changes
         //Supports adding, removing, reordering events
         //Supports getting events
-        public List<TransmissionEvent> Events { get; }
+        public List<PlaylistEvent> Events { get; }
         
-        public Playlist(List<TransmissionEvent> listEvents)
+        public Playlist(List<PlaylistEvent> listEvents)
         {
             Events = listEvents;
         }

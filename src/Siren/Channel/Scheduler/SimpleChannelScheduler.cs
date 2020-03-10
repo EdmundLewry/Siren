@@ -16,7 +16,7 @@ namespace PBS.Siren
             //given the source and playout strategies
             List<ChannelListEvent> events = new List<ChannelListEvent>();
 
-            list.Events.ForEach((TransmissionEvent e) => {
+            list.Events.ForEach((PlaylistEvent e) => {
                 ChannelListEvent channelEvent = TranslateListEvent(e, channelConfig);
                 if(channelEvent!=null)
                 {
@@ -28,7 +28,7 @@ namespace PBS.Siren
             return new ChannelList(events); 
         }
 
-        private ChannelListEvent TranslateListEvent(TransmissionEvent e, IPlayoutChainConfiguration channelConfig)
+        private ChannelListEvent TranslateListEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)
         {
             IDevice deviceForPlayout = FindDeviceForEvent(e, channelConfig);
             if(deviceForPlayout == null)
@@ -38,7 +38,7 @@ namespace PBS.Siren
             return new ChannelListEvent(e, deviceForPlayout);
         }
 
-        private IDevice FindDeviceForEvent(TransmissionEvent e, IPlayoutChainConfiguration channelConfig)
+        private IDevice FindDeviceForEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)
         {
             //Should use Linq for this eventually
             if(channelConfig.ChainDevices.Count == 0)
@@ -51,7 +51,7 @@ namespace PBS.Siren
 
         private void CalculateListTimings(IPlaylist list, IPlayoutChainConfiguration channelConfig)
         {
-            list.Events.ForEach((TransmissionEvent e) => e.EventTimingStrategy.CalculateStartTime());
+            list.Events.ForEach((PlaylistEvent e) => e.EventTimingStrategy.CalculateStartTime());
         }
     }
 }

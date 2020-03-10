@@ -26,7 +26,7 @@ namespace PBS.Siren
             MediaInstance demoMedia = createDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
-            List<TransmissionEvent> events = generateTransmissionEvents(demoMedia, startTime);
+            List<PlaylistEvent> events = generatePlaylistEvents(demoMedia, startTime);
             
             Playlist list = new Playlist(events);
             PrintTransmissionListContent(list);
@@ -36,13 +36,13 @@ namespace PBS.Siren
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
 
-            Dictionary<IDevice, PlayoutList> playoutLists = PlayoutListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
+            Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
             DeliverPlayoutListsToDevices(playoutLists);
         }
 
         private static void PrintTransmissionListContent(Playlist list)
         {
-            list.Events.ForEach((TransmissionEvent e) => Console.WriteLine(TransmissionEventTranslationService.TranslateToString(e)));
+            list.Events.ForEach((PlaylistEvent e) => Console.WriteLine(PlaylistEventTranslationService.TranslateToString(e)));
         }
 
         private static MediaInstance createDemoMediaInstance()
@@ -55,15 +55,15 @@ namespace PBS.Siren
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
-        private static List<TransmissionEvent> generateTransmissionEvents(MediaInstance demoMedia, DateTime startTime)
+        private static List<PlaylistEvent> generatePlaylistEvents(MediaInstance demoMedia, DateTime startTime)
         {
             MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia, 0, demoMedia.Duration);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
             FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
-            TransmissionEvent transmissionEvent = new TransmissionEvent(sourceStrategy, playoutStrategy, timingStrategy);
+            PlaylistEvent PlaylistEvent = new PlaylistEvent(sourceStrategy, playoutStrategy, timingStrategy);
 
-            List<TransmissionEvent> events = new List<TransmissionEvent>();
-            events.Add(transmissionEvent);
+            List<PlaylistEvent> events = new List<PlaylistEvent>();
+            events.Add(PlaylistEvent);
             return events;
         }
 
@@ -83,7 +83,7 @@ namespace PBS.Siren
             ChannelList list = demoChannel.GeneratedList;
             list.Events.ForEach(Console.WriteLine);
         }
-        private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, PlayoutList> playoutLists)
+        private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
         {
             throw new NotImplementedException();
         }
