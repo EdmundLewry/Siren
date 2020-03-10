@@ -10,14 +10,14 @@ namespace PBS.Siren
             
         }
 
-        public ChannelList GenerateChannelList(IPlaylist list, IPlayoutChainConfiguration channelConfig)
+        public TransmissionList GenerateChannelList(IPlaylist list, IPlayoutChainConfiguration channelConfig)
         {
             //Work through each event in the list and find the devices in the config that will need to be controlled
             //given the source and playout strategies
-            List<ChannelListEvent> events = new List<ChannelListEvent>();
+            List<TransmissionListEvent> events = new List<TransmissionListEvent>();
 
             list.Events.ForEach((PlaylistEvent e) => {
-                ChannelListEvent channelEvent = TranslateListEvent(e, channelConfig);
+                TransmissionListEvent channelEvent = TranslateListEvent(e, channelConfig);
                 if(channelEvent!=null)
                 {
                     events.Add(channelEvent);
@@ -25,17 +25,17 @@ namespace PBS.Siren
             });
 
             CalculateListTimings(list, channelConfig);
-            return new ChannelList(events); 
+            return new TransmissionList(events); 
         }
 
-        private ChannelListEvent TranslateListEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)
+        private TransmissionListEvent TranslateListEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)
         {
             IDevice deviceForPlayout = FindDeviceForEvent(e, channelConfig);
             if(deviceForPlayout == null)
             {
                 return null;
             }
-            return new ChannelListEvent(e, deviceForPlayout);
+            return new TransmissionListEvent(e, deviceForPlayout);
         }
 
         private IDevice FindDeviceForEvent(PlaylistEvent e, IPlayoutChainConfiguration channelConfig)

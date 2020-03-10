@@ -13,7 +13,7 @@ namespace SirenTest
     {
         Mock<IDevice> mockDevice1;
         Mock<IDevice> mockDevice2;
-        ChannelList channelList;
+        TransmissionList channelList;
 
         PlaylistEvent PlaylistEvent1;
         PlaylistEvent PlaylistEvent2;
@@ -29,18 +29,18 @@ namespace SirenTest
             var mockPlayoutStrategy = new Mock<IPlayoutStrategy>();
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             PlaylistEvent1 = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
-            ChannelListEvent event1 = new ChannelListEvent(PlaylistEvent1, mockDevice1.Object);
+            TransmissionListEvent event1 = new TransmissionListEvent(PlaylistEvent1, mockDevice1.Object);
             
             PlaylistEvent2 = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
-            ChannelListEvent event2 = new ChannelListEvent(PlaylistEvent2, mockDevice1.Object);
+            TransmissionListEvent event2 = new TransmissionListEvent(PlaylistEvent2, mockDevice1.Object);
             
             PlaylistEvent3 = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
-            ChannelListEvent event3 = new ChannelListEvent(PlaylistEvent3, mockDevice2.Object);
+            TransmissionListEvent event3 = new TransmissionListEvent(PlaylistEvent3, mockDevice2.Object);
             
             PlaylistEvent4 = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
-            ChannelListEvent event4 = new ChannelListEvent(PlaylistEvent4, mockDevice1.Object);
+            TransmissionListEvent event4 = new TransmissionListEvent(PlaylistEvent4, mockDevice1.Object);
             
-            channelList = new ChannelList(new List<ChannelListEvent>() {event1, event2, event3, event4});
+            channelList = new TransmissionList(new List<TransmissionListEvent>() {event1, event2, event3, event4});
         }
 
         [Fact]

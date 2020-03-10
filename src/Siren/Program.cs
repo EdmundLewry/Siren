@@ -80,7 +80,7 @@ namespace PBS.Siren
 
         private static void PrintChannelListContent(Channel demoChannel)
         {
-            ChannelList list = demoChannel.GeneratedList;
+            TransmissionList list = demoChannel.GeneratedList;
             list.Events.ForEach(Console.WriteLine);
         }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)

@@ -9,7 +9,7 @@ namespace PBS.Siren
     {
         public IPlayoutChainConfiguration ChainConfiguration { get; set; }
         public IPlaylist SourceList { get; set; }
-        public ChannelList GeneratedList { get; set; }
+        public TransmissionList GeneratedList { get; set; }
         public IScheduler Scheduler { get; set; }
         
         public Channel(IPlayoutChainConfiguration channelConfig, IPlaylist list, IScheduler listScheduler)

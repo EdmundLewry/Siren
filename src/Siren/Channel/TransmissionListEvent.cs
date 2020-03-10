@@ -3,7 +3,7 @@ using System;
 namespace PBS.Siren
 {
     /*
-    A Channel List event is the combination of a particular Transmission Event and
+    A Transmission List event is the combination of a particular Playlist Event and
     a particular set of devices required to fulfil the event.
 
     It allows us to have an understanding of what devices we expect to be used for
@@ -11,29 +11,29 @@ namespace PBS.Siren
     but without needing to interact with the device for every event in the list that would
     use it.
     */
-    public class ChannelListEvent
+    public class TransmissionListEvent
     {
-        public ChannelListEventState EventState { get; set; }
+        public TransmissionListEventState EventState { get; set; }
         //We may want more human readable identifiers
         public Guid Id { get; set; }
 
 
-        //Should it reference a Transmission Event, or be a copy of it's data?
+        //Should it reference a Playlist Event, or be a copy of it's data?
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
         public IDevice Device { get; set; }
 
-        public ChannelListEvent(PlaylistEvent PlaylistEvent, IDevice deviceForPlayout)
+        public TransmissionListEvent(PlaylistEvent PlaylistEvent, IDevice deviceForPlayout)
         {
             RelatedPlaylistEvent = PlaylistEvent;
             Device = deviceForPlayout;
-            EventState = new ChannelListEventState();
+            EventState = new TransmissionListEventState();
             Id = Guid.NewGuid();
         }
 
         public override String ToString()
         {
             //Would like to use Json for this
-            return base.ToString() + ":\nId: " + Id.ToString() + "\nTransmission Event: " + RelatedPlaylistEvent.ToString() + "\nDevice: " + Device.ToString();
+            return base.ToString() + ":\nId: " + Id.ToString() + "\nPlaylist Event: " + RelatedPlaylistEvent.ToString() + "\nDevice: " + Device.ToString();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace SirenTest
         [Fact]
         public void GenerateList_AssignsEventsToDevices()
         {
-            ChannelList generatedList = scheduler.GenerateChannelList(list, config);
+            TransmissionList generatedList = scheduler.GenerateChannelList(list, config);
 
             Assert.Single(generatedList.Events);
 
@@ -45,7 +45,7 @@ namespace SirenTest
         [Fact]
         public void GenerateList_TriggersEventTimingStrategyInEvents()
         {
-            ChannelList generatedList = scheduler.GenerateChannelList(list, config);
+            TransmissionList generatedList = scheduler.GenerateChannelList(list, config);
 
             Assert.Single(generatedList.Events);
 

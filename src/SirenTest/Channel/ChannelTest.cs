@@ -22,7 +22,7 @@ namespace SirenTest
             mockTransmissionList = new Mock<IPlaylist>();
             mockScheduler = new Mock<IScheduler>();
 
-            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IPlayoutChainConfiguration>())).Returns(new ChannelList(new List<ChannelListEvent>()));
+            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IPlayoutChainConfiguration>())).Returns(new TransmissionList(new List<TransmissionListEvent>()));
         }
 
         [Fact]
