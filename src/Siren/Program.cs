@@ -36,7 +36,7 @@ namespace PBS.Siren
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
 
-            Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GeneratePlayoutLists(demoChannel.GeneratedList);
+            Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
             DeliverPlayoutListsToDevices(playoutLists);
         }
 

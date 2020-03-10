@@ -9,7 +9,7 @@ using PBS.Siren;
 
 namespace SirenTest
 {
-    public class PlayoutListGenerationServiceTest
+    public class DeviceListGenerationServiceTest
     {
         Mock<IDevice> mockDevice1;
         Mock<IDevice> mockDevice2;
@@ -20,7 +20,7 @@ namespace SirenTest
         PlaylistEvent PlaylistEvent3;
         PlaylistEvent PlaylistEvent4;
 
-        public PlayoutListGenerationServiceTest()
+        public DeviceListGenerationServiceTest()
         {
             mockDevice1 = new Mock<IDevice>();
             mockDevice2 = new Mock<IDevice>();
@@ -44,18 +44,18 @@ namespace SirenTest
         }
 
         [Fact]
-        public void GeneratePlayoutLists_ShouldCreateOnePlayoutListForEachDevice()
+        public void GenerateDeviceLists_ShouldCreateOneDeviceListForEachDevice()
         {
-            Dictionary<IDevice,DeviceList> lists = DeviceListGenerationService.GeneratePlayoutLists(channelList);
+            Dictionary<IDevice,DeviceList> lists = DeviceListGenerationService.GenerateDeviceLists(channelList);
 
             Assert.True(lists.ContainsKey(mockDevice1.Object));
             Assert.True(lists.ContainsKey(mockDevice2.Object));
         }
 
         [Fact]
-        public void GeneratePlayoutLists_ShouldCreateListsOfOnlyEventsRelatedToOneDevice()
+        public void GenerateDeviceLists_ShouldCreateListsOfOnlyEventsRelatedToOneDevice()
         {
-            Dictionary<IDevice,DeviceList> lists = DeviceListGenerationService.GeneratePlayoutLists(channelList);
+            Dictionary<IDevice,DeviceList> lists = DeviceListGenerationService.GenerateDeviceLists(channelList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
             Assert.Equal(3, deviceOneList.Events.Count);
