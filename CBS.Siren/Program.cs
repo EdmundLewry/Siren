@@ -23,15 +23,15 @@ namespace PBS.Siren
             @ The Device will then report playing the media at the Fixed Start Time, with the positional properties required
             */
 
-            MediaInstance demoMedia = createDemoMediaInstance();
+            MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
-            List<PlaylistEvent> events = generatePlaylistEvents(demoMedia, startTime);
+            List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime);
             
             Playlist list = new Playlist(events);
             PrintTransmissionListContent(list);
             
-            Channel demoChannel = generateChannel(list);
+            Channel demoChannel = GenerateChannel(list);
 
             Console.WriteLine("Channel Created");
             PrintChannelListContent(demoChannel);
@@ -45,7 +45,7 @@ namespace PBS.Siren
             list.Events.ForEach((PlaylistEvent e) => Console.WriteLine(PlaylistEventTranslationService.TranslateToString(e)));
         }
 
-        private static MediaInstance createDemoMediaInstance()
+        private static MediaInstance CreateDemoMediaInstance()
         {
             const int FPS = 25;
             const int mediaDurationSeconds = 30;
@@ -55,7 +55,7 @@ namespace PBS.Siren
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
-        private static List<PlaylistEvent> generatePlaylistEvents(MediaInstance demoMedia, DateTime startTime)
+        private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime)
         {
             MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia, 0, demoMedia.Duration);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
@@ -67,7 +67,7 @@ namespace PBS.Siren
             return events;
         }
 
-        private static Channel generateChannel(Playlist list)
+        private static Channel GenerateChannel(Playlist list)
         {
             List<IDevice> devices = new List<IDevice>();
             devices.Add(new DemoDevice("DemoDevice1"));

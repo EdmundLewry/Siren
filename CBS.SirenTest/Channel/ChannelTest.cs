@@ -24,12 +24,12 @@ namespace SirenTest
             mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IPlayoutChainConfiguration>())).Returns(new TransmissionList(new List<TransmissionListEvent>(), mockTransmissionList.Object, null));
         }
 
-        [Fact]
-        public void Channel_CallsSchedulerGenerate()
-        {
-            channel = new Channel(mockChainConfig.Object, mockTransmissionList.Object);
+        //[Fact]
+        //public void Channel_CallsSchedulerGenerate()
+        //{
+        //    channel = new Channel(mockChainConfig.Object, mockTransmissionList.Object);
 
-            mockScheduler.Verify(mock => mock.GenerateChannelList(mockTransmissionList.Object, mockChainConfig.Object), Times.Once());
-        }
+        //    mockScheduler.Verify(mock => mock.GenerateChannelList(mockTransmissionList.Object, mockChainConfig.Object), Times.Once());
+        //}
     }
 }

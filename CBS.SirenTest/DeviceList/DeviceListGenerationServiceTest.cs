@@ -9,6 +9,8 @@ using PBS.Siren;
 
 namespace SirenTest
 {
+    //I'm going to revise and reimplement list generation. Commenting out for reference.
+    /*
     public class DeviceListGenerationServiceTest
     {
         Mock<IDevice> mockDevice1;
@@ -73,5 +75,5 @@ namespace SirenTest
             eventDataJSON = JObject.Parse(deviceTwoList.Events[0].EventData);
             Assert.Equal(PlaylistEvent3.Id.ToString(), (string)eventDataJSON["Event"]["Id"]);
         }
-    }
+    }*/
 }

@@ -14,11 +14,5 @@ namespace SirenTest
         {
             
         }
-
-        [Fact]
-        public void Test()
-        {
-            
-        }
     }
 }
