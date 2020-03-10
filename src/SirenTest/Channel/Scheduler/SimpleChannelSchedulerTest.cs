@@ -11,7 +11,7 @@ namespace SirenTest
     public class SimpleChannelSchedulerTests
     {
         SimpleChannelScheduler scheduler;
-        TransmissionList list;
+        Playlist list;
         PlayoutChainConfiguration config;
         Mock<IDevice> mockDevice;
         TransmissionEvent transmissionEvent;
@@ -25,7 +25,7 @@ namespace SirenTest
             mockTimingStrategy = new Mock<IEventTimingStrategy>();
             mockTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Now);
             transmissionEvent = new TransmissionEvent(new Mock<ISourceStrategy>().Object, new Mock<IPlayoutStrategy>().Object, mockTimingStrategy.Object);
-            list = new TransmissionList(new List<TransmissionEvent>() {transmissionEvent});
+            list = new Playlist(new List<TransmissionEvent>() {transmissionEvent});
             
             mockDevice = new Mock<IDevice>();
             config = new PlayoutChainConfiguration(new List<IDevice>() { mockDevice.Object });

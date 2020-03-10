@@ -12,7 +12,7 @@ TODO:
  */
 namespace PBS.Siren
 {
-    public class TransmissionList : ITransmissionList
+    public class Playlist : IPlaylist
     {
         //Holds a collection of events
         //Validates the collection of events in relation to each other when something changes
@@ -20,7 +20,7 @@ namespace PBS.Siren
         //Supports getting events
         public List<TransmissionEvent> Events { get; }
         
-        public TransmissionList(List<TransmissionEvent> listEvents)
+        public Playlist(List<TransmissionEvent> listEvents)
         {
             Events = listEvents;
         }

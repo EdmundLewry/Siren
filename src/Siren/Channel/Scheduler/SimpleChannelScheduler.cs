@@ -10,7 +10,7 @@ namespace PBS.Siren
             
         }
 
-        public ChannelList GenerateChannelList(ITransmissionList list, IPlayoutChainConfiguration channelConfig)
+        public ChannelList GenerateChannelList(IPlaylist list, IPlayoutChainConfiguration channelConfig)
         {
             //Work through each event in the list and find the devices in the config that will need to be controlled
             //given the source and playout strategies
@@ -49,7 +49,7 @@ namespace PBS.Siren
             return channelConfig.ChainDevices[0];
         }
 
-        private void CalculateListTimings(ITransmissionList list, IPlayoutChainConfiguration channelConfig)
+        private void CalculateListTimings(IPlaylist list, IPlayoutChainConfiguration channelConfig)
         {
             list.Events.ForEach((TransmissionEvent e) => e.EventTimingStrategy.CalculateStartTime());
         }

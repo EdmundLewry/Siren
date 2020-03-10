@@ -3,11 +3,11 @@ using System;
 namespace PBS.Siren
 {
     /*
-    A transmission event is an item in a Transmission List that defines what should be played out,
+    A playlist event is an item in a Playlist that defines what should be played out,
     for how long, when it should start, where in the channel layout it should be displayed,
     and validates that that data makes sense against the source being represented.
      */
-    public class TransmissionEvent
+    public class PlaylistEvent
     {
         public ISourceStrategy SourceStrategy { get; set; }
         public IPlayoutStrategy PlayoutStrategy { get; set; }
@@ -23,7 +23,7 @@ namespace PBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
         
-        public TransmissionEvent(ISourceStrategy source, IPlayoutStrategy playout, IEventTimingStrategy timingStrategy)
+        public PlaylistEvent(ISourceStrategy source, IPlayoutStrategy playout, IEventTimingStrategy timingStrategy)
         {
             SourceStrategy = source;
             PlayoutStrategy = playout;

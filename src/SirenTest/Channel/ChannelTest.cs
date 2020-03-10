@@ -13,16 +13,16 @@ namespace SirenTest
         Channel channel;
 
         Mock<IPlayoutChainConfiguration> mockChainConfig;
-        Mock<ITransmissionList> mockTransmissionList;
+        Mock<IPlaylist> mockTransmissionList;
         Mock<IScheduler> mockScheduler;
 
         public ChannelTest()
         {
             mockChainConfig = new Mock<IPlayoutChainConfiguration>();
-            mockTransmissionList = new Mock<ITransmissionList>();
+            mockTransmissionList = new Mock<IPlaylist>();
             mockScheduler = new Mock<IScheduler>();
 
-            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<ITransmissionList>(), It.IsAny<IPlayoutChainConfiguration>())).Returns(new ChannelList(new List<ChannelListEvent>()));
+            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IPlayoutChainConfiguration>())).Returns(new ChannelList(new List<ChannelListEvent>()));
         }
 
         [Fact]

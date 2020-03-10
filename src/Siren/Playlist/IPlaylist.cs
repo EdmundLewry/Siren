@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PBS.Siren
 {
-    public interface ITransmissionList
+    public interface IPlaylist
     {
         List<TransmissionEvent> Events { get; }
     }

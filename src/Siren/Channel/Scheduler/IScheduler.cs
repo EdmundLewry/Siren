@@ -10,6 +10,6 @@ namespace PBS.Siren
     */
     public interface IScheduler
     {
-        ChannelList GenerateChannelList(ITransmissionList list, IPlayoutChainConfiguration channelConfig);
+        ChannelList GenerateChannelList(IPlaylist list, IPlayoutChainConfiguration channelConfig);
     }
 }

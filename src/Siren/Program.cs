@@ -28,7 +28,7 @@ namespace PBS.Siren
             DateTime startTime = DateTime.Now.AddSeconds(30);
             List<TransmissionEvent> events = generateTransmissionEvents(demoMedia, startTime);
             
-            TransmissionList list = new TransmissionList(events);
+            Playlist list = new Playlist(events);
             PrintTransmissionListContent(list);
             
             Channel demoChannel = generateChannel(list);
@@ -40,7 +40,7 @@ namespace PBS.Siren
             DeliverPlayoutListsToDevices(playoutLists);
         }
 
-        private static void PrintTransmissionListContent(TransmissionList list)
+        private static void PrintTransmissionListContent(Playlist list)
         {
             list.Events.ForEach((TransmissionEvent e) => Console.WriteLine(TransmissionEventTranslationService.TranslateToString(e)));
         }
@@ -67,7 +67,7 @@ namespace PBS.Siren
             return events;
         }
 
-        private static Channel generateChannel(TransmissionList list)
+        private static Channel generateChannel(Playlist list)
         {
             List<IDevice> devices = new List<IDevice>();
             devices.Add(new DemoDevice("DemoDevice1"));
