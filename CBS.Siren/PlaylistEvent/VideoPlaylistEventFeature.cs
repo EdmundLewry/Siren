@@ -4,11 +4,13 @@ namespace CBS.Siren
     {
         public IPlayoutStrategy PlayoutStrategy { get; set; }
         public ISourceStrategy SourceStrategy { get; set; }
+        private IFeaturePropertiesFactory PropertiesFactory { get; set; }
 
-        public VideoPlaylistEventFeature(IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy)
+        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance)
         {
-            PlayoutStrategy = playoutStrategy;
-            SourceStrategy = sourceStrategy;
+            PropertiesFactory = factory;
+            PlayoutStrategy = PropertiesFactory.CreatePrimaryVideoPlayoutStrategy();
+            SourceStrategy = PropertiesFactory.CreateMediaSourceStrategy(mediaInstance);
         }
     }
 }

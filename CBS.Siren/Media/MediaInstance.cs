@@ -15,19 +15,14 @@ namespace CBS.Siren
      */
     public class MediaInstance
     {
-        public String Name { get; } 
+        public string Name { get; } 
 
         //This will need to become a timecode
         public int Duration { get; } //currently in number of frames (assuming 25FPS)
-        public String FilePath { get; }
+        public string FilePath { get; }
         public FileType InstanceFileType { get; }
 
-        public MediaInstance()
-        {
-
-        }
-
-        public MediaInstance(String instanceName, int totalDurationInFrames, String instanceFilePath, FileType type)
+        public MediaInstance(string instanceName = "", int totalDurationInFrames = 0, string instanceFilePath = "", FileType type = FileType.TEXT)
         {
             Name = instanceName;
             Duration = totalDurationInFrames;

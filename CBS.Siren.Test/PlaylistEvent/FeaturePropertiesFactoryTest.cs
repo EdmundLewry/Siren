@@ -11,15 +11,8 @@ namespace CBS.Siren.Test
         {
             IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
 
-            Assert.IsType<MediaSourceStrategy>(featurePropertiesFactory.CreateSourceStrategy("media"));
-        }
-        
-        [Fact]
-        public void CreateSourceStrategy_WithAnInvalidType_ReturnsNull()
-        {
-            IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
-
-            Assert.Null(featurePropertiesFactory.CreateSourceStrategy("invalid"));
+            MediaInstance mediaInstance = new MediaInstance("test");
+            Assert.IsType<MediaSourceStrategy>(featurePropertiesFactory.CreateMediaSourceStrategy(mediaInstance));
         }
         
         [Fact]
@@ -27,15 +20,7 @@ namespace CBS.Siren.Test
         {
             IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
 
-            Assert.IsType<PrimaryVideoPlayoutStrategy>(featurePropertiesFactory.CreatePlayoutStrategy("primaryVideo"));
-        }
-
-        [Fact]
-        public void CreatePlayoutStrategy_WithAnInvalidType_ReturnsNull()
-        {
-            IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
-
-            Assert.Null(featurePropertiesFactory.CreatePlayoutStrategy("invalid"));
+            Assert.IsType<PrimaryVideoPlayoutStrategy>(featurePropertiesFactory.CreatePrimaryVideoPlayoutStrategy());
         }
     }
 }

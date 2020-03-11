@@ -6,30 +6,15 @@ namespace CBS.Siren
 {
     public class FeaturePropertiesFactory : IFeaturePropertiesFactory
     {
-        const string PRIMARY_VIDEO_PLAYOUT_STRATEGY = "primaryVideo";
-        const string MEIDA_SOURCE_STRATEGY = "media";
 
-        public FeaturePropertiesFactory()
+        public IPlayoutStrategy CreatePrimaryVideoPlayoutStrategy()
         {
-            
+            return new PrimaryVideoPlayoutStrategy();
         }
 
-        public IPlayoutStrategy CreatePlayoutStrategy(string type)
+        public ISourceStrategy CreateMediaSourceStrategy(MediaInstance mediaInstance)
         {
-            return type switch
-            {
-                PRIMARY_VIDEO_PLAYOUT_STRATEGY => new PrimaryVideoPlayoutStrategy(),
-                _ => null
-            };
-        }
-
-        public ISourceStrategy CreateSourceStrategy(string type)
-        {
-            return type switch
-            {
-                MEIDA_SOURCE_STRATEGY => new MediaSourceStrategy(new MediaInstance(), 0, 0),
-                _ => null
-            };
+            return new MediaSourceStrategy(mediaInstance, 0, mediaInstance.Duration);
         }
     }
 }
