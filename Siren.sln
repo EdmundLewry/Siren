@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29905.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.Siren", "CBS.Siren\CBS.Siren.csproj", "{5B723D2C-DB1A-4345-8556-55801DA0516E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.Siren.Test", "CBS.SirenTest\CBS.Siren.Test.csproj", "{DA497DAB-362F-49C3-B185-86FE4EA48E0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.Siren.Test", "CBS.Siren.Test\CBS.Siren.Test.csproj", "{98841694-D5D4-430A-9B88-1054F740AF99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{5B723D2C-DB1A-4345-8556-55801DA0516E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B723D2C-DB1A-4345-8556-55801DA0516E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B723D2C-DB1A-4345-8556-55801DA0516E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA497DAB-362F-49C3-B185-86FE4EA48E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA497DAB-362F-49C3-B185-86FE4EA48E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA497DAB-362F-49C3-B185-86FE4EA48E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA497DAB-362F-49C3-B185-86FE4EA48E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98841694-D5D4-430A-9B88-1054F740AF99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98841694-D5D4-430A-9B88-1054F740AF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98841694-D5D4-430A-9B88-1054F740AF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98841694-D5D4-430A-9B88-1054F740AF99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
