@@ -60,7 +60,9 @@ namespace CBS.Siren
             MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia, 0, demoMedia.Duration);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
             FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
-            PlaylistEvent PlaylistEvent = new PlaylistEvent(sourceStrategy, playoutStrategy, timingStrategy);
+            //TODO:3 Should the feature takecare of this? Potentially we need to pass a factory for this
+            VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(playoutStrategy, sourceStrategy);
+            PlaylistEvent PlaylistEvent = new PlaylistEvent(new List<IPlaylistEventFeature>() { videoFeature }, timingStrategy);
 
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             events.Add(PlaylistEvent);

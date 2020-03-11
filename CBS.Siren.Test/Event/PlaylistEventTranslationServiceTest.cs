@@ -20,19 +20,13 @@ namespace SirenTest
         [Fact]
         public void TranslateToString_ShouldMatch()
         {
-            string sourceEventData = "MockStrategy{MockSource=true}";
-            var mockSourceStrategy = new Mock<ISourceStrategy>();
-            mockSourceStrategy.Setup(mock => mock.BuildEventData()).Returns(sourceEventData);
+            var mockEventFeature = new Mock<IPlaylistEventFeature>();
 
-            string playoutEventData = "MockStrategy{MockPlayout=true}";
-            var mockPlayoutStrategy = new Mock<IPlayoutStrategy>();
-            mockPlayoutStrategy.Setup(mock => mock.BuildEventData()).Returns(playoutEventData);
-            
             string timingEventData = "MockStrategy{MockEventTiming=true}";
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             mockEventTimingStrategy.Setup(mock => mock.BuildEventData()).Returns(timingEventData);
 
-            PlaylistEvent PlaylistEvent = new PlaylistEvent(mockSourceStrategy.Object, mockPlayoutStrategy.Object, mockEventTimingStrategy.Object);
+            PlaylistEvent PlaylistEvent = new PlaylistEvent(new List<IPlaylistEventFeature>() { mockEventFeature.Object }, mockEventTimingStrategy.Object);
             
             String translatedEvent = PlaylistEventTranslationService.TranslateToString(PlaylistEvent);
 
@@ -49,12 +43,6 @@ namespace SirenTest
 
             JObject timingStrategy = (JObject)containedEvent["EventTimingStrategy"];
             Assert.Equal(timingEventData, (string)timingStrategy["EventData"]);
-
-            JObject playoutStrategy = (JObject)containedEvent["PlayoutStrategy"];
-            Assert.Equal(playoutEventData, (string)playoutStrategy["EventData"]);
-
-            JObject sourceStrategy = (JObject)containedEvent["SourceStrategy"];
-            Assert.Equal(sourceEventData, (string)sourceStrategy["EventData"]);
         }
     }
 }

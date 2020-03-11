@@ -14,9 +14,7 @@ namespace CBS.Siren
                                                                     new JProperty("Id", PlaylistEvent.Id),
                                                                     new JProperty("StartTime", PlaylistEvent.StartTime),
                                                                     new JProperty("Duration", PlaylistEvent.Duration),
-                                                                    new JProperty("EventTimingStrategy", new JObject(new JProperty("EventData", PlaylistEvent.EventTimingStrategy.BuildEventData()))),
-                                                                    new JProperty("PlayoutStrategy", new JObject(new JProperty("EventData", PlaylistEvent.PlayoutStrategy.BuildEventData()))),
-                                                                    new JProperty("SourceStrategy", new JObject(new JProperty("EventData", PlaylistEvent.SourceStrategy.BuildEventData()))))));
+                                                                    new JProperty("EventTimingStrategy", new JObject(new JProperty("EventData", PlaylistEvent.EventTimingStrategy.BuildEventData()))))));
             return eventObject.ToString();
         } 
     }
