@@ -22,6 +22,11 @@ namespace CBS.Siren
         public String FilePath { get; }
         public FileType InstanceFileType { get; }
 
+        public MediaInstance()
+        {
+
+        }
+
         public MediaInstance(String instanceName, int totalDurationInFrames, String instanceFilePath, FileType type)
         {
             Name = instanceName;

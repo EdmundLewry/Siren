@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 using CBS.Siren;
 
-namespace SirenTest
+namespace CBS.Siren.Test
 {
     public class PlaylistEventTranslationServiceTest
     {
