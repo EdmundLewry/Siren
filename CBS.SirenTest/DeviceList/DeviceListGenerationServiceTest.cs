@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 
-using PBS.Siren;
+using CBS.Siren;
 
 namespace SirenTest
 {

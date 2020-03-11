@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     //Should this be some abstraction for video, graphics, audio, and subtitle file types?
     public enum FileType

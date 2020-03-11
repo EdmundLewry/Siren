@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Scheduler takes a Transmision List and a Playout Chain Configuration and applies logic to it to

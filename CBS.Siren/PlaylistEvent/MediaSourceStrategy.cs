@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     The Media Source strategy defines what Media will be played out for an event,

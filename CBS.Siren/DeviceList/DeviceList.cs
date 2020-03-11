@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     The Device List is a collection of Playout Events which define what will functionality

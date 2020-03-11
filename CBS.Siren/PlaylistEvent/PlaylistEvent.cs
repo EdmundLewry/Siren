@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A playlist event is an item in a Playlist that defines what should be played out,

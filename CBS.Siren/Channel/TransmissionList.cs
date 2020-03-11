@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Transmission List is a list of Transmission Events which reference PLaylist Events

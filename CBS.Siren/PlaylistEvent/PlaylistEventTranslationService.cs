@@ -3,7 +3,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class PlaylistEventTranslationService
     {

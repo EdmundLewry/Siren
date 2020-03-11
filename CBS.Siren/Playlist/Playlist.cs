@@ -10,7 +10,7 @@ that this list makes sense to play out.
 TODO:
 - Should this be an immutable object?
  */
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class Playlist : IPlaylist
     {

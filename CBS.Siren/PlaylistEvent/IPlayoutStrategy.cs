@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A playout strategy is a piece of logic and series of data that defines where in the layout

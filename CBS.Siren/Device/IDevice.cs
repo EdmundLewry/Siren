@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Device is an abstraction for any device required to perform the playout of a list

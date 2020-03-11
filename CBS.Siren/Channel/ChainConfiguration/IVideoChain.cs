@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Playout Chain Configuration is the specific set of devices and their inter-connections

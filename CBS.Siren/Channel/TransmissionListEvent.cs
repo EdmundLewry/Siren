@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Transmission List event is the combination of a particular Playlist Event and

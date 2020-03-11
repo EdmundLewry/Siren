@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A channel is a logical combination of a particular transmission list, 1 or more Payout Chain

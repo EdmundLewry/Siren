@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class DeviceListEventState
     {

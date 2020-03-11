@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class DeviceListGenerationService
     {

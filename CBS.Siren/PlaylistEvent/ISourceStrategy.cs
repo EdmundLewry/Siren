@@ -1,5 +1,5 @@
 using System;
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Source Strategy is the series of data that defines what the input of the event is.

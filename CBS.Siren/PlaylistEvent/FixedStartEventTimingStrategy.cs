@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class FixedStartEventTimingStrategy : IEventTimingStrategy
     {

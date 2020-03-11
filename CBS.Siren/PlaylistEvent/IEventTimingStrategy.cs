@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     An Event Timing Strategy is the logic for an individual Transmission Event which is used to generate
