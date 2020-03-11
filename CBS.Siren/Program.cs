@@ -29,18 +29,18 @@ namespace PBS.Siren
             List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime);
             
             Playlist list = new Playlist(events);
-            PrintTransmissionListContent(list);
+            PrintPlaylistContent(list);
             
             Channel demoChannel = GenerateChannel(list);
 
             Console.WriteLine("Channel Created");
-            PrintChannelListContent(demoChannel);
+            PrintTransmissionListContent(demoChannel);
 
-            Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
-            DeliverPlayoutListsToDevices(playoutLists);
+            //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
+            //DeliverPlayoutListsToDevices(playoutLists);
         }
 
-        private static void PrintTransmissionListContent(Playlist list)
+        private static void PrintPlaylistContent(Playlist list)
         {
             list.Events.ForEach((PlaylistEvent e) => Console.WriteLine(PlaylistEventTranslationService.TranslateToString(e)));
         }
@@ -69,18 +69,17 @@ namespace PBS.Siren
 
         private static Channel GenerateChannel(Playlist list)
         {
+            //TODO:3 Will need to configure this with a list
             List<IDevice> devices = new List<IDevice>();
             devices.Add(new DemoDevice("DemoDevice1"));
             VideoChain chainConfiguration = new VideoChain(devices);
 
-            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
-
-            return new Channel(chainConfiguration, list);
+            return new Channel(chainConfiguration);
         }
 
-        private static void PrintChannelListContent(Channel demoChannel)
+        private static void PrintTransmissionListContent(Channel demoChannel)
         {
-            TransmissionList list = demoChannel.GeneratedList;
+            TransmissionList list = demoChannel.ConfiguredList;
             list.Events.ForEach(Console.WriteLine);
         }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
