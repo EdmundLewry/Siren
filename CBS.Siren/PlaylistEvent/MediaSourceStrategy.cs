@@ -26,9 +26,12 @@ namespace CBS.Siren
             EOM = eom;
         }
 
-        public string BuildEventData()
+        public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return "MediaSourceStrategy:" +
+            $"\nMedia Name:  {Instance.Name}" +
+            $"\nSOM: {SOM}" +
+            $"\nEOM: {EOM}";
         }
     }
 }

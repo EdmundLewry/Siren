@@ -12,6 +12,6 @@ namespace CBS.Siren
     */
     public interface IPlayoutStrategy
     {
-        String BuildEventData();
+        //String BuildEventData();
     }
 }

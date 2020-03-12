@@ -7,9 +7,9 @@ namespace CBS.Siren
             
         }
 
-        public string BuildEventData()
+        public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return "PrimaryVideoPlayoutStrategy";
         }
     }
 }

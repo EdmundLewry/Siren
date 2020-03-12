@@ -36,7 +36,7 @@ namespace CBS.Siren
                     playoutEventLists[channelEvent.Device] = new List<DeviceListEvent>();
                 }
 
-                playoutEventLists[channelEvent.Device].Add(new DeviceListEvent(PlaylistEventTranslationService.TranslateToString(channelEvent.RelatedPlaylistEvent)));
+                playoutEventLists[channelEvent.Device].Add(new DeviceListEvent(channelEvent.RelatedPlaylistEvent.ToJson().ToString()));
             });
             
             return playoutEventLists;

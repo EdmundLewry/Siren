@@ -16,9 +16,10 @@ namespace CBS.Siren
             return TargetStartTime;
         }
 
-        public string BuildEventData()
+        public override string ToString()
         {
-            throw new NotImplementedException();
+            return "FixedStartEventTimingStrategy:" +
+            $"TargetStartTime: {TargetStartTime}";
         }
     }
 }

@@ -31,10 +31,10 @@ namespace CBS.Siren
             Playlist list = new Playlist(events);
             PrintPlaylistContent(list);
             
-            Channel demoChannel = GenerateChannel(list);
+            /*Channel demoChannel = GenerateChannel(list);
 
             Console.WriteLine("Channel Created");
-            PrintTransmissionListContent(demoChannel);
+            PrintTransmissionListContent(demoChannel);*/
 
             //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
             //DeliverPlayoutListsToDevices(playoutLists);
@@ -42,7 +42,7 @@ namespace CBS.Siren
 
         private static void PrintPlaylistContent(Playlist list)
         {
-            list.Events.ForEach((PlaylistEvent e) => Console.WriteLine(PlaylistEventTranslationService.TranslateToString(e)));
+            list.Events.ForEach((playlistEvent) => Console.WriteLine(playlistEvent.ToString()));
         }
 
         private static MediaInstance CreateDemoMediaInstance()

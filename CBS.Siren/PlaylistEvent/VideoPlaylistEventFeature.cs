@@ -12,5 +12,12 @@ namespace CBS.Siren
             PlayoutStrategy = PropertiesFactory.CreatePrimaryVideoPlayoutStrategy();
             SourceStrategy = PropertiesFactory.CreateMediaSourceStrategy(mediaInstance);
         }
+
+        public override string ToString()
+        {
+            return "VideoPlaylistEventFeature:" +
+            $"\nPlayout Strategy: {PlayoutStrategy.ToString()}" +
+            $"\nSource Strategy: {SourceStrategy.ToString()}";
+        }  
     }
 }

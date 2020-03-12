@@ -24,11 +24,11 @@ namespace CBS.Siren.Test
 
             string timingEventData = "MockStrategy{MockEventTiming=true}";
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
-            mockEventTimingStrategy.Setup(mock => mock.BuildEventData()).Returns(timingEventData);
+            mockEventTimingStrategy.Setup(mock => mock.ToString()).Returns(timingEventData);
 
             PlaylistEvent PlaylistEvent = new PlaylistEvent(new List<IPlaylistEventFeature>() { mockEventFeature.Object }, mockEventTimingStrategy.Object);
             
-            String translatedEvent = PlaylistEventTranslationService.TranslateToString(PlaylistEvent);
+            String translatedEvent = PlaylistEventExtensions.ToJson(PlaylistEvent).ToString();
 
             JObject rebuiltEvent = JObject.Parse(translatedEvent);
             Assert.True(rebuiltEvent.ContainsKey("Event"));

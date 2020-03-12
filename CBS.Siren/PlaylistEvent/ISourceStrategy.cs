@@ -9,6 +9,6 @@ namespace CBS.Siren
     */
     public interface ISourceStrategy
     {
-        String BuildEventData();
+        //String BuildEventData();
     }
 }

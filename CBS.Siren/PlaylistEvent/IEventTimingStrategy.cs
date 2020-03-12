@@ -12,6 +12,6 @@ namespace CBS.Siren
     public interface IEventTimingStrategy
     {
         DateTime CalculateStartTime();
-        String BuildEventData();
+        string ToString();
     }
 }

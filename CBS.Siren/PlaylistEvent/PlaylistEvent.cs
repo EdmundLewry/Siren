@@ -30,9 +30,19 @@ namespace CBS.Siren
             Id = Guid.NewGuid();
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            return base.ToString() + " Id: " + Id.ToString() + " StartTime: " + StartTime;
+            string returnValue =  $"{base.ToString()}" + 
+                    $"\nId: {Id.ToString()}" +
+                    $"\nStartTime: {StartTime} Duration: {Duration}" +
+                    $"\nTimingStategy: {EventTimingStrategy.ToString()}";
+            
+            foreach(IPlaylistEventFeature feature in EventFeatures)
+            {
+                returnValue = returnValue + $"\nEvent Feature: {feature.ToString()}";
+            }
+
+            return returnValue;
         }
     }
 }
