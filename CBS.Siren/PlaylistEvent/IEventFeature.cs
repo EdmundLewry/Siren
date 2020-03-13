@@ -1,6 +1,6 @@
 namespace CBS.Siren
 {
-    public interface IPlaylistEventFeature
+    public interface IEventFeature
     {
         IPlayoutStrategy PlayoutStrategy { get; set; }
         ISourceStrategy SourceStrategy { get; set; }       

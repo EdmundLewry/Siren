@@ -59,7 +59,7 @@ namespace CBS.Siren
         {
             FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
             VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
-            PlaylistEvent playlistEvent = new PlaylistEvent(new List<IPlaylistEventFeature>() { videoFeature }, timingStrategy);
+            PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
 
             List<PlaylistEvent> events = new List<PlaylistEvent>() {
                 playlistEvent

@@ -10,7 +10,7 @@ namespace CBS.Siren
      */
     public class PlaylistEvent
     {
-        public IEnumerable<IPlaylistEventFeature> EventFeatures { get; set; }
+        public IEnumerable<IEventFeature> EventFeatures { get; set; }
         public IEventTimingStrategy EventTimingStrategy { get; set; }
 
         //This should be in timecode
@@ -23,7 +23,7 @@ namespace CBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
         
-        public PlaylistEvent(IEnumerable<IPlaylistEventFeature> features, IEventTimingStrategy timingStrategy)
+        public PlaylistEvent(IEnumerable<IEventFeature> features, IEventTimingStrategy timingStrategy)
         {
             EventFeatures = features;
             EventTimingStrategy = timingStrategy;
@@ -37,7 +37,7 @@ namespace CBS.Siren
                     $"\nStartTime: {StartTime} Duration: {Duration}" +
                     $"\nTimingStategy: {EventTimingStrategy.ToString()}";
             
-            foreach(IPlaylistEventFeature feature in EventFeatures)
+            foreach(IEventFeature feature in EventFeatures)
             {
                 returnValue = returnValue + $"\nEvent Feature: {feature.ToString()}";
             }

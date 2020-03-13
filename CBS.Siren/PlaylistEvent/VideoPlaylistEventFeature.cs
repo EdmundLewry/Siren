@@ -1,6 +1,6 @@
 namespace CBS.Siren
 {
-    public class VideoPlaylistEventFeature : IPlaylistEventFeature
+    public class VideoPlaylistEventFeature : IEventFeature
     {
         public IPlayoutStrategy PlayoutStrategy { get; set; }
         public ISourceStrategy SourceStrategy { get; set; }

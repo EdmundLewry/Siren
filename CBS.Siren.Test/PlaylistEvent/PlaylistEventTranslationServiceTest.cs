@@ -12,21 +12,18 @@ namespace CBS.Siren.Test
 {
     public class PlaylistEventTranslationServiceTest
     {
-        public PlaylistEventTranslationServiceTest()
-        {
-            
-        }
-
+        //Will reimplement this functionality and introduce tests at the time
+        /*
         [Fact]
         public void TranslateToString_ShouldMatch()
         {
-            var mockEventFeature = new Mock<IPlaylistEventFeature>();
+            var mockEventFeature = new Mock<IEventFeature>();
 
             string timingEventData = "MockStrategy{MockEventTiming=true}";
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             mockEventTimingStrategy.Setup(mock => mock.ToString()).Returns(timingEventData);
 
-            PlaylistEvent PlaylistEvent = new PlaylistEvent(new List<IPlaylistEventFeature>() { mockEventFeature.Object }, mockEventTimingStrategy.Object);
+            PlaylistEvent PlaylistEvent = new PlaylistEvent(new List<IEventFeature>() { mockEventFeature.Object }, mockEventTimingStrategy.Object);
             
             String translatedEvent = PlaylistEventExtensions.ToJson(PlaylistEvent).ToString();
 
@@ -44,5 +41,6 @@ namespace CBS.Siren.Test
             JObject timingStrategy = (JObject)containedEvent["EventTimingStrategy"];
             Assert.Equal(timingEventData, (string)timingStrategy["EventData"]);
         }
+        */
     }
 }

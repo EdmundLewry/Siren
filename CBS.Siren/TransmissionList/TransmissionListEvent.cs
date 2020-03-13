@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace CBS.Siren
 {
@@ -17,14 +18,18 @@ namespace CBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
 
+        List<IEventFeature> EventFeatures { get; set; }
 
-        //Should it reference a Playlist Event, or be a copy of it's data?
+        //I think this should just be a way to reference the related playlist event
+        //There may not be a related event, so this could be null. We may choose to do
+        //this with an id, but no reason not to store the event right now
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
         public IDevice Device { get; set; }
 
-        public TransmissionListEvent(PlaylistEvent PlaylistEvent, IDevice deviceForPlayout)
+        public TransmissionListEvent(IDevice deviceForPlayout, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
             RelatedPlaylistEvent = PlaylistEvent;
+            EventFeatures = features;
             Device = deviceForPlayout;
             EventState = new TransmissionListEventState();
             Id = Guid.NewGuid();
@@ -32,8 +37,16 @@ namespace CBS.Siren
 
         public override String ToString()
         {
-            //Would like to use Json for this
-            return base.ToString() + ":\nId: " + Id.ToString() + "\nPlaylist Event: " + RelatedPlaylistEvent.ToString() + "\nDevice: " + Device.ToString();
+            string returnValue =  base.ToString() + 
+                    $":\nId: {Id}" + 
+                    $"\nPlaylist Event: {RelatedPlaylistEvent.Id}" + 
+                    $"\nDevice: {Device.ToString()}";
+
+            EventFeatures.ForEach((feature) => {
+                returnValue = returnValue + $"\nEventFeature: {feature.ToString()}";
+            });
+
+            return returnValue;
         }
     }
 }
