@@ -3,16 +3,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace CBS.Siren
 {
-    public class PrimaryVideoPlayoutStrategy : IPlayoutStrategy, IEquatable<PrimaryVideoPlayoutStrategy>
+    public class PrimaryVideoPlayoutStrategy : IPlayoutStrategy
     {
-        public PrimaryVideoPlayoutStrategy()
-        {
-            
-        }
+        public string StrategyType => "primaryVideo";
 
-        public bool Equals([AllowNull] PrimaryVideoPlayoutStrategy other)
+        public bool Equals([AllowNull] IPlayoutStrategy other)
         {
-            return other != null;
+            return other is PrimaryVideoPlayoutStrategy;
         }
 
         public override string ToString()

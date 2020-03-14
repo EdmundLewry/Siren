@@ -10,18 +10,16 @@ namespace CBS.Siren
         public ISourceStrategy SourceStrategy { get; set; }
         private IFeaturePropertiesFactory PropertiesFactory { get; set; }
 
-        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance)
-        {
-            PropertiesFactory = factory;
-            PlayoutStrategy = PropertiesFactory.CreatePrimaryVideoPlayoutStrategy();
-            SourceStrategy = PropertiesFactory.CreateMediaSourceStrategy(mediaInstance);
-        }
-        
         public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy)
         {
             PropertiesFactory = factory;
             PlayoutStrategy = playoutStrategy;
             SourceStrategy = sourceStrategy;
+        }
+
+        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance) :
+            this(factory, factory.CreatePrimaryVideoPlayoutStrategy(), factory.CreateMediaSourceStrategy(mediaInstance))
+        {
         }
 
         public override string ToString()

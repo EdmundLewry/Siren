@@ -31,7 +31,9 @@ namespace CBS.Siren
         {
             return feature.FeatureType switch
             {
-                "video" => new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), feature.PlayoutStrategy, feature.SourceStrategy),
+                "video" => new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), 
+                                                        ConstructPlayoutStrategyFromType(feature.PlayoutStrategy), 
+                                                        ConstructSourceStrategyFromType(feature.SourceStrategy)),
                 _ => null
             };
         }
@@ -41,6 +43,24 @@ namespace CBS.Siren
             return eventTimingStrategy.StrategyType switch
             {
                 "fixed" => new FixedStartEventTimingStrategy(eventTimingStrategy),
+                _ => null
+            };
+        }
+
+        private static IPlayoutStrategy ConstructPlayoutStrategyFromType(IPlayoutStrategy playoutStrategy)
+        {
+            return playoutStrategy.StrategyType switch
+            {
+                "primaryVideo" => new PrimaryVideoPlayoutStrategy(),
+                _ => null
+            };
+        }
+
+        private static ISourceStrategy ConstructSourceStrategyFromType(ISourceStrategy sourceStrategy)
+        {
+            return sourceStrategy.StrategyType switch
+            {
+                "mediaSource" => new MediaSourceStrategy(sourceStrategy),
                 _ => null
             };
         }

@@ -10,8 +10,8 @@ namespace CBS.Siren
     relate to Graphics (what layer, position, and dimensions to use to display the event contents), it could
     relate to audio or subtitles potentially.
     */
-    public interface IPlayoutStrategy
+    public interface IPlayoutStrategy : IEquatable<IPlayoutStrategy>
     {
-        //String BuildEventData();
+        string StrategyType { get; }
     }
 }
