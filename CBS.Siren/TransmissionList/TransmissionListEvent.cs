@@ -46,13 +46,14 @@ namespace CBS.Siren
         {
             string returnValue =  base.ToString() + 
                     $":\nId: {Id}" +
-                    $"\nExpectedStartTime: {ExpectedStartTime} ExpectedDuration: {ExpectedDuration}" +
-                    $"\nTimingStategy: {EventTimingStrategy.ToString()}" +
-                    $"\nPlaylist Event: {RelatedPlaylistEvent.Id}" + 
-                    $"\nDevice: {Device?.ToString()}";
+                    $"\nExpectedStartTime: {ExpectedStartTime}" +
+                    $"\nExpectedDuration: {ExpectedDuration}" +
+                    $"\nTimingStategy - {EventTimingStrategy.ToString()}" +
+                    $"\nRelated Playlist Event Id: {RelatedPlaylistEvent.Id}" + 
+                    $"\nDevice - {Device?.ToString()}";
 
             EventFeatures.ForEach((feature) => {
-                returnValue = returnValue + $"\nEventFeature: {feature.ToString()}";
+                returnValue = returnValue + $"\nEventFeature - {feature.ToString()}";
             });
 
             return returnValue;

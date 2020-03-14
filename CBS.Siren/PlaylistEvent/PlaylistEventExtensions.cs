@@ -13,8 +13,6 @@ namespace CBS.Siren
                                         new JProperty("Event", 
                                             new JObject(
                                                 new JProperty("Id", PlaylistEvent.Id),
-                                                new JProperty("StartTime", PlaylistEvent.StartTime),
-                                                new JProperty("Duration", PlaylistEvent.Duration),
                                                 new JProperty("EventTimingStrategy", 
                                                     new JObject(
                                                         new JProperty("EventTimingData", PlaylistEvent.EventTimingStrategy.ToString())

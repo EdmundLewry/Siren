@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CBS.Siren.Time;
 
 namespace CBS.Siren
 {
@@ -27,7 +28,7 @@ namespace CBS.Siren
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
-            List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime);
+            List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime, 3);
             
             Playlist list = new Playlist(events);
             PrintPlaylistContent(list);
@@ -66,15 +67,18 @@ namespace CBS.Siren
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
-        private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime)
+        private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
         {
-            FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
-            VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
-            PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
+            List<PlaylistEvent> events = new List<PlaylistEvent>();
+            for (int i = 0; i < eventCount; ++i)
+            {
+                int additionalSeconds = (demoMedia.Duration / TimeSource.SYSTEM_FRAMERATE) * i;
+                FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
+                VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
+                PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
+                events.Add(playlistEvent);
+            }
 
-            List<PlaylistEvent> events = new List<PlaylistEvent>() {
-                playlistEvent
-            };
             return events;
         }
 

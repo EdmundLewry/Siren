@@ -13,10 +13,6 @@ namespace CBS.Siren
         public IEnumerable<IEventFeature> EventFeatures { get; set; }
         public IEventTimingStrategy EventTimingStrategy { get; set; }
 
-        //This should be in timecode
-        public int Duration { get; set; } //Currently in frames (assuming 25FPS)
-        //Should be in timecode
-        public DateTime StartTime { get; set; }
         public bool IsValid { get; set; }
         public String ValidationStatus { get; set; }
 
@@ -34,7 +30,6 @@ namespace CBS.Siren
         {
             string returnValue =  $"{base.ToString()}" + 
                     $"\nId: {Id.ToString()}" +
-                    $"\nStartTime: {StartTime} Duration: {Duration}" +
                     $"\nTimingStategy: {EventTimingStrategy.ToString()}";
             
             foreach(IEventFeature feature in EventFeatures)

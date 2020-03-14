@@ -31,7 +31,7 @@ namespace CBS.Siren
             string result = "";
             for (int i = 0; i < Events.Count; ++i)
             {
-                result = $"{result}\nEvent #{i} - {Events[i].ToString()}";
+                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
             }
 
             return result;
