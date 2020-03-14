@@ -23,6 +23,7 @@ namespace CBS.Siren
             @ The Device will then report playing the media at the Fixed Start Time, with the positional properties required
             */
 
+            Console.WriteLine("*** Beginning program. Generating playlist. ***");
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
@@ -32,6 +33,7 @@ namespace CBS.Siren
             PrintPlaylistContent(list);
             
             Console.WriteLine("\n*** Generating Transmission List from Playlist ***\n");
+            
             //TODO - Create TransmissionListService - The thing that actually works on a transmission list
             //Generate TransmissionList from playlist
             TransmissionList transmissionList = GenerateTransmissionList(list);
@@ -48,7 +50,10 @@ namespace CBS.Siren
 
         private static void PrintPlaylistContent(Playlist list)
         {
-            list.Events.ForEach((playlistEvent) => Console.WriteLine(playlistEvent.ToString()));
+            Console.WriteLine("Playlist contains the following events:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(list.ToString());
+            Console.ResetColor();
         }
 
         private static MediaInstance CreateDemoMediaInstance()
@@ -86,7 +91,9 @@ namespace CBS.Siren
         private static void PrintTransmissionListContent(TransmissionList list)
         {
             Console.WriteLine("Transmission List contains the following events:");
-            list.Events.ForEach((listEvent) => Console.WriteLine(listEvent.ToString()));
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(list.ToString());
+            Console.ResetColor();
         }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
         {

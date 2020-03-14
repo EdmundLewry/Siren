@@ -35,7 +35,7 @@ namespace CBS.Siren
             {
                 return null;
             }
-            return new TransmissionListEvent(deviceForPlayout, new List<IEventFeature>(), e);
+            return new TransmissionListEvent(deviceForPlayout, null, new List<IEventFeature>(), e);
         }
 
         private IDevice FindDeviceForEvent(PlaylistEvent e, IVideoChain channelConfig)

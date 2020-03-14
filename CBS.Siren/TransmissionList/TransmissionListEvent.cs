@@ -18,7 +18,13 @@ namespace CBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
 
+        public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }
+
+        //This should be in timecode
+        public int ExpectedDuration { get; set; } //Currently in frames (assuming 25FPS)
+        //Should be in timecode
+        public DateTime ExpectedStartTime { get; set; }
 
         //I think this should just be a way to reference the related playlist event
         //There may not be a related event, so this could be null. We may choose to do
@@ -26,11 +32,12 @@ namespace CBS.Siren
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
         public IDevice Device { get; set; }
 
-        public TransmissionListEvent(IDevice deviceForPlayout, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
+        public TransmissionListEvent(IDevice deviceForPlayout, IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
             RelatedPlaylistEvent = PlaylistEvent;
             EventFeatures = features;
             Device = deviceForPlayout;
+            EventTimingStrategy = eventTiming;
             EventState = new TransmissionListEventState();
             Id = Guid.NewGuid();
         }
@@ -38,9 +45,11 @@ namespace CBS.Siren
         public override String ToString()
         {
             string returnValue =  base.ToString() + 
-                    $":\nId: {Id}" + 
+                    $":\nId: {Id}" +
+                    $"\nExpectedStartTime: {ExpectedStartTime} ExpectedDuration: {ExpectedDuration}" +
+                    $"\nTimingStategy: {EventTimingStrategy.ToString()}" +
                     $"\nPlaylist Event: {RelatedPlaylistEvent.Id}" + 
-                    $"\nDevice: {Device.ToString()}";
+                    $"\nDevice: {Device?.ToString()}";
 
             EventFeatures.ForEach((feature) => {
                 returnValue = returnValue + $"\nEventFeature: {feature.ToString()}";

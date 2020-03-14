@@ -1,3 +1,6 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+
 namespace CBS.Siren
 {
     /*
@@ -7,7 +10,7 @@ namespace CBS.Siren
     The MediaSourceStrategy may relate to the whole Media Instance (the full duration) that it references
     or it may relate to a segment of that Media instance.
     */
-    public class MediaSourceStrategy : ISourceStrategy
+    public class MediaSourceStrategy : ISourceStrategy, IEquatable<MediaSourceStrategy>
     {
         public MediaInstance Instance { get; }
         
@@ -32,6 +35,14 @@ namespace CBS.Siren
             $"\nMedia Name:  {Instance.Name}" +
             $"\nSOM: {SOM}" +
             $"\nEOM: {EOM}";
+        }
+
+        public bool Equals([AllowNull] MediaSourceStrategy other)
+        {
+            return other != null &&
+                Instance.Equals(other.Instance) &&
+                SOM == other.SOM &&
+                EOM == other.EOM;
         }
     }
 }

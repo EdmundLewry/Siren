@@ -24,5 +24,16 @@ namespace CBS.Siren
         {
             Events = listEvents;
         }
+
+        public override string ToString()
+        {
+            string result = "";
+            for(int i=0; i<Events.Count; ++i)
+            {
+                result = $"{result}\nEvent #{i} - {Events[i].ToString()}";
+            }
+
+            return result;
+        }
     }
 }

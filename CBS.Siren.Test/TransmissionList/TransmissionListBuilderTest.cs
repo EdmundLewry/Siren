@@ -61,5 +61,16 @@ namespace CBS.Siren.Test
 
             Assert.Equal(event1.Id, transmissionList.Events[0].RelatedPlaylistEvent.Id);
         }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void GivenAPlaylist_BuildTransmissionList_CreatesTransmissionEventWithSameTiming()
+        {
+            PlaylistEvent event1 = GenerateTestPlaylistEvent();
+            IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1 });
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist);
+
+            Assert.Equal(event1.EventTimingStrategy, transmissionList.Events[0].EventTimingStrategy);
+        }
     }
 }
