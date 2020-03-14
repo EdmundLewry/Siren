@@ -6,6 +6,6 @@ namespace CBS.Siren.Time
 {
     public static class TimeSource
     {
-        public const int SYSTEM_FRAMERATE = 25;
+        public const int SOURCE_FRAMERATE = 25;
     }
 }

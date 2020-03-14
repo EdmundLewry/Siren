@@ -8,23 +8,8 @@ namespace CBS.Siren
     {
         static void Main(string[] args)
         {
-
-            /*
-            1: Create a Media Instance based on a file
-            2: Create Transmission Event with a source strategy that uses that media instance, which plays out as primary video and
-                which has a fixed start
-            3: Create a Transmission List containing that event
-            4: Create a Demo Device
-            5: Create a Chain Configuration which uses that device for playing events with a Media Source
-            6: Create a Scheduler
-            7: Create a Channel with the Transmission List, Scheduler, and the Chain Configuration
-            @ This point the scheduler should generate a Channel List by triggering the event timing strategies on the events
-            @ A Playout List Generation Service should then generate a Playout List (this will eventually be triggered by cue/uncue)
-            @ The Device should be passed this Playlist
-            @ The Device will then report playing the media at the Fixed Start Time, with the positional properties required
-            */
-
             Console.WriteLine("*** Beginning program. Generating playlist. ***");
+            
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
@@ -72,7 +57,7 @@ namespace CBS.Siren
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             for (int i = 0; i < eventCount; ++i)
             {
-                int additionalSeconds = (demoMedia.Duration / TimeSource.SYSTEM_FRAMERATE) * i;
+                int additionalSeconds = (demoMedia.Duration / TimeSource.SOURCE_FRAMERATE) * i;
                 FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
                 VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
                 PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
@@ -80,6 +65,14 @@ namespace CBS.Siren
             }
 
             return events;
+        }
+
+        private static void PrintTransmissionListContent(TransmissionList list)
+        {
+            Console.WriteLine("Transmission List contains the following events:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(list.ToString());
+            Console.ResetColor();
         }
 
         private static Channel GenerateChannel(Playlist list)
@@ -92,13 +85,6 @@ namespace CBS.Siren
             return new Channel(chainConfiguration);
         }
 
-        private static void PrintTransmissionListContent(TransmissionList list)
-        {
-            Console.WriteLine("Transmission List contains the following events:");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(list.ToString());
-            Console.ResetColor();
-        }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
         {
             throw new NotImplementedException();
