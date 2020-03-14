@@ -18,7 +18,7 @@ namespace CBS.Siren
         //We may want more human readable identifiers
         public Guid Id { get; set; }
 
-        List<IEventFeature> EventFeatures { get; set; }
+        public List<IEventFeature> EventFeatures { get; set; }
 
         //I think this should just be a way to reference the related playlist event
         //There may not be a related event, so this could be null. We may choose to do

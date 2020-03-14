@@ -7,6 +7,7 @@ namespace CBS.Siren.Test
     {
 
         [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CreateSourceStrategy_WithMedia_ReturnsAMediaSourceStrategy()
         {
             IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
@@ -16,6 +17,7 @@ namespace CBS.Siren.Test
         }
         
         [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CreatePlayoutStrategy_WithPrimaryVideo_ReturnsAPrimaryVideoPlayoutStrategy()
         {
             IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();

@@ -16,6 +16,7 @@ namespace CBS.Siren.Test
         }
 
         [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_ReportsGivenTarget()
         {
             const String targetTimeString = "01/10/2019 08:00:00 AM";

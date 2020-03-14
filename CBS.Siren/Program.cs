@@ -31,13 +31,19 @@ namespace CBS.Siren
             Playlist list = new Playlist(events);
             PrintPlaylistContent(list);
             
-            /*Channel demoChannel = GenerateChannel(list);
-
-            Console.WriteLine("Channel Created");
-            PrintTransmissionListContent(demoChannel);*/
+            Console.WriteLine("\n*** Generating Transmission List from Playlist ***\n");
+            //TODO - Create TransmissionListService - The thing that actually works on a transmission list
+            //Generate TransmissionList from playlist
+            TransmissionList transmissionList = GenerateTransmissionList(list);
+            PrintTransmissionListContent(transmissionList);
 
             //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
             //DeliverPlayoutListsToDevices(playoutLists);
+        }
+
+        private static TransmissionList GenerateTransmissionList(Playlist list)
+        {
+            return TransmissionListBuilder.BuildFromPlaylist(list);
         }
 
         private static void PrintPlaylistContent(Playlist list)
@@ -77,10 +83,10 @@ namespace CBS.Siren
             return new Channel(chainConfiguration);
         }
 
-        private static void PrintTransmissionListContent(Channel demoChannel)
+        private static void PrintTransmissionListContent(TransmissionList list)
         {
-            TransmissionList list = demoChannel.ConfiguredList;
-            list.Events.ForEach(Console.WriteLine);
+            Console.WriteLine("Transmission List contains the following events:");
+            list.Events.ForEach((listEvent) => Console.WriteLine(listEvent.ToString()));
         }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
         {
