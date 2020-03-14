@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A Transmission List is a list of Transmission Events which reference PLaylist Events
@@ -24,6 +24,17 @@ namespace PBS.Siren
             Scheduler = listScheduler;
             SourceList = list;
             Events = events;
+        }
+
+        public override string ToString()
+        {
+            string result = "";
+            for (int i = 0; i < Events.Count; ++i)
+            {
+                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
+            }
+
+            return result;
         }
     }
 }

@@ -10,7 +10,7 @@ that this list makes sense to play out.
 TODO:
 - Should this be an immutable object?
  */
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class Playlist : IPlaylist
     {
@@ -23,6 +23,17 @@ namespace PBS.Siren
         public Playlist(List<PlaylistEvent> listEvents)
         {
             Events = listEvents;
+        }
+
+        public override string ToString()
+        {
+            string result = "";
+            for(int i=0; i<Events.Count; ++i)
+            {
+                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
+            }
+
+            return result;
         }
     }
 }

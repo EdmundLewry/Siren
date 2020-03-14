@@ -1,4 +1,4 @@
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A channel is a logical combination of a particular transmission list, 1 or more Payout Chain
@@ -8,9 +8,9 @@ namespace PBS.Siren
     public class Channel
     {
         public IVideoChain ChainConfiguration { get; set; }
-        public TransmissionList GeneratedList { get; set; }
+        public TransmissionList ConfiguredList { get; set; }
         
-        public Channel(IVideoChain channelConfig, IPlaylist list)
+        public Channel(IVideoChain channelConfig)
         {
             ChainConfiguration = channelConfig;
 

@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A playlist event is an item in a Playlist that defines what should be played out,
@@ -9,31 +10,34 @@ namespace PBS.Siren
      */
     public class PlaylistEvent
     {
-        public ISourceStrategy SourceStrategy { get; set; }
-        public IPlayoutStrategy PlayoutStrategy { get; set; }
+        public IEnumerable<IEventFeature> EventFeatures { get; set; }
         public IEventTimingStrategy EventTimingStrategy { get; set; }
 
-        //This should be in timecode
-        public int Duration { get; set; } //Currently in frames (assuming 25FPS)
-        //Should be in timecode
-        public DateTime StartTime { get; set; }
         public bool IsValid { get; set; }
         public String ValidationStatus { get; set; }
 
         //We may want more human readable identifiers
         public Guid Id { get; set; }
         
-        public PlaylistEvent(ISourceStrategy source, IPlayoutStrategy playout, IEventTimingStrategy timingStrategy)
+        public PlaylistEvent(IEnumerable<IEventFeature> features, IEventTimingStrategy timingStrategy)
         {
-            SourceStrategy = source;
-            PlayoutStrategy = playout;
+            EventFeatures = features;
             EventTimingStrategy = timingStrategy;
             Id = Guid.NewGuid();
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            return base.ToString() + " Id: " + Id.ToString() + " StartTime: " + StartTime;
+            string returnValue =  $"{base.ToString()}" + 
+                    $"\nId: {Id.ToString()}" +
+                    $"\nTimingStategy: {EventTimingStrategy.ToString()}";
+            
+            foreach(IEventFeature feature in EventFeatures)
+            {
+                returnValue = returnValue + $"\nEvent Feature: {feature.ToString()}";
+            }
+
+            return returnValue;
         }
     }
 }

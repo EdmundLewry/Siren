@@ -4,9 +4,9 @@ using Moq;
 using System;
 using System.Collections.Generic;
 
-using PBS.Siren;
+using CBS.Siren;
 
-namespace SirenTest
+namespace CBS.Siren.Test
 {
     public class FixedStartEventTimingStrategyTest
     {
@@ -16,6 +16,7 @@ namespace SirenTest
         }
 
         [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_ReportsGivenTarget()
         {
             const String targetTimeString = "01/10/2019 08:00:00 AM";

@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     //Should this be some abstraction for video, graphics, audio, and subtitle file types?
     public enum FileType
@@ -13,16 +13,16 @@ namespace PBS.Siren
     A Media Instance represents 1 or more files that relate to a single coherent
     piece of media that can be scheduled for playout in a list
      */
-    public class MediaInstance
+    public struct MediaInstance
     {
-        public String Name { get; } 
+        public string Name { get; } 
 
         //This will need to become a timecode
         public int Duration { get; } //currently in number of frames (assuming 25FPS)
-        public String FilePath { get; }
+        public string FilePath { get; }
         public FileType InstanceFileType { get; }
 
-        public MediaInstance(String instanceName, int totalDurationInFrames, String instanceFilePath, FileType type)
+        public MediaInstance(string instanceName = "", int totalDurationInFrames = 0, string instanceFilePath = "", FileType type = FileType.TEXT)
         {
             Name = instanceName;
             Duration = totalDurationInFrames;

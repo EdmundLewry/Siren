@@ -1,4 +1,7 @@
-namespace PBS.Siren
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace CBS.Siren
 {
     /*
     The Media Source strategy defines what Media will be played out for an event,
@@ -18,7 +21,9 @@ namespace PBS.Siren
         //Will need a timecode for this. Currently in frames
         //EOM = EOM of Media
         public int EOM { get; set; } //Currently in 25 FPS
-        
+
+        public string StrategyType => "mediaSource";
+
         public MediaSourceStrategy(MediaInstance instance, int som, int eom)
         {
             Instance = instance;
@@ -26,9 +31,34 @@ namespace PBS.Siren
             EOM = eom;
         }
 
-        public string BuildEventData()
+        public MediaSourceStrategy(ISourceStrategy other)
         {
-            throw new System.NotImplementedException();
+            if (other is MediaSourceStrategy mediaStrategy)
+            {
+                Instance = mediaStrategy.Instance;
+                SOM = mediaStrategy.SOM;
+                EOM = mediaStrategy.EOM;
+                return;
+            }
+
+            throw new ArgumentException("Failed to construct source strategy. Given strategy was not the same type", "other");
+        }
+
+
+        public override string ToString()
+        {
+            return "MediaSourceStrategy:" +
+            $"\nMedia Name:  {Instance.Name}" +
+            $"\nSOM: {SOM}" +
+            $"\nEOM: {EOM}";
+        }
+
+        public bool Equals([AllowNull] ISourceStrategy other)
+        {
+            return other is MediaSourceStrategy sourceStrategy &&
+                Instance.Equals(sourceStrategy.Instance) &&
+                SOM == sourceStrategy.SOM &&
+                EOM == sourceStrategy.EOM;
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     A DeviceListEvent is a lightweight container for the data required by a specific device in order for

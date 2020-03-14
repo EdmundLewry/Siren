@@ -1,15 +1,20 @@
-namespace PBS.Siren
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+namespace CBS.Siren
 {
     public class PrimaryVideoPlayoutStrategy : IPlayoutStrategy
     {
-        public PrimaryVideoPlayoutStrategy()
+        public string StrategyType => "primaryVideo";
+
+        public bool Equals([AllowNull] IPlayoutStrategy other)
         {
-            
+            return other is PrimaryVideoPlayoutStrategy;
         }
 
-        public string BuildEventData()
+        public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return "PrimaryVideoPlayoutStrategy";
         }
     }
 }

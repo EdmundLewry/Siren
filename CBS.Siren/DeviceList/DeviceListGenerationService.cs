@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     public class DeviceListGenerationService
     {
@@ -36,7 +36,7 @@ namespace PBS.Siren
                     playoutEventLists[channelEvent.Device] = new List<DeviceListEvent>();
                 }
 
-                playoutEventLists[channelEvent.Device].Add(new DeviceListEvent(PlaylistEventTranslationService.TranslateToString(channelEvent.RelatedPlaylistEvent)));
+                playoutEventLists[channelEvent.Device].Add(new DeviceListEvent(channelEvent.RelatedPlaylistEvent.ToJson().ToString()));
             });
             
             return playoutEventLists;

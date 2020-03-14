@@ -1,6 +1,6 @@
 using System;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     /*
     The Demo Device is an implementation of the Device interface that allows us to simulate how

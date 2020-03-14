@@ -1,48 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using CBS.Siren.Time;
 
-namespace PBS.Siren
+namespace CBS.Siren
 {
     class Program
     {
         static void Main(string[] args)
         {
-
-            /*
-            1: Create a Media Instance based on a file
-            2: Create Transmission Event with a source strategy that uses that media instance, which plays out as primary video and
-                which has a fixed start
-            3: Create a Transmission List containing that event
-            4: Create a Demo Device
-            5: Create a Chain Configuration which uses that device for playing events with a Media Source
-            6: Create a Scheduler
-            7: Create a Channel with the Transmission List, Scheduler, and the Chain Configuration
-            @ This point the scheduler should generate a Channel List by triggering the event timing strategies on the events
-            @ A Playout List Generation Service should then generate a Playout List (this will eventually be triggered by cue/uncue)
-            @ The Device should be passed this Playlist
-            @ The Device will then report playing the media at the Fixed Start Time, with the positional properties required
-            */
-
+            Console.WriteLine("*** Beginning program. Generating playlist. ***");
+            
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
-            List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime);
+            List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime, 3);
             
             Playlist list = new Playlist(events);
-            PrintTransmissionListContent(list);
+            PrintPlaylistContent(list);
             
-            Channel demoChannel = GenerateChannel(list);
+            Console.WriteLine("\n*** Generating Transmission List from Playlist ***\n");
+            
+            //TODO - Create TransmissionListService - The thing that actually works on a transmission list
+            //Generate TransmissionList from playlist
+            TransmissionList transmissionList = GenerateTransmissionList(list);
+            PrintTransmissionListContent(transmissionList);
 
-            Console.WriteLine("Channel Created");
-            PrintChannelListContent(demoChannel);
-
-            Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
-            DeliverPlayoutListsToDevices(playoutLists);
+            //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
+            //DeliverPlayoutListsToDevices(playoutLists);
         }
 
-        private static void PrintTransmissionListContent(Playlist list)
+        private static TransmissionList GenerateTransmissionList(Playlist list)
         {
-            list.Events.ForEach((PlaylistEvent e) => Console.WriteLine(PlaylistEventTranslationService.TranslateToString(e)));
+            return TransmissionListBuilder.BuildFromPlaylist(list);
+        }
+
+        private static void PrintPlaylistContent(Playlist list)
+        {
+            Console.WriteLine("Playlist contains the following events:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(list.ToString());
+            Console.ResetColor();
         }
 
         private static MediaInstance CreateDemoMediaInstance()
@@ -55,34 +52,39 @@ namespace PBS.Siren
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
-        private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime)
+        private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
         {
-            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(demoMedia, 0, demoMedia.Duration);
-            PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
-            FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime);
-            PlaylistEvent PlaylistEvent = new PlaylistEvent(sourceStrategy, playoutStrategy, timingStrategy);
-
             List<PlaylistEvent> events = new List<PlaylistEvent>();
-            events.Add(PlaylistEvent);
+            for (int i = 0; i < eventCount; ++i)
+            {
+                int additionalSeconds = (demoMedia.Duration / TimeSource.SOURCE_FRAMERATE) * i;
+                FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
+                VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
+                PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
+                events.Add(playlistEvent);
+            }
+
             return events;
+        }
+
+        private static void PrintTransmissionListContent(TransmissionList list)
+        {
+            Console.WriteLine("Transmission List contains the following events:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(list.ToString());
+            Console.ResetColor();
         }
 
         private static Channel GenerateChannel(Playlist list)
         {
+            //TODO:3 Will need to configure this with a list
             List<IDevice> devices = new List<IDevice>();
             devices.Add(new DemoDevice("DemoDevice1"));
             VideoChain chainConfiguration = new VideoChain(devices);
 
-            SimpleChannelScheduler scheduler = new SimpleChannelScheduler();
-
-            return new Channel(chainConfiguration, list);
+            return new Channel(chainConfiguration);
         }
 
-        private static void PrintChannelListContent(Channel demoChannel)
-        {
-            TransmissionList list = demoChannel.GeneratedList;
-            list.Events.ForEach(Console.WriteLine);
-        }
         private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
         {
             throw new NotImplementedException();
