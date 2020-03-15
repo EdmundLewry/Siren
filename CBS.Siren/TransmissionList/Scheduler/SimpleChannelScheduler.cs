@@ -25,7 +25,7 @@ namespace CBS.Siren
             });
 
             CalculateListTimings(list, channelConfig);*/
-            return new TransmissionList(new List<TransmissionListEvent>(), list, null); 
+            return new TransmissionList(new List<TransmissionListEvent>(), list); 
         }
 
         private TransmissionListEvent TranslateListEvent(PlaylistEvent e, IVideoChain channelConfig)

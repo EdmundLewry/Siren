@@ -19,9 +19,8 @@ namespace CBS.Siren
         public IScheduler Scheduler { get; set; }
         public List<TransmissionListEvent> Events { get; }
         
-        public TransmissionList(List<TransmissionListEvent> events, IPlaylist list, IScheduler listScheduler)
+        public TransmissionList(List<TransmissionListEvent> events, IPlaylist list)
         {
-            Scheduler = listScheduler;
             SourceList = list;
             Events = events;
         }

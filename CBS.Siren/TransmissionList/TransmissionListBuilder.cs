@@ -11,7 +11,7 @@ namespace CBS.Siren
             List<TransmissionListEvent> createdEvents = new List<TransmissionListEvent>();
             list.Events.ForEach((playlistEvent) => createdEvents.Add(GenerateTransmissionEvent(playlistEvent, videoChain)));
 
-            return new TransmissionList(createdEvents, list, new SimpleChannelScheduler());
+            return new TransmissionList(createdEvents, list);
         }
 
         private static TransmissionListEvent GenerateTransmissionEvent(PlaylistEvent playlistEvent, IVideoChain videoChain)

@@ -21,7 +21,7 @@ namespace SirenTest
             mockChainConfig = new Mock<IVideoChain>();
             mockTransmissionList = new Mock<IPlaylist>();
 
-            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IVideoChain>())).Returns(new TransmissionList(new List<TransmissionListEvent>(), mockTransmissionList.Object, null));
+            mockScheduler.Setup(mock => mock.GenerateChannelList(It.IsAny<IPlaylist>(), It.IsAny<IVideoChain>())).Returns(new TransmissionList(new List<TransmissionListEvent>(), mockTransmissionList.Object));
         }
 
         //[Fact]
