@@ -16,4 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\CBS.Siren\CBS.Siren.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scheduler\BenchMarkTests\" />
+  </ItemGroup>
 </Project>

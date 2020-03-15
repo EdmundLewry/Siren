@@ -68,7 +68,7 @@ namespace CBS.Siren.Test
 
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void ScheduleTransmissionList_ShouldCreateOneDeviceListWithCorrectOrder()
+        public void ScheduleTransmissionList_ShouldCreateDeviceListWithCorrectOrder()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
             Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
