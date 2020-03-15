@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using CBS.Siren.Logging;
 using CBS.Siren.Time;
+using NLog;
 
 namespace CBS.Siren
 {
     class Program
     {
+        private static ILogger _logger = LoggingManager.GetLogger(typeof(Program).FullName);
+
         static void Main(string[] args)
         {
-            Console.WriteLine("*** Beginning program. Generating playlist. ***");
+            LoggingManager.ConfigureLogging();
+
+            _logger.Info("*** Beginning program. Generating playlist. ***");
             
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
@@ -17,8 +23,8 @@ namespace CBS.Siren
             
             Playlist list = new Playlist(events);
             PrintPlaylistContent(list);
-            
-            Console.WriteLine("\n*** Generating Transmission List from Playlist ***\n");
+
+            _logger.Info("\n*** Generating Transmission List from Playlist ***\n");
             
             //TODO - Create TransmissionListService - The thing that actually works on a transmission list
             //Generate TransmissionList from playlist
@@ -27,6 +33,10 @@ namespace CBS.Siren
 
             //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
             //DeliverPlayoutListsToDevices(playoutLists);
+
+            _logger.Info("*** Completed Siren Program ***");
+
+            LoggingManager.Shutdown();
         }
 
         private static TransmissionList GenerateTransmissionList(Playlist list)
@@ -36,9 +46,9 @@ namespace CBS.Siren
 
         private static void PrintPlaylistContent(Playlist list)
         {
-            Console.WriteLine("Playlist contains the following events:");
+            _logger.Info("Playlist contains the following events:");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(list.ToString());
+            _logger.Info(list.ToString());
             Console.ResetColor();
         }
 
@@ -69,9 +79,9 @@ namespace CBS.Siren
 
         private static void PrintTransmissionListContent(TransmissionList list)
         {
-            Console.WriteLine("Transmission List contains the following events:");
+            _logger.Info("Transmission List contains the following events:");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(list.ToString());
+            _logger.Info(list.ToString());
             Console.ResetColor();
         }
 
