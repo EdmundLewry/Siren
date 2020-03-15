@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
     public static class TransmissionListBuilder
     {
-        public static TransmissionList BuildFromPlaylist(IPlaylist list)
+        public static TransmissionList BuildFromPlaylist(IPlaylist list, IVideoChain videoChain)
         {
             List<TransmissionListEvent> createdEvents = new List<TransmissionListEvent>();
-            list.Events.ForEach((playlistEvent) => createdEvents.Add(GenerateTransmissionEvent(playlistEvent)));
+            list.Events.ForEach((playlistEvent) => createdEvents.Add(GenerateTransmissionEvent(playlistEvent, videoChain)));
 
             return new TransmissionList(createdEvents, list, new SimpleChannelScheduler());
         }
 
-        private static TransmissionListEvent GenerateTransmissionEvent(PlaylistEvent playlistEvent)
+        private static TransmissionListEvent GenerateTransmissionEvent(PlaylistEvent playlistEvent, IVideoChain videoChain)
         {
             List<IEventFeature> features = new List<IEventFeature>();
 
@@ -23,8 +24,16 @@ namespace CBS.Siren
                 features.Add(ConstructEventFeatureFromType(feature));
             }
 
+            //Currently have no way to decide what device should go where. So we just put the first one in
+            //Eventually we'll pull this from the Device to event mapping
+            IDevice deviceToPlayOn = null;
+            if(videoChain != null && videoChain.ChainDevices.Any())
+            {
+                deviceToPlayOn = videoChain.ChainDevices.FirstOrDefault();
+            }
+
             IEventTimingStrategy eventTimingStrategy = ConstructTimingStrategyFromType(playlistEvent.EventTimingStrategy);
-            return new TransmissionListEvent(null, eventTimingStrategy, features, playlistEvent);
+            return new TransmissionListEvent(deviceToPlayOn, eventTimingStrategy, features, playlistEvent);
         }
 
         private static IEventFeature ConstructEventFeatureFromType(IEventFeature feature)

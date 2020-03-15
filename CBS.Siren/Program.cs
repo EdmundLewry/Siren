@@ -25,23 +25,24 @@ namespace CBS.Siren
             PrintPlaylistContent(list);
 
             _logger.Info("\n*** Generating Transmission List from Playlist ***\n");
-            
+
+            Channel channel = GenerateChannel();
             //TODO - Create TransmissionListService - The thing that actually works on a transmission list
             //Generate TransmissionList from playlist
-            TransmissionList transmissionList = GenerateTransmissionList(list);
+            TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
             PrintTransmissionListContent(transmissionList);
 
-            //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
-            //DeliverPlayoutListsToDevices(playoutLists);
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
+            PrintDeviceListsContent(deviceLists);
 
             _logger.Info("*** Completed Siren Program ***");
 
             LoggingManager.Shutdown();
         }
 
-        private static TransmissionList GenerateTransmissionList(Playlist list)
+        private static TransmissionList GenerateTransmissionList(Playlist list, IVideoChain videoChain)
         {
-            return TransmissionListBuilder.BuildFromPlaylist(list);
+            return TransmissionListBuilder.BuildFromPlaylist(list, videoChain);
         }
 
         private static void PrintPlaylistContent(Playlist list)
@@ -85,7 +86,18 @@ namespace CBS.Siren
             Console.ResetColor();
         }
 
-        private static Channel GenerateChannel(Playlist list)
+        private static void PrintDeviceListsContent(Dictionary<IDevice, DeviceList> deviceLists)
+        {
+            foreach (KeyValuePair<IDevice, DeviceList> deviceListPair in deviceLists)
+            {
+                _logger.Info($"Device:{deviceListPair.Key.Name} will have a Device List containing the following events:");
+                Console.ForegroundColor = ConsoleColor.Green;
+                _logger.Info(deviceListPair.Value.ToString());
+                Console.ResetColor();
+            }
+        }
+
+        private static Channel GenerateChannel()
         {
             //TODO:3 Will need to configure this with a list
             List<IDevice> devices = new List<IDevice>();
@@ -93,11 +105,6 @@ namespace CBS.Siren
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);
-        }
-
-        private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
-        {
-            throw new NotImplementedException();
         }
     }
 }
