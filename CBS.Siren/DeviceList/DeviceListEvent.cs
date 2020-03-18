@@ -12,7 +12,7 @@ namespace CBS.Siren
         public Guid Id { get; set; }
 
         public DeviceListEventState EventState { get; set; }
-        public String EventData {get;}
+        public string EventData {get;}
 
         public DeviceListEvent(String eventData)
         {
