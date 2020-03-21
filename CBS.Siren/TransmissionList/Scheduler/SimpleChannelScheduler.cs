@@ -53,5 +53,10 @@ namespace CBS.Siren
         {
             //list.Events.ForEach((PlaylistEvent e) => e.EventTimingStrategy.CalculateStartTime());
         }
+
+        public static Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList)
+        {
+            return new Dictionary<IDevice, DeviceList>();
+        }
     }
 }
