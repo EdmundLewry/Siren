@@ -23,6 +23,7 @@ namespace CBS.Siren
                 features.Add(ConstructEventFeatureFromType(feature));
             }
 
+            //TODO:4 Need to have device per feature!
             //Currently have no way to decide what device should go where. So we just put the first one in
             //Eventually we'll pull this from the Device to event mapping
             IDevice deviceToPlayOn = null;

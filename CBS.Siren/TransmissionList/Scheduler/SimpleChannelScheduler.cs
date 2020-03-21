@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace CBS.Siren
@@ -9,53 +10,58 @@ namespace CBS.Siren
             
         }
 
-        public TransmissionList GenerateChannelList(IPlaylist list, IVideoChain channelConfig)
+        public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList)
         {
-            //Work through each event in the list and find the devices in the config that will need to be controlled
-            //given the source and playout strategies
-            /*List<TransmissionListEvent> events = new List<TransmissionListEvent>();
+            TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList);
+            return GenerateDeviceLists(calculatedTransmsmissionList);
+        }
 
-            list.Events.ForEach((PlaylistEvent e) => {
-                TransmissionListEvent channelEvent = TranslateListEvent(e, channelConfig);
-                if(channelEvent!=null)
+        private TransmissionList CalculateListTimings(TransmissionList transmissionList)
+        {
+            transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
+                transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime();
+                transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
+            });
+
+            return transmissionList;
+        }
+
+        private int CalculateLongestFeatureDuration(List<IEventFeature> eventFeatures)
+        {
+            return 0;
+        }
+
+        private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList)
+        {
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
+            
+            transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
+
+                DeviceListEvent deviceListEvent = TranslateListEvent(transmissionEvent);
+                if (deviceListEvent != null)
                 {
-                    events.Add(channelEvent);
+                    if (!deviceLists.ContainsKey(transmissionEvent.Device))
+                    {
+                        deviceLists[transmissionEvent.Device] = new DeviceList(new List<DeviceListEvent>());
+                    }
+                    deviceLists[transmissionEvent.Device].Events.Add(deviceListEvent);
                 }
             });
 
-            CalculateListTimings(list, channelConfig);*/
-            return new TransmissionList(new List<TransmissionListEvent>(), list); 
+            return deviceLists;
         }
 
-        private TransmissionListEvent TranslateListEvent(PlaylistEvent e, IVideoChain channelConfig)
+        private DeviceListEvent TranslateListEvent(TransmissionListEvent transmissionEvent)
         {
-            IDevice deviceForPlayout = FindDeviceForEvent(e, channelConfig);
-            if(deviceForPlayout == null)
-            {
-                return null;
-            }
-            return new TransmissionListEvent(deviceForPlayout, null, new List<IEventFeature>(), e);
+
+            string eventData = GenerateEventDate(transmissionEvent);
+            return new DeviceListEvent(eventData, transmissionEvent.Id);
         }
 
-        private IDevice FindDeviceForEvent(PlaylistEvent e, IVideoChain channelConfig)
+        private string GenerateEventDate(TransmissionListEvent transmissionEvent)
         {
-            //Should use Linq for this eventually
-            if(channelConfig.ChainDevices.Count == 0)
-            {
-                return null;
-            }
-
-            return channelConfig.ChainDevices[0];
+            return "";
         }
 
-        private void CalculateListTimings(IPlaylist list, IVideoChain channelConfig)
-        {
-            //list.Events.ForEach((PlaylistEvent e) => e.EventTimingStrategy.CalculateStartTime());
-        }
-
-        public static Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList)
-        {
-            return new Dictionary<IDevice, DeviceList>();
-        }
     }
 }

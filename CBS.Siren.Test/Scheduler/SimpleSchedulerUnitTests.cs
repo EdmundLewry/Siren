@@ -45,7 +45,8 @@ namespace CBS.Siren.Test
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListForEachDevice()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
-            Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             Assert.True(lists.ContainsKey(mockDevice1.Object));
             Assert.True(lists.ContainsKey(mockDevice2.Object));
@@ -56,10 +57,10 @@ namespace CBS.Siren.Test
         public void ScheduleTransmissionList_ShouldCreateListsOfOnlyEventsRelatedToOneDevice()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
-            Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
-            Assert.Equal(3, deviceOneList.Events.Count);
 
             Assert.Contains(deviceOneList.Events, ((deviceEvent) => deviceEvent.RelatedTransmissionListEventId == event1.Id));
             Assert.Contains(deviceOneList.Events, ((deviceEvent) => deviceEvent.RelatedTransmissionListEventId == event2.Id));
@@ -68,7 +69,6 @@ namespace CBS.Siren.Test
             Assert.DoesNotContain(deviceOneList.Events, ((deviceEvent) => deviceEvent.RelatedTransmissionListEventId == event3.Id));
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];
-            Assert.Equal(2, deviceTwoList.Events.Count);
 
             Assert.Contains(deviceTwoList.Events, ((deviceEvent) => deviceEvent.RelatedTransmissionListEventId == event3.Id));
 
@@ -82,17 +82,16 @@ namespace CBS.Siren.Test
         public void ScheduleTransmissionList_ShouldCreateDeviceListWithCorrectOrder()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
-            Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
-            Assert.Equal(3, deviceOneList.Events.Count);
 
             Assert.Equal(event1.Id, deviceOneList.Events[0].RelatedTransmissionListEventId);
             Assert.Equal(event2.Id, deviceOneList.Events[1].RelatedTransmissionListEventId);
             Assert.Equal(event4.Id, deviceOneList.Events[2].RelatedTransmissionListEventId);
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];
-            Assert.Equal(2, deviceTwoList.Events.Count);
 
             Assert.Equal(event3.Id, deviceTwoList.Events[0].RelatedTransmissionListEventId);
             Assert.Equal(event3.Id, deviceTwoList.Events[1].RelatedTransmissionListEventId);
@@ -103,7 +102,8 @@ namespace CBS.Siren.Test
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListEventsWithCorrectData()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
-            Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
             DeviceListEvent deviceListEvent = deviceOneList.Events[0];
@@ -132,7 +132,8 @@ namespace CBS.Siren.Test
         public void ScheduleTransmissionList_ShouldCreateAnEventPerFeature()
         {
             TransmissionList transmissionList = GenerateTransmissionList();
-            Dictionary<IDevice, DeviceList> lists = SimpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];
             Assert.Equal(2, deviceTwoList.Events.Count);

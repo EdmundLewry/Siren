@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace CBS.Siren
 {
     /*
@@ -10,6 +12,6 @@ namespace CBS.Siren
     */
     public interface IScheduler
     {
-        TransmissionList GenerateChannelList(IPlaylist list, IVideoChain channelConfig);
+        Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList);
     }
 }
