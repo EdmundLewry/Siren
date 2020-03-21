@@ -6,6 +6,8 @@ namespace CBS.Siren
     {
         string FeatureType { get; }
         IPlayoutStrategy PlayoutStrategy { get; set; }
-        ISourceStrategy SourceStrategy { get; set; }       
+        ISourceStrategy SourceStrategy { get; set; }
+        IDevice Device { get; set; }
+        int CalculateDuration();
     }
 }

@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using CBS.Siren.Logging;
 using CBS.Siren.Time;
+using NLog;
 
 namespace CBS.Siren
 {
     class Program
     {
+        private static ILogger _logger = LoggingManager.GetLogger(typeof(Program).FullName);
+
         static void Main(string[] args)
         {
-            Console.WriteLine("*** Beginning program. Generating playlist. ***");
+            LoggingManager.ConfigureLogging();
+
+            _logger.Info("*** Beginning program. Generating playlist. ***");
             
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
@@ -17,28 +23,37 @@ namespace CBS.Siren
             
             Playlist list = new Playlist(events);
             PrintPlaylistContent(list);
-            
-            Console.WriteLine("\n*** Generating Transmission List from Playlist ***\n");
-            
+
+            _logger.Info("\n*** Generating Transmission List from Playlist ***\n");
+
+            Channel channel = GenerateChannel();
             //TODO - Create TransmissionListService - The thing that actually works on a transmission list
             //Generate TransmissionList from playlist
-            TransmissionList transmissionList = GenerateTransmissionList(list);
+            TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
             PrintTransmissionListContent(transmissionList);
 
-            //Dictionary<IDevice, DeviceList> playoutLists = DeviceListGenerationService.GenerateDeviceLists(demoChannel.GeneratedList);
-            //DeliverPlayoutListsToDevices(playoutLists);
+            _logger.Info("\n*** Generating Device Lists from Transmission List ***\n");
+
+            SimpleScheduler scheduler = new SimpleScheduler();
+            Dictionary<IDevice, DeviceList> deviceLists = scheduler.ScheduleTransmissionList(transmissionList);
+
+            PrintDeviceListsContent(deviceLists);
+
+            _logger.Info("*** Completed Siren Program ***");
+
+            LoggingManager.Shutdown();
         }
 
-        private static TransmissionList GenerateTransmissionList(Playlist list)
+        private static TransmissionList GenerateTransmissionList(Playlist list, IVideoChain videoChain)
         {
-            return TransmissionListBuilder.BuildFromPlaylist(list);
+            return TransmissionListBuilder.BuildFromPlaylist(list, videoChain);
         }
 
         private static void PrintPlaylistContent(Playlist list)
         {
-            Console.WriteLine("Playlist contains the following events:");
+            _logger.Info("Playlist contains the following events:");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(list.ToString());
+            _logger.Info(list.ToString());
             Console.ResetColor();
         }
 
@@ -48,7 +63,7 @@ namespace CBS.Siren
             const int mediaDurationSeconds = 30;
             const int secondsAsFrames = FPS * mediaDurationSeconds;
             const String mediaName = "DemoMedia1";
-            const String mediaPath = "C:\\Media\\DemoMedia1.txt";
+            const String mediaPath = "\\Media\\DemoMedia1.txt";
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
@@ -57,7 +72,7 @@ namespace CBS.Siren
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             for (int i = 0; i < eventCount; ++i)
             {
-                int additionalSeconds = (demoMedia.Duration / TimeSource.SOURCE_FRAMERATE) * i;
+                int additionalSeconds = demoMedia.Duration.FramesToSeconds() * i;
                 FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
                 VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
                 PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
@@ -69,13 +84,24 @@ namespace CBS.Siren
 
         private static void PrintTransmissionListContent(TransmissionList list)
         {
-            Console.WriteLine("Transmission List contains the following events:");
+            _logger.Info("Transmission List contains the following events:");
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(list.ToString());
+            _logger.Info(list.ToString());
             Console.ResetColor();
         }
 
-        private static Channel GenerateChannel(Playlist list)
+        private static void PrintDeviceListsContent(Dictionary<IDevice, DeviceList> deviceLists)
+        {
+            foreach (KeyValuePair<IDevice, DeviceList> deviceListPair in deviceLists)
+            {
+                _logger.Info($"Device:{deviceListPair.Key.Name} will have a Device List containing the following events:");
+                Console.ForegroundColor = ConsoleColor.Green;
+                _logger.Info(deviceListPair.Value.ToString());
+                Console.ResetColor();
+            }
+        }
+
+        private static Channel GenerateChannel()
         {
             //TODO:3 Will need to configure this with a list
             List<IDevice> devices = new List<IDevice>();
@@ -83,11 +109,6 @@ namespace CBS.Siren
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);
-        }
-
-        private static void DeliverPlayoutListsToDevices(Dictionary<IDevice, DeviceList> playoutLists)
-        {
-            throw new NotImplementedException();
         }
     }
 }

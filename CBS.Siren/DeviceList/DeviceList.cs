@@ -12,11 +12,22 @@ namespace CBS.Siren
     */
     public class DeviceList
     {
-        public List<DeviceListEvent> Events { get; }
+        public List<DeviceListEvent> Events { get; set; }
         
         public DeviceList(List<DeviceListEvent> events)
         {
             Events = events;
+        }
+
+        public override string ToString()
+        {
+            string result = "";
+            for (int i = 0; i < Events.Count; ++i)
+            {
+                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
+            }
+
+            return result;
         }
     }
 }

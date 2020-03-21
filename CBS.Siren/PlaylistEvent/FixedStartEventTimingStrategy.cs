@@ -36,7 +36,7 @@ namespace CBS.Siren
             $"TargetStartTime: {TargetStartTime}";
         }
 
-        public bool Equals([AllowNull] IEventTimingStrategy other)
+        public virtual bool Equals([AllowNull] IEventTimingStrategy other)
         {
             return other is FixedStartEventTimingStrategy fixedStrategy &&
                 TargetStartTime == fixedStrategy.TargetStartTime;

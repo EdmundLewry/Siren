@@ -8,17 +8,17 @@ namespace CBS.Siren
         public string FeatureType { get; } = "video";
         public IPlayoutStrategy PlayoutStrategy { get; set; }
         public ISourceStrategy SourceStrategy { get; set; }
-        private IFeaturePropertiesFactory PropertiesFactory { get; set; }
+        public IDevice Device { get; set; }
 
-        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy)
+        public VideoPlaylistEventFeature(IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy, IDevice device = null)
         {
-            PropertiesFactory = factory;
             PlayoutStrategy = playoutStrategy;
             SourceStrategy = sourceStrategy;
+            Device = device;
         }
 
-        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance) :
-            this(factory, factory.CreatePrimaryVideoPlayoutStrategy(), factory.CreateMediaSourceStrategy(mediaInstance))
+        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance, IDevice device = null) :
+            this(factory.CreatePrimaryVideoPlayoutStrategy(), factory.CreateMediaSourceStrategy(mediaInstance), device)
         {
         }
 
@@ -26,15 +26,23 @@ namespace CBS.Siren
         {
             return "VideoPlaylistEventFeature:" +
             $"\nPlayout Strategy: {PlayoutStrategy.ToString()}" +
-            $"\nSource Strategy: {SourceStrategy.ToString()}";
+            $"\nSource Strategy: {SourceStrategy.ToString()}" + 
+            $"\nDevice - {Device?.ToString()}";
         }
 
-        public bool Equals([AllowNull] IEventFeature other)
+        public virtual bool Equals([AllowNull] IEventFeature other)
         {
             return other is VideoPlaylistEventFeature videoEvent &&
                     FeatureType == other.FeatureType &&
                     PlayoutStrategy.Equals(other.PlayoutStrategy) &&
-                    SourceStrategy.Equals(other.SourceStrategy);
+                    SourceStrategy.Equals(other.SourceStrategy) &&
+                    Device?.Name == other.Device?.Name;
+        }
+
+        public int CalculateDuration()
+        {
+            //For our duration, we only care about the length of the Media Source Strategy
+            return SourceStrategy.GetDuration();
         }
     }
 }

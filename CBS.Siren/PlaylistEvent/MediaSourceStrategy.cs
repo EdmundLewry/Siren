@@ -53,12 +53,32 @@ namespace CBS.Siren
             $"\nEOM: {EOM}";
         }
 
-        public bool Equals([AllowNull] ISourceStrategy other)
+        public virtual bool Equals([AllowNull] ISourceStrategy other)
         {
             return other is MediaSourceStrategy sourceStrategy &&
                 Instance.Equals(sourceStrategy.Instance) &&
                 SOM == sourceStrategy.SOM &&
                 EOM == sourceStrategy.EOM;
         }
+
+        public int GetDuration()
+        {
+            return Math.Min(Instance.Duration, EOM) - SOM;
+        }
+
+        public object BuildStrategyData()
+        {
+            var strategyData = new
+            {
+                type = StrategyType,
+                mediaInstance = Instance,
+                som = SOM,
+                eom = EOM
+            };
+
+            return strategyData;
+        }
+
+
     }
 }

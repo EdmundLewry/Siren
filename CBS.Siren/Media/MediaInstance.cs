@@ -1,5 +1,3 @@
-using System;
-
 namespace CBS.Siren
 {
     //Should this be some abstraction for video, graphics, audio, and subtitle file types?
