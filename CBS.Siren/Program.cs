@@ -68,7 +68,7 @@ namespace CBS.Siren
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             for (int i = 0; i < eventCount; ++i)
             {
-                int additionalSeconds = (demoMedia.Duration / TimeSource.SOURCE_FRAMERATE) * i;
+                int additionalSeconds = demoMedia.Duration.FramesToSeconds() * i;
                 FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
                 VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
                 PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);

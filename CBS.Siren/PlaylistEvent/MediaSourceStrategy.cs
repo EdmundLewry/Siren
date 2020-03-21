@@ -60,5 +60,25 @@ namespace CBS.Siren
                 SOM == sourceStrategy.SOM &&
                 EOM == sourceStrategy.EOM;
         }
+
+        public int GetDuration()
+        {
+            return Math.Min(Instance.Duration, EOM) - SOM;
+        }
+
+        public object BuildStrategyData()
+        {
+            var strategyData = new
+            {
+                type = StrategyType,
+                mediaInstance = Instance,
+                som = SOM,
+                eom = EOM
+            };
+
+            return strategyData;
+        }
+
+
     }
 }

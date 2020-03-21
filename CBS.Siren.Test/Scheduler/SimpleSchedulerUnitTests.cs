@@ -29,10 +29,12 @@ namespace CBS.Siren.Test
             mockDevice2 = new Mock<IDevice>();
 
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
+            mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Parse("01/01/2020 14:30:00"));
 
             var mockFeature = new Mock<IEventFeature>();
             MediaInstance mediaInstance = new MediaInstance("test1");
             mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, 0, 750));
+            mockFeature.Setup(mock => mock.CalculateDuration()).Returns(750);
             List<IEventFeature> eventFeatures = new List<IEventFeature>() { mockFeature.Object };
 
             event1 = new TransmissionListEvent(mockDevice1.Object, mockEventTimingStrategy.Object, eventFeatures);
@@ -113,15 +115,15 @@ namespace CBS.Siren.Test
             Assert.Equal(event1.ExpectedStartTime, timingElement.GetProperty("startTime").GetDateTime());
             Assert.Equal(event1.ExpectedDuration, timingElement.GetProperty("duration").GetInt32());
 
-            int durationAsSeconds = event1.ExpectedDuration / TimeSource.SOURCE_FRAMERATE;
-            DateTime expectedEndTime = event1.ExpectedStartTime.AddSeconds(durationAsSeconds);
+            DateTime expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.FramesToSeconds());
             Assert.Equal(expectedEndTime, timingElement.GetProperty("endTime").GetDateTime());
 
             JsonElement sourceElement = eventDataJson.GetProperty("source");
-            Assert.Equal("media", sourceElement.GetProperty("type").GetString());
-            Assert.Equal("test1", sourceElement.GetProperty("mediaInstance").GetProperty("name").ToString());
-            Assert.Equal(0, sourceElement.GetProperty("SOM").GetInt32());
-            Assert.Equal(750, sourceElement.GetProperty("EOM").GetInt32());
+            JsonElement sourceDataElement = sourceElement.GetProperty("strategyData");
+            Assert.Equal("mediaSource", sourceDataElement.GetProperty("type").GetString());
+            Assert.Equal("test1", sourceDataElement.GetProperty("mediaInstance").GetProperty("name").ToString());
+            Assert.Equal(0, sourceDataElement.GetProperty("som").GetInt32());
+            Assert.Equal(750, sourceDataElement.GetProperty("eom").GetInt32());
             
             Assert.Equal(event1.Id, deviceListEvent.RelatedTransmissionListEventId);
         }

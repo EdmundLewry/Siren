@@ -36,5 +36,11 @@ namespace CBS.Siren
                     PlayoutStrategy.Equals(other.PlayoutStrategy) &&
                     SourceStrategy.Equals(other.SourceStrategy);
         }
+
+        public int CalculateDuration()
+        {
+            //For our duration, we only care about the length of the Media Source Strategy
+            return SourceStrategy.GetDuration();
+        }
     }
 }
