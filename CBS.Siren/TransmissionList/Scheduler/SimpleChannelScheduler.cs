@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -36,29 +37,40 @@ namespace CBS.Siren
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
             
             transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
-
-                DeviceListEvent deviceListEvent = TranslateListEvent(transmissionEvent);
-                if (deviceListEvent != null)
+                if (!deviceLists.ContainsKey(transmissionEvent.Device))
                 {
-                    if (!deviceLists.ContainsKey(transmissionEvent.Device))
-                    {
-                        deviceLists[transmissionEvent.Device] = new DeviceList(new List<DeviceListEvent>());
-                    }
-                    deviceLists[transmissionEvent.Device].Events.Add(deviceListEvent);
+                    deviceLists[transmissionEvent.Device] = new DeviceList(new List<DeviceListEvent>());
                 }
+
+                deviceLists[transmissionEvent.Device].Events.AddRange(TranslateListEventToDeviceEvents(transmissionEvent));
             });
 
             return deviceLists;
         }
 
-        private DeviceListEvent TranslateListEvent(TransmissionListEvent transmissionEvent)
+        private IEnumerable<DeviceListEvent> TranslateListEventToDeviceEvents(TransmissionListEvent transmissionEvent)
         {
+            List<DeviceListEvent> deviceListEvents = new List<DeviceListEvent>();
 
-            string eventData = GenerateEventDate(transmissionEvent);
+            transmissionEvent.EventFeatures.ForEach(feature =>
+            {
+                DeviceListEvent deviceListEvent = TranslateListEventFeature(transmissionEvent, feature);
+                if (deviceListEvent != null)
+                {
+                    deviceListEvents.Add(deviceListEvent);
+                }
+            });
+
+            return deviceListEvents;
+        }
+
+        private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature)
+        {
+            string eventData = GenerateEventData(transmissionEvent, feature);
             return new DeviceListEvent(eventData, transmissionEvent.Id);
         }
 
-        private string GenerateEventDate(TransmissionListEvent transmissionEvent)
+        private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)
         {
             return "";
         }

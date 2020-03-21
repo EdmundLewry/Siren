@@ -12,7 +12,7 @@ namespace CBS.Siren
     */
     public class DeviceList
     {
-        public List<DeviceListEvent> Events { get; }
+        public List<DeviceListEvent> Events { get; set; }
         
         public DeviceList(List<DeviceListEvent> events)
         {
