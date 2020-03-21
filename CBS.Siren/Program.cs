@@ -32,7 +32,11 @@ namespace CBS.Siren
             TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
             PrintTransmissionListContent(transmissionList);
 
-            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
+            _logger.Info("\n*** Generating Device Lists from Transmission List ***\n");
+
+            SimpleScheduler scheduler = new SimpleScheduler();
+            Dictionary<IDevice, DeviceList> deviceLists = scheduler.ScheduleTransmissionList(transmissionList);
+
             PrintDeviceListsContent(deviceLists);
 
             _logger.Info("*** Completed Siren Program ***");

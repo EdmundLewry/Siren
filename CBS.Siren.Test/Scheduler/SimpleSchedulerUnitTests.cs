@@ -49,7 +49,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListForEachDevice()
         {
-            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             Assert.True(lists.ContainsKey(mockDevice1.Object));
@@ -60,7 +60,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateListsOfOnlyEventsRelatedToOneDevice()
         {
-            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
@@ -84,7 +84,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateDeviceListWithCorrectOrder()
         {
-            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
@@ -103,7 +103,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListEventsWithCorrectData()
         {
-            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
@@ -132,7 +132,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateAnEventPerFeature()
         {
-            SimpleChannelScheduler simpleChannelScheduler = new SimpleChannelScheduler();
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];

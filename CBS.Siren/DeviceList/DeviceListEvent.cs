@@ -21,5 +21,13 @@ namespace CBS.Siren
             RelatedTransmissionListEventId = relatedEventId;
             EventData = eventData;
         }
+
+        public override String ToString()
+        {
+            return  base.ToString() +
+                    $":\nId: {Id}" +
+                    $"\nRelated Transmission List Event Id: {RelatedTransmissionListEventId}" +
+                    $"\nEventData: {EventData}";
+        }
     }
 }

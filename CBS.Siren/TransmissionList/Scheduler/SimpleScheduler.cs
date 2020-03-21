@@ -6,9 +6,9 @@ using CBS.Siren.Utilities;
 
 namespace CBS.Siren
 {
-    public class SimpleChannelScheduler : IScheduler
+    public class SimpleScheduler : IScheduler
     {
-        public SimpleChannelScheduler()
+        public SimpleScheduler()
         {
             
         }
