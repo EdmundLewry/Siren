@@ -10,7 +10,7 @@ namespace CBS.Siren
     {
         //We may want more human readable identifiers
         public Guid Id { get; set; }
-        public Guid? RelatedTransmissionListEventId { get; set; } = null;
+        public Guid? RelatedTransmissionListEventId { get; set; }
 
         public DeviceListEventState EventState { get; set; }
         public string EventData {get;}

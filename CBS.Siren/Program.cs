@@ -59,7 +59,7 @@ namespace CBS.Siren
             const int mediaDurationSeconds = 30;
             const int secondsAsFrames = FPS * mediaDurationSeconds;
             const String mediaName = "DemoMedia1";
-            const String mediaPath = "C:\\Media\\DemoMedia1.txt";
+            const String mediaPath = "\\Media\\DemoMedia1.txt";
             return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
         }
 
