@@ -17,32 +17,30 @@ namespace CBS.Siren
         {
             List<IEventFeature> features = new List<IEventFeature>();
 
-            //I suspect Event Features in the playlist will be just data later on, so just storing the type for now
             foreach(IEventFeature feature in playlistEvent.EventFeatures)
             {
-                features.Add(ConstructEventFeatureFromType(feature));
+                features.Add(ConstructEventFeatureFromType(feature, videoChain));
             }
 
-            //TODO:4 Need to have device per feature!
+            IEventTimingStrategy eventTimingStrategy = ConstructTimingStrategyFromType(playlistEvent.EventTimingStrategy);
+            return new TransmissionListEvent(eventTimingStrategy, features, playlistEvent);
+        }
+
+        private static IEventFeature ConstructEventFeatureFromType(IEventFeature feature, IVideoChain videoChain)
+        {
             //Currently have no way to decide what device should go where. So we just put the first one in
             //Eventually we'll pull this from the Device to event mapping
             IDevice deviceToPlayOn = null;
-            if(videoChain != null && videoChain.ChainDevices.Any())
+            if (videoChain != null && videoChain.ChainDevices.Any())
             {
                 deviceToPlayOn = videoChain.ChainDevices.FirstOrDefault();
             }
 
-            IEventTimingStrategy eventTimingStrategy = ConstructTimingStrategyFromType(playlistEvent.EventTimingStrategy);
-            return new TransmissionListEvent(deviceToPlayOn, eventTimingStrategy, features, playlistEvent);
-        }
-
-        private static IEventFeature ConstructEventFeatureFromType(IEventFeature feature)
-        {
             return feature.FeatureType switch
             {
-                "video" => new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), 
-                                                        ConstructPlayoutStrategyFromType(feature.PlayoutStrategy), 
-                                                        ConstructSourceStrategyFromType(feature.SourceStrategy)),
+                "video" => new VideoPlaylistEventFeature(ConstructPlayoutStrategyFromType(feature.PlayoutStrategy), 
+                                                        ConstructSourceStrategyFromType(feature.SourceStrategy),
+                                                        deviceToPlayOn),
                 _ => null
             };
         }

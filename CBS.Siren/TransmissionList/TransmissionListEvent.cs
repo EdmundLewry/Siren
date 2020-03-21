@@ -30,13 +30,11 @@ namespace CBS.Siren
         //There may not be a related event, so this could be null. We may choose to do
         //this with an id, but no reason not to store the event right now
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
-        public IDevice Device { get; set; }
 
-        public TransmissionListEvent(IDevice deviceForPlayout, IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
+        public TransmissionListEvent(IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
             RelatedPlaylistEvent = PlaylistEvent;
             EventFeatures = features;
-            Device = deviceForPlayout;
             EventTimingStrategy = eventTiming;
             EventState = new TransmissionListEventState();
             Id = Guid.NewGuid();
@@ -44,13 +42,12 @@ namespace CBS.Siren
 
         public override String ToString()
         {
-            string returnValue =  base.ToString() + 
+            string returnValue = base.ToString() +
                     $":\nId: {Id}" +
                     $"\nExpectedStartTime: {ExpectedStartTime}" +
                     $"\nExpectedDuration: {ExpectedDuration}" +
                     $"\nTimingStategy - {EventTimingStrategy.ToString()}" +
-                    $"\nRelated Playlist Event Id: {RelatedPlaylistEvent.Id}" + 
-                    $"\nDevice - {Device?.ToString()}";
+                    $"\nRelated Playlist Event Id: {RelatedPlaylistEvent.Id}";
 
             EventFeatures.ForEach((feature) => {
                 returnValue = returnValue + $"\nEventFeature - {feature.ToString()}";

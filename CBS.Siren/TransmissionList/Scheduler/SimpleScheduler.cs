@@ -39,31 +39,32 @@ namespace CBS.Siren
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
             
             transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
-                if (!deviceLists.ContainsKey(transmissionEvent.Device))
-                {
-                    deviceLists[transmissionEvent.Device] = new DeviceList(new List<DeviceListEvent>());
-                }
-
-                deviceLists[transmissionEvent.Device].Events.AddRange(TranslateListEventToDeviceEvents(transmissionEvent));
+                TranslateListEventToDeviceEvents(transmissionEvent, deviceLists); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
             });
 
             return deviceLists;
         }
 
-        private IEnumerable<DeviceListEvent> TranslateListEventToDeviceEvents(TransmissionListEvent transmissionEvent)
+        private void TranslateListEventToDeviceEvents(TransmissionListEvent transmissionEvent, Dictionary<IDevice, DeviceList> deviceLists)
         {
-            List<DeviceListEvent> deviceListEvents = new List<DeviceListEvent>();
-
             transmissionEvent.EventFeatures.ForEach(feature =>
             {
+                if(feature.Device == null)
+                {
+                    return;
+                }
+
+                if (!deviceLists.ContainsKey(feature.Device))
+                {
+                    deviceLists[feature.Device] = new DeviceList(new List<DeviceListEvent>());
+                }
+
                 DeviceListEvent deviceListEvent = TranslateListEventFeature(transmissionEvent, feature);
                 if (deviceListEvent != null)
                 {
-                    deviceListEvents.Add(deviceListEvent);
+                    deviceLists[feature.Device].Events.Add(deviceListEvent);
                 }
             });
-
-            return deviceListEvents;
         }
 
         private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature)

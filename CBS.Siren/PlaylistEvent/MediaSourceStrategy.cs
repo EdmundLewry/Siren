@@ -53,7 +53,7 @@ namespace CBS.Siren
             $"\nEOM: {EOM}";
         }
 
-        public bool Equals([AllowNull] ISourceStrategy other)
+        public virtual bool Equals([AllowNull] ISourceStrategy other)
         {
             return other is MediaSourceStrategy sourceStrategy &&
                 Instance.Equals(sourceStrategy.Instance) &&

@@ -76,7 +76,7 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void GivenAPlaylistAndVideoChain_BuildTransmissionList_CreatesTransmissionEventWithDevices()
+        public void GivenAPlaylistAndVideoChain_BuildTransmissionList_CreatesTransmissionFeatureWithDevices()
         {
             var device = new Mock<IDevice>();
             var videoChain = new Mock<IVideoChain>();
@@ -86,7 +86,7 @@ namespace CBS.Siren.Test
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1 });
             TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, videoChain.Object);
 
-            Assert.Equal(device.Object, transmissionList.Events[0].Device);
+            Assert.Equal(device.Object, transmissionList.Events[0].EventFeatures[0].Device);
         }
     }
 }

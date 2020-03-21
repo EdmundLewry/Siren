@@ -9,8 +9,9 @@ namespace CBS.Siren.Test
 {
     public class SimpleSchedulerUnitTests
     {
-        private Mock<IDevice> mockDevice1;
-        private Mock<IDevice> mockDevice2;
+        private readonly Mock<IDevice> mockDevice1 = new Mock<IDevice>();
+        private readonly Mock<IDevice> mockDevice2 = new Mock<IDevice>();
+        private readonly Mock<IDevice> mockDevice3 = new Mock<IDevice>();
         
         private TransmissionListEvent event1;
         private TransmissionListEvent event2;
@@ -25,9 +26,6 @@ namespace CBS.Siren.Test
 
         public TransmissionList GenerateTransmissionList()
         {
-            mockDevice1 = new Mock<IDevice>();
-            mockDevice2 = new Mock<IDevice>();
-
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Parse("01/01/2020 14:30:00"));
 
@@ -35,12 +33,19 @@ namespace CBS.Siren.Test
             MediaInstance mediaInstance = new MediaInstance("test1");
             mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, 0, 750));
             mockFeature.Setup(mock => mock.CalculateDuration()).Returns(750);
+            mockFeature.Setup(mock => mock.Device).Returns(mockDevice1.Object);
             List<IEventFeature> eventFeatures = new List<IEventFeature>() { mockFeature.Object };
 
-            event1 = new TransmissionListEvent(mockDevice1.Object, mockEventTimingStrategy.Object, eventFeatures);
-            event2 = new TransmissionListEvent(mockDevice1.Object, mockEventTimingStrategy.Object, eventFeatures);
-            event3 = new TransmissionListEvent(mockDevice2.Object, mockEventTimingStrategy.Object, new List<IEventFeature>() { mockFeature.Object, new Mock<IEventFeature>().Object });
-            event4 = new TransmissionListEvent(mockDevice1.Object, mockEventTimingStrategy.Object, eventFeatures);
+            var mockFeature2 = new Mock<IEventFeature>();
+            mockFeature2.Setup(mock => mock.Device).Returns(mockDevice2.Object);
+            
+            var mockFeature3 = new Mock<IEventFeature>();
+            mockFeature3.Setup(mock => mock.Device).Returns(mockDevice3.Object);
+
+            event1 = new TransmissionListEvent(mockEventTimingStrategy.Object, eventFeatures);
+            event2 = new TransmissionListEvent(mockEventTimingStrategy.Object, eventFeatures);
+            event3 = new TransmissionListEvent(mockEventTimingStrategy.Object, new List<IEventFeature>() { mockFeature2.Object, mockFeature3.Object});
+            event4 = new TransmissionListEvent(mockEventTimingStrategy.Object, eventFeatures);
 
             return new TransmissionList(new List<TransmissionListEvent>() {event1, event2, event3, event4}, null);
         }
@@ -54,6 +59,7 @@ namespace CBS.Siren.Test
 
             Assert.True(lists.ContainsKey(mockDevice1.Object));
             Assert.True(lists.ContainsKey(mockDevice2.Object));
+            Assert.True(lists.ContainsKey(mockDevice3.Object));
         }
 
         [Fact]
@@ -96,7 +102,6 @@ namespace CBS.Siren.Test
             DeviceList deviceTwoList = lists[mockDevice2.Object];
 
             Assert.Equal(event3.Id, deviceTwoList.Events[0].RelatedTransmissionListEventId);
-            Assert.Equal(event3.Id, deviceTwoList.Events[1].RelatedTransmissionListEventId);
         }
         
         [Fact]
@@ -136,7 +141,10 @@ namespace CBS.Siren.Test
             Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];
-            Assert.Equal(2, deviceTwoList.Events.Count);
+            Assert.Equal(event3.Id, deviceTwoList.Events[0].RelatedTransmissionListEventId);
+            
+            DeviceList deviceThreeList = lists[mockDevice3.Object];
+            Assert.Equal(event3.Id, deviceThreeList.Events[0].RelatedTransmissionListEventId);
         }
     }
 }

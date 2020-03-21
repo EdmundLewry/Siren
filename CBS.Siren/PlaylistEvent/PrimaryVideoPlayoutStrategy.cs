@@ -7,7 +7,7 @@ namespace CBS.Siren
     {
         public string StrategyType => "primaryVideo";
 
-        public bool Equals([AllowNull] IPlayoutStrategy other)
+        public virtual bool Equals([AllowNull] IPlayoutStrategy other)
         {
             return other is PrimaryVideoPlayoutStrategy;
         }
