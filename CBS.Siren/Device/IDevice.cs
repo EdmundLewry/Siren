@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace CBS.Siren
 {
     /*
@@ -10,5 +12,7 @@ namespace CBS.Siren
     public interface IDevice
     {
         string Name { get; }
+
+        void Run(CancellationToken token);
     }
 }

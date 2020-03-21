@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using CBS.Siren.Logging;
 using CBS.Siren.Time;
 using NLog;
@@ -15,7 +17,12 @@ namespace CBS.Siren
             LoggingManager.ConfigureLogging();
 
             _logger.Info("*** Beginning program. Generating playlist. ***");
-            
+
+            IDevice device = new DemoDevice("DemoDevice1");
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Thread deviceThread = new Thread(() => device.Run(cancellationTokenSource.Token));
+            deviceThread.Start();
+
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
             DateTime startTime = DateTime.Now.AddSeconds(30);
@@ -26,7 +33,7 @@ namespace CBS.Siren
 
             _logger.Info("\n*** Generating Transmission List from Playlist ***\n");
 
-            Channel channel = GenerateChannel();
+            Channel channel = GenerateChannel(device);
             //TODO - Create TransmissionListService - The thing that actually works on a transmission list
             //Generate TransmissionList from playlist
             TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
@@ -41,6 +48,10 @@ namespace CBS.Siren
 
             _logger.Info("*** Completed Siren Program ***");
 
+            Task.Delay(5000).Wait();
+
+            cancellationTokenSource.Cancel();
+            deviceThread.Join();
             LoggingManager.Shutdown();
         }
 
@@ -101,11 +112,10 @@ namespace CBS.Siren
             }
         }
 
-        private static Channel GenerateChannel()
+        private static Channel GenerateChannel(IDevice device)
         {
             //TODO:3 Will need to configure this with a list
-            List<IDevice> devices = new List<IDevice>();
-            devices.Add(new DemoDevice("DemoDevice1"));
+            List<IDevice> devices = new List<IDevice>() { device };
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);

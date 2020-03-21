@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CBS.Siren
 {
@@ -17,6 +19,20 @@ namespace CBS.Siren
         public override String ToString()
         {
             return base.ToString() + " Name: " + Name;
+        }
+
+        public void Run(CancellationToken token)
+        {
+            DoRun(token).Wait();
+        }
+
+        private async Task DoRun(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                Console.WriteLine("Ticking");
+                await Task.Delay(2000);
+            }
         }
     }
 }
