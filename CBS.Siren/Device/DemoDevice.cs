@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CBS.Siren
+namespace CBS.Siren.Device
 {
     /*
     The Demo Device is an implementation of the Device interface that allows us to simulate how
@@ -10,6 +10,9 @@ namespace CBS.Siren
     */
     public class DemoDevice : IDevice
     {
+        private IDeviceController Controller { get; set; }
+        private IDeviceDriver Driver { get; set; }
+
         public String Name { get; }
         public DemoDevice(String name)
         {

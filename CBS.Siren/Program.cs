@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using CBS.Siren.Device;
 using CBS.Siren.Logging;
 using CBS.Siren.Time;
 using NLog;

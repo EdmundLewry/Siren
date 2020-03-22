@@ -1,4 +1,4 @@
-﻿namespace CBS.Siren.Device.DeviceDriver
+﻿namespace CBS.Siren.Device
 {
     public interface IDeviceDriver
     {

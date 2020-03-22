@@ -1,3 +1,4 @@
+using CBS.Siren.Device;
 using System.Collections.Generic;
 
 namespace CBS.Siren

@@ -1,3 +1,4 @@
+using CBS.Siren.Device;
 using Moq;
 using System;
 using System.Collections.Generic;

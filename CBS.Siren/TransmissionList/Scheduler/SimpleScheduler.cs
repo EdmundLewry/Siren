@@ -1,8 +1,8 @@
 using CBS.Siren.Time;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CBS.Siren.Utilities;
+using CBS.Siren.Device;
 
 namespace CBS.Siren
 {
