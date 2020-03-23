@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CBS.Siren.Device
 {
@@ -11,6 +12,6 @@ namespace CBS.Siren.Device
         DeviceList ActiveDeviceList { get; set; }
         DeviceListEvent CurrentEvent { get; }
 
-        void Run(CancellationToken token);
+        Task Run(CancellationToken token);
     }
 }

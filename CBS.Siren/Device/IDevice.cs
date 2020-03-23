@@ -14,5 +14,6 @@ namespace CBS.Siren.Device
         string Name { get; }
 
         void Run(CancellationToken token);
+        void SetDeviceList(DeviceList deviceList);
     }
 }

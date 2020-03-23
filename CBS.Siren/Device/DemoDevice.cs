@@ -17,11 +17,17 @@ namespace CBS.Siren.Device
         public DemoDevice(String name)
         {
             Name = name;
+            Controller = new DeviceController();
         }
 
         public override String ToString()
         {
             return base.ToString() + " Name: " + Name;
+        }
+
+        public void SetDeviceList(DeviceList deviceList)
+        {
+            Controller.ActiveDeviceList = deviceList;
         }
 
         public void Run(CancellationToken token)
@@ -31,11 +37,8 @@ namespace CBS.Siren.Device
 
         private async Task DoRun(CancellationToken token)
         {
-            while (!token.IsCancellationRequested)
-            {
-                Console.WriteLine("Ticking");
-                await Task.Delay(2000);
-            }
+            await Controller.Run(token);
         }
+
     }
 }

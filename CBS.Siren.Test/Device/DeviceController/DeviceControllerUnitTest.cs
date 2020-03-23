@@ -1,6 +1,8 @@
 ﻿using CBS.Siren.Device;
+using CBS.Siren.Time;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -19,7 +21,7 @@ namespace CBS.Siren.Test.Device
 
         private DeviceListEvent GenerateDeviceListEvent(DateTime startTime, DateTime endTime)
         {
-            string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToString()}\",\"duration\":25,\"endTime\":\"{endTime.ToString()}\"}}}}";
+            string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToString("o")}\",\"duration\":25,\"endTime\":\"{endTime.ToString("o")}\"}}}}";
 
             DeviceListEvent deviceListEvent = new DeviceListEvent(eventData);
 
@@ -90,10 +92,43 @@ namespace CBS.Siren.Test.Device
 
             Assert.NotNull(evt);
             Assert.Equal(deviceController, evt.Sender);
-            Assert.Equal(expectedArgs, evt.Arguments);
+            Assert.Equal(expectedArgs.AffectedEvent.Id, evt.Arguments.AffectedEvent.Id);
 
-            cancellationTokenSource.Cancel();
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
         }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task DeviceController_EmitsEventStartEvent_AtStartFrameOfEvent()
+        {
+            DateTime eventTime = DateTime.Now;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
+            IDeviceController deviceController = new DeviceController();
+            deviceController.OnEventStarted += eventHandler;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+            
+            deviceController.ActiveDeviceList = deviceList;
+            await deviceController.Run(cancellationTokenSource.Token);
+
+            //TODO:2 Move this to within the DeviceListEvent
+            JsonElement startTimeElement = JsonDocument.Parse(deviceList.Events[0].EventData).RootElement.GetProperty("timing").GetProperty("startTime");
+            DateTime expectedTime = DateTime.Parse(startTimeElement.GetString());
+            Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            deviceController.OnEventStarted -= eventHandler;
+        }
+
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -117,9 +152,43 @@ namespace CBS.Siren.Test.Device
 
             Assert.NotNull(evt);
             Assert.Equal(deviceController, evt.Sender);
-            Assert.Equal(expectedArgs, evt.Arguments);
+            Assert.Equal(expectedArgs.AffectedEvent.Id, evt.Arguments.AffectedEvent.Id);
 
-            cancellationTokenSource.Cancel();
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
         }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task DeviceController_EmitsEventEndEvent_AtEndFrameOfEvent()
+        {
+            DateTime eventTime = DateTime.Now;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
+            IDeviceController deviceController = new DeviceController();
+            deviceController.OnEventEnded += eventHandler;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = deviceList;
+            await deviceController.Run(cancellationTokenSource.Token);
+
+            //TODO:2 Move this to within the DeviceListEvent
+            JsonElement endTimeElement = JsonDocument.Parse(deviceList.Events[0].EventData).RootElement.GetProperty("timing").GetProperty("endTime");
+            DateTime expectedTime = DateTime.Parse(endTimeElement.GetString());
+            Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            deviceController.OnEventEnded -= eventHandler;
+        }
+
+        //Could I expose and test the internal functions and make the above integration tests - But choosing not to as this is a demo implementation
     }
 }
