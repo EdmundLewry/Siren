@@ -15,12 +15,16 @@ namespace CBS.Siren.Device
         private DeviceDriver Driver { get; set; }
 
         public String Name { get; }
+
+        public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
         public DemoDevice(String name, ILogger logger)
         {
             Name = name;
             Controller = new DeviceController(logger);
             Driver = new DeviceDriver(Controller, logger);
         }
+
+        public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
 
         public override String ToString()
         {
@@ -37,10 +41,33 @@ namespace CBS.Siren.Device
             DoRun(token).Wait();
         }
 
+        //TODO: Unit test this
         private async Task DoRun(CancellationToken token)
         {
-            await Controller.Run(token);
+            Task controllerTask = Controller.Run(token);
+
+            while(!token.IsCancellationRequested)
+            {
+                if(Controller.CurrentEvent != null && CurrentStatus == IDevice.DeviceStatus.STOPPED)
+                {
+                    ChangeStatus(IDevice.DeviceStatus.PLAYING);
+                    
+                }
+
+                if(Controller.CurrentEvent == null && CurrentStatus == IDevice.DeviceStatus.PLAYING)
+                {
+                    ChangeStatus(IDevice.DeviceStatus.STOPPED);
+                }
+            }
+
+            await controllerTask;
         }
 
+        private void ChangeStatus(IDevice.DeviceStatus newStatus)
+        {
+            IDevice.DeviceStatus oldStatus = CurrentStatus;
+            CurrentStatus = newStatus;
+            OnDeviceStatusChanged?.Invoke(this, new DeviceStatusEventArgs(oldStatus, CurrentStatus));
+        }
     }
 }

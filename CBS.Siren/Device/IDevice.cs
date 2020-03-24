@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 
 namespace CBS.Siren.Device
@@ -11,9 +12,16 @@ namespace CBS.Siren.Device
     */
     public interface IDevice
     {
+        public enum DeviceStatus
+        {
+            STOPPED,
+            PLAYING
+        }
+
         string Name { get; }
 
         void Run(CancellationToken token);
         void SetDeviceList(DeviceList deviceList);
+        event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged;
     }
 }

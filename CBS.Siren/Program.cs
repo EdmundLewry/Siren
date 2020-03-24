@@ -24,7 +24,16 @@ namespace CBS.Siren
 
             _logger.LogInformation("*** Beginning program. Generating playlist. ***");
 
+            bool playoutComplete = false;
+            EventHandler<DeviceStatusEventArgs> statusEventHandler = new EventHandler<DeviceStatusEventArgs>((sender, args) => {
+                if(args.NewStatus == IDevice.DeviceStatus.STOPPED)
+                {
+                    playoutComplete = true;
+                }
+            });
+
             IDevice device = new DemoDevice("DemoDevice1", _logger);
+            device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(() => device.Run(cancellationTokenSource.Token));
             deviceThread.Start();
@@ -54,11 +63,15 @@ namespace CBS.Siren
 
             DeliverDeviceLists(deviceLists);
 
-
-            Task.Delay(15000).Wait();
+            Task inputTask = Task.Run(() => Console.ReadLine());
+            while(!playoutComplete && !inputTask.IsCompleted)
+            {
+                Task.Delay(1000).Wait();
+            }
 
             _logger.LogInformation("*** Completed Siren Program ***");
 
+            device.OnDeviceStatusChanged -= statusEventHandler;
             cancellationTokenSource.Cancel();
             deviceThread.Join();
             LoggingManager.Shutdown();
@@ -80,7 +93,7 @@ namespace CBS.Siren
         private static MediaInstance CreateDemoMediaInstance()
         {
             const int FPS = 25;
-            const int mediaDurationSeconds = 30;
+            const int mediaDurationSeconds = 5;
             const int secondsAsFrames = FPS * mediaDurationSeconds;
             const String mediaName = "DemoMedia1";
             const String mediaPath = "\\Media\\DemoMedia1.txt";

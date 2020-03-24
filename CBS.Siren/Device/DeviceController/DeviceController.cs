@@ -29,9 +29,9 @@ namespace CBS.Siren.Device
                 }
                 _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
             } 
-        } 
-        
-        private int EventIndex { get; set; }
+        }
+
+        private int EventIndex { get; set; } = INVALID_INDEX;
         public DeviceListEvent CurrentEvent { get => EventIndex==INVALID_INDEX ? null : ActiveDeviceList.Events[EventIndex]; }
 
         public DeviceController(ILogger logger)
