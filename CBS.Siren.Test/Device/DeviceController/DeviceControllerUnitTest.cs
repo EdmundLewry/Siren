@@ -1,5 +1,7 @@
 ﻿using CBS.Siren.Device;
 using CBS.Siren.Time;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -34,7 +36,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_DeviceController_SetsCurrentEvent()
         {
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
@@ -46,7 +48,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenCurrentEventEnds_DeviceController_ChangesCurrentEvent()
         {
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             DeviceList generatedList = GenerateTestDeviceList();
             generatedList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
 
@@ -76,7 +78,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenEventStartTimeIsMet_DeviceController_EmitsEventStartEvent()
         {
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -108,7 +110,7 @@ namespace CBS.Siren.Test.Device
         {
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             deviceController.OnEventStarted += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
@@ -136,7 +138,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenEventEndTimeIsMet_DeviceController_EmitsEventEndEvent()
         {
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -168,7 +170,7 @@ namespace CBS.Siren.Test.Device
         {
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
-            IDeviceController deviceController = new DeviceController();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             deviceController.OnEventEnded += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);

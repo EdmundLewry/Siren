@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +12,14 @@ namespace CBS.Siren.Device
     public class DemoDevice : IDevice
     {
         private IDeviceController Controller { get; set; }
-        private IDeviceDriver Driver { get; set; }
+        private DeviceDriver Driver { get; set; }
 
         public String Name { get; }
-        public DemoDevice(String name)
+        public DemoDevice(String name, ILogger logger)
         {
             Name = name;
-            Controller = new DeviceController();
+            Controller = new DeviceController(logger);
+            Driver = new DeviceDriver(Controller, logger);
         }
 
         public override String ToString()

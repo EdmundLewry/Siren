@@ -3,11 +3,13 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CBS.Siren.Time;
+using Microsoft.Extensions.Logging;
 
 namespace CBS.Siren.Device
 {
     public class DeviceController : IDeviceController
     {
+        private readonly ILogger _logger;
         private const int INVALID_INDEX = -1;
 
         private bool _eventHasStarted = false;
@@ -25,15 +27,16 @@ namespace CBS.Siren.Device
                     _activeDeviceList = value;
                     EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
                 }
+                _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
             } 
         } 
         
         private int EventIndex { get; set; }
         public DeviceListEvent CurrentEvent { get => EventIndex==INVALID_INDEX ? null : ActiveDeviceList.Events[EventIndex]; }
 
-        public DeviceController()
+        public DeviceController(ILogger logger)
         {
-
+            _logger = logger;
         }
 
         public async Task Run(CancellationToken token)
