@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CBS.Siren.Time;
 
 namespace CBS.Siren.Device
 {
@@ -8,6 +10,7 @@ namespace CBS.Siren.Device
     {
         private const int INVALID_INDEX = -1;
 
+        private bool _eventHasStarted = false;
         private readonly object _deviceListLock = new object();
 
         public event EventHandler<DeviceEventChangedEventArgs> OnEventStarted = delegate { };
@@ -39,27 +42,42 @@ namespace CBS.Siren.Device
             {
                 lock(_deviceListLock)
                 {
-                    if(ActiveDeviceList?.Events.Count > 0)
+                    if(ListIsPlaying())
                     {
                         if(CheckForEventEnd())
                         {
                             CurrentEventEnded();
                         }
 
-                        if(CheckForEventStart())
+                        if(CurrentEvent != null && !_eventHasStarted && CheckForEventStart())
                         {
                             CurrentEventStarted();
                         }
                     }
                 }
                 
-                await Task.Delay(10);
+                await Task.Delay(5);
             }
+        }
+
+        private bool ListIsPlaying() => ActiveDeviceList?.Events.Count > 0 && CurrentEvent != null;
+
+        private bool TimeHasPassed(string timeToCheck)
+        {
+            DateTime expectedTime = DateTime.Parse(timeToCheck);
+
+            if (expectedTime.DifferenceInFrames(DateTime.Now) >= 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private bool CheckForEventEnd()
         {
-            return true;
+            JsonElement endTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("endTime");
+            return TimeHasPassed(endTimeElement.GetString());
         }
 
         private void CurrentEventEnded()
@@ -74,17 +92,20 @@ namespace CBS.Siren.Device
                 EventIndex = INVALID_INDEX;
             }
 
+            _eventHasStarted = false;
             OnEventEnded?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
         }
 
         private bool CheckForEventStart()
         {
-            return false;
+            JsonElement startTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("startTime");
+            return TimeHasPassed(startTimeElement.GetString());
         }
 
         private void CurrentEventStarted()
         {
-            
+            _eventHasStarted = true;
+            OnEventStarted?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
         }
     }
 }

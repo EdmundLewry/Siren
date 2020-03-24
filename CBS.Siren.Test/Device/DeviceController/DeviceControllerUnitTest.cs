@@ -11,6 +11,8 @@ namespace CBS.Siren.Test.Device
 {
     public class DeviceControllerUnitTest
     {
+        private const int TIMEOUT = 2000;
+
         private DeviceList GenerateTestDeviceList()
         {
             DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTime.Now.AddMilliseconds(50), DateTime.Now.AddSeconds(1));
@@ -50,7 +52,7 @@ namespace CBS.Siren.Test.Device
 
             deviceController.ActiveDeviceList = generatedList;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
             Task deviceControllerTask = Task.Run(() => deviceController.Run(cancellationTokenSource.Token));
 
             deviceController.OnEventEnded += (sender, args) => {
@@ -76,15 +78,15 @@ namespace CBS.Siren.Test.Device
         {
             IDeviceController deviceController = new DeviceController();
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
             DeviceList deviceList = GenerateTestDeviceList();
             var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
                 h => deviceController.OnEventStarted += h,
                 h => deviceController.OnEventStarted -= h,
-                () => Task.Run(() => {
+                () => Task.Run(async () => {
                             deviceController.ActiveDeviceList = deviceList;
-                            deviceController.Run(cancellationTokenSource.Token);
+                            await deviceController.Run(cancellationTokenSource.Token);
                         })
             );
 
@@ -109,7 +111,7 @@ namespace CBS.Siren.Test.Device
             IDeviceController deviceController = new DeviceController();
             deviceController.OnEventStarted += eventHandler;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
             DeviceList deviceList = GenerateTestDeviceList();
             
@@ -136,15 +138,15 @@ namespace CBS.Siren.Test.Device
         {
             IDeviceController deviceController = new DeviceController();
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
             DeviceList deviceList = GenerateTestDeviceList();
             var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
                 h => deviceController.OnEventEnded += h,
                 h => deviceController.OnEventEnded -= h,
-                () => Task.Run(() => {
+                () => Task.Run(async () => {
                     deviceController.ActiveDeviceList = deviceList;
-                    deviceController.Run(cancellationTokenSource.Token);
+                    await deviceController.Run(cancellationTokenSource.Token);
                 })
             );
 
@@ -169,7 +171,7 @@ namespace CBS.Siren.Test.Device
             IDeviceController deviceController = new DeviceController();
             deviceController.OnEventEnded += eventHandler;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
             DeviceList deviceList = GenerateTestDeviceList();
 
