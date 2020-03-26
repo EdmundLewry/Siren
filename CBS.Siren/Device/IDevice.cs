@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CBS.Siren.Device
 {
@@ -19,8 +20,9 @@ namespace CBS.Siren.Device
         }
 
         string Name { get; }
+        DeviceStatus CurrentStatus { get; }
 
-        void Run(CancellationToken token);
+        Task Run(CancellationToken token);
         void SetDeviceList(DeviceList deviceList);
         event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged;
     }

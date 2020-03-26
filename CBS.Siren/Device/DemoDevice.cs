@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,16 +11,16 @@ namespace CBS.Siren.Device
     public class DemoDevice : IDevice
     {
         private IDeviceController Controller { get; set; }
-        private DeviceDriver Driver { get; set; }
+        private IDeviceDriver Driver { get; set; }
 
         public String Name { get; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
-        public DemoDevice(String name, ILogger logger)
+        public DemoDevice(String name, IDeviceController controller, IDeviceDriver driver)
         {
             Name = name;
-            Controller = new DeviceController(logger);
-            Driver = new DeviceDriver(Controller, logger);
+            Controller = controller;
+            Driver = driver;
         }
 
         public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
@@ -36,12 +35,11 @@ namespace CBS.Siren.Device
             Controller.ActiveDeviceList = deviceList;
         }
 
-        public void Run(CancellationToken token)
+        public async Task Run(CancellationToken token)
         {
-            DoRun(token).Wait();
+            await DoRun(token);
         }
 
-        //TODO: Unit test this
         private async Task DoRun(CancellationToken token)
         {
             Task controllerTask = Controller.Run(token);
@@ -58,6 +56,8 @@ namespace CBS.Siren.Device
                 {
                     ChangeStatus(IDevice.DeviceStatus.STOPPED);
                 }
+
+                await Task.Delay(5); //This just prevents us from thrashing the CPU
             }
 
             await controllerTask;

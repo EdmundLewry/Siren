@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -120,9 +119,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = deviceList;
             await deviceController.Run(cancellationTokenSource.Token);
 
-            //TODO:2 Move this to within the DeviceListEvent
-            JsonElement startTimeElement = JsonDocument.Parse(deviceList.Events[0].EventData).RootElement.GetProperty("timing").GetProperty("startTime");
-            DateTime expectedTime = DateTime.Parse(startTimeElement.GetString());
+            DateTime expectedTime = deviceList.Events[0].StartTime;
             Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
 
             if (cancellationTokenSource.Token.CanBeCanceled)
@@ -180,9 +177,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = deviceList;
             await deviceController.Run(cancellationTokenSource.Token);
 
-            //TODO:2 Move this to within the DeviceListEvent
-            JsonElement endTimeElement = JsonDocument.Parse(deviceList.Events[0].EventData).RootElement.GetProperty("timing").GetProperty("endTime");
-            DateTime expectedTime = DateTime.Parse(endTimeElement.GetString());
+            DateTime expectedTime = deviceList.Events[0].EndTime;
             Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
 
             if (cancellationTokenSource.Token.CanBeCanceled)

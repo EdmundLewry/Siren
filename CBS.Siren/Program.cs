@@ -15,6 +15,11 @@ namespace CBS.Siren
     {
         private static ILogger _logger;
 
+        protected Program()
+        {
+
+        }
+
         static void Main(string[] args)
         {
             LoggingManager.ConfigureLogging();
@@ -32,7 +37,8 @@ namespace CBS.Siren
                 }
             });
 
-            IDevice device = new DemoDevice("DemoDevice1", _logger);
+            IDeviceFactory deviceFactory = new DeviceFactory();
+            IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logger);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(() => device.Run(cancellationTokenSource.Token));

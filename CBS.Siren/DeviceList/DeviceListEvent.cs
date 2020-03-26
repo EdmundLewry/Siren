@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 
 namespace CBS.Siren
 {
@@ -14,12 +15,33 @@ namespace CBS.Siren
 
         public DeviceListEventState EventState { get; set; }
         public string EventData {get;}
+        public DateTime StartTime { get; private set; }
+        public DateTime EndTime { get; private set; }
 
         public DeviceListEvent(String eventData, Guid? relatedEventId = null)
         {
             Id = Guid.NewGuid();
             RelatedTransmissionListEventId = relatedEventId;
             EventData = eventData;
+            ProcessEventData();
+        }
+
+        private void ProcessEventData()
+        {
+            //Should do better error handling here
+            try
+            {
+                //I wonder if we should try to separate JSON from the Device Event?
+                JsonElement timingElement = JsonDocument.Parse(EventData).RootElement.GetProperty("timing");
+                StartTime = DateTime.Parse(timingElement.GetProperty("startTime").GetString());
+                EndTime = DateTime.Parse(timingElement.GetProperty("endTime").GetString());
+            }
+            catch
+            {
+                Console.WriteLine("Unable to parse event data");
+                StartTime = DateTime.MaxValue;
+                EndTime = DateTime.MaxValue;
+            }
         }
 
         public override String ToString()

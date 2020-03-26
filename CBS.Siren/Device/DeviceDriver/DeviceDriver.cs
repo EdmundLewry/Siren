@@ -3,7 +3,7 @@ using System;
 
 namespace CBS.Siren.Device
 {
-    public class DeviceDriver : IDisposable
+    public class DeviceDriver : IDisposable, IDeviceDriver
     {
         private IDeviceController Controller { get; set; }
         private ILogger _logger { get; set; }
