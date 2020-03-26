@@ -1,4 +1,4 @@
-using System;
+using CBS.Siren.Device;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CBS.Siren

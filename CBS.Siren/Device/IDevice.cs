@@ -1,4 +1,8 @@
-namespace CBS.Siren
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace CBS.Siren.Device
 {
     /*
     A Device is an abstraction for any device required to perform the playout of a list
@@ -7,8 +11,19 @@ namespace CBS.Siren
 
     By updating the state of the Playout List Events, the device can provide feedback as well.
     */
-    public interface IDevice
+    public interface IDevice : IDisposable
     {
+        public enum DeviceStatus
+        {
+            STOPPED,
+            PLAYING
+        }
+
         string Name { get; }
+        DeviceStatus CurrentStatus { get; }
+
+        Task Run(CancellationToken token);
+        void SetDeviceList(DeviceList deviceList);
+        event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged;
     }
 }

@@ -1,4 +1,5 @@
-﻿using CBS.Siren.Time;
+﻿using CBS.Siren.Device;
+using CBS.Siren.Time;
 using Moq;
 using System;
 using System.Collections.Generic;
