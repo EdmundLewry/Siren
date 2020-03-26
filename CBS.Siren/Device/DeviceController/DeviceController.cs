@@ -17,6 +17,7 @@ namespace CBS.Siren.Device
 
         public event EventHandler<DeviceEventChangedEventArgs> OnEventStarted = delegate { };
         public event EventHandler<DeviceEventChangedEventArgs> OnEventEnded = delegate { };
+        public event EventHandler<EventArgs> OnDeviceListEnded = delegate { };
 
         private DeviceList _activeDeviceList;
         public DeviceList ActiveDeviceList { 
@@ -59,7 +60,7 @@ namespace CBS.Siren.Device
                     }
                 }
                 
-                await Task.Delay(5);
+                await Task.Delay(5); //Stops us thrashing the CPU
             }
         }
 
@@ -93,6 +94,7 @@ namespace CBS.Siren.Device
             else
             {
                 EventIndex = INVALID_INDEX;
+                OnDeviceListEnded?.Invoke(this, EventArgs.Empty);
             }
 
             _eventHasStarted = false;

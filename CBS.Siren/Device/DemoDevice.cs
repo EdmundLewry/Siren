@@ -13,6 +13,9 @@ namespace CBS.Siren.Device
         private IDeviceController Controller { get; set; }
         private IDeviceDriver Driver { get; set; }
 
+        private EventHandler<DeviceEventChangedEventArgs> DeviceEventChangeEventHandler { get; set; }
+        private EventHandler<EventArgs> DeviceListEndEventHandler { get; set; }
+
         public String Name { get; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
@@ -21,6 +24,23 @@ namespace CBS.Siren.Device
             Name = name;
             Controller = controller;
             Driver = driver;
+            DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => AssessDeviceStatus());
+            DeviceListEndEventHandler = new EventHandler<EventArgs>((sender, args) => AssessDeviceStatus());
+            SubscribeToControllerEvents();
+        }
+
+        private void SubscribeToControllerEvents()
+        {
+            Controller.OnEventStarted += DeviceEventChangeEventHandler;
+            Controller.OnEventEnded += DeviceEventChangeEventHandler;
+            Controller.OnDeviceListEnded += DeviceListEndEventHandler;
+        }
+
+        private void UnsubscribeFromControllerEvents()
+        {
+            Controller.OnEventStarted -= DeviceEventChangeEventHandler;
+            Controller.OnEventEnded -= DeviceEventChangeEventHandler;
+            Controller.OnDeviceListEnded -= DeviceListEndEventHandler;
         }
 
         public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
@@ -37,30 +57,21 @@ namespace CBS.Siren.Device
 
         public async Task Run(CancellationToken token)
         {
-            await DoRun(token);
+            await Controller.Run(token);
         }
 
-        private async Task DoRun(CancellationToken token)
+        private void AssessDeviceStatus()
         {
-            Task controllerTask = Controller.Run(token);
-
-            while(!token.IsCancellationRequested)
+            if (Controller.CurrentEvent != null && CurrentStatus == IDevice.DeviceStatus.STOPPED)
             {
-                if(Controller.CurrentEvent != null && CurrentStatus == IDevice.DeviceStatus.STOPPED)
-                {
-                    ChangeStatus(IDevice.DeviceStatus.PLAYING);
-                    
-                }
+                ChangeStatus(IDevice.DeviceStatus.PLAYING);
 
-                if(Controller.CurrentEvent == null && CurrentStatus == IDevice.DeviceStatus.PLAYING)
-                {
-                    ChangeStatus(IDevice.DeviceStatus.STOPPED);
-                }
-
-                await Task.Delay(5); //This just prevents us from thrashing the CPU
             }
 
-            await controllerTask;
+            if (Controller.CurrentEvent == null && CurrentStatus == IDevice.DeviceStatus.PLAYING)
+            {
+                ChangeStatus(IDevice.DeviceStatus.STOPPED);
+            }
         }
 
         private void ChangeStatus(IDevice.DeviceStatus newStatus)
@@ -69,5 +80,29 @@ namespace CBS.Siren.Device
             CurrentStatus = newStatus;
             OnDeviceStatusChanged?.Invoke(this, new DeviceStatusEventArgs(oldStatus, CurrentStatus));
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    UnsubscribeFromControllerEvents();
+                    Driver.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

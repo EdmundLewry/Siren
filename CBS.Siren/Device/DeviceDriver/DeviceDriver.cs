@@ -3,22 +3,22 @@ using System;
 
 namespace CBS.Siren.Device
 {
-    public class DeviceDriver : IDisposable, IDeviceDriver
+    public class DeviceDriver : IDeviceDriver
     {
         private IDeviceController Controller { get; set; }
         private ILogger _logger { get; set; }
 
-        private readonly EventHandler<DeviceEventChangedEventArgs> DeviceEventStart;
-        private readonly EventHandler<DeviceEventChangedEventArgs> DeviceEventEnd;
+        private readonly EventHandler<DeviceEventChangedEventArgs> _deviceEventStart;
+        private readonly EventHandler<DeviceEventChangedEventArgs> _deviceEventEnd;
 
         public DeviceDriver(IDeviceController controller, ILogger logger)
         {
             Controller = controller;
             _logger = logger;
-            DeviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Playing: {args.AffectedEvent.ToString()}"));
-            DeviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Stopped Playing: {args.AffectedEvent.ToString()}"));
-            Controller.OnEventStarted += DeviceEventStart;
-            Controller.OnEventEnded += DeviceEventEnd;
+            _deviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Playing: {args.AffectedEvent.ToString()}"));
+            _deviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Stopped Playing: {args.AffectedEvent.ToString()}"));
+            Controller.OnEventStarted += _deviceEventStart;
+            Controller.OnEventEnded += _deviceEventEnd;
         }
 
         #region IDisposable Support
@@ -32,8 +32,8 @@ namespace CBS.Siren.Device
                 {
                     if(Controller != null)
                     {
-                        Controller.OnEventStarted -= DeviceEventStart;
-                        Controller.OnEventEnded -= DeviceEventEnd;
+                        Controller.OnEventStarted -= _deviceEventStart;
+                        Controller.OnEventEnded -= _deviceEventEnd;
                     }
                 }
 

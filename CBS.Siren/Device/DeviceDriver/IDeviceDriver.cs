@@ -1,6 +1,8 @@
-﻿namespace CBS.Siren.Device
+﻿using System;
+
+namespace CBS.Siren.Device
 {
-    public interface IDeviceDriver
+    public interface IDeviceDriver : IDisposable
     {
 
     }

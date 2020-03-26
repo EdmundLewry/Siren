@@ -187,7 +187,36 @@ namespace CBS.Siren.Test.Device
 
             deviceController.OnEventEnded -= eventHandler;
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task DeviceController_EmitsDeviceListEvent_AtEndOfFinalEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
 
-        //Could I expose and test the internal functions and make the above integration tests - But choosing not to as this is a demo implementation
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+
+            var evt = await Assert.RaisesAsync<EventArgs>(
+                h => deviceController.OnDeviceListEnded += h,
+                h => deviceController.OnDeviceListEnded -= h,
+                () => Task.Run(async () =>
+                {
+                    deviceController.ActiveDeviceList = deviceList;
+                    await deviceController.Run(cancellationTokenSource.Token);
+                })
+            );
+
+            Assert.NotNull(evt);
+            Assert.Equal(deviceController, evt.Sender);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
+
+        //Could expose and test the internal functions and make the above integration tests - But choosing not to as this is a demo implementation
     }
 }

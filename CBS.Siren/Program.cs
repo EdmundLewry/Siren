@@ -38,10 +38,10 @@ namespace CBS.Siren
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logger);
+            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logger);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Thread deviceThread = new Thread(() => device.Run(cancellationTokenSource.Token));
+            Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
             deviceThread.Start();
 
             MediaInstance demoMedia = CreateDemoMediaInstance();

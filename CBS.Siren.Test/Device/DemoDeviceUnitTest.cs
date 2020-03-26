@@ -16,13 +16,13 @@ namespace CBS.Siren.Test.Device
             var mockDriver = new Mock<IDeviceDriver>().Object;
             var mockController = new Mock<IDeviceController>().Object;
 
-            IDevice device = new DemoDevice("test", mockController, mockDriver);
+            using IDevice device = new DemoDevice("test", mockController, mockDriver);
             Assert.Equal(IDevice.DeviceStatus.STOPPED, device.CurrentStatus);
         }
         
         [Fact]
         [Trait("TestType","UnitTest")]
-        public async Task WhenController_ReturnsCurrentEvent_DeviceReportsPlaying_Once()
+        public void WhenController_ReturnsCurrentEvent_DeviceReportsPlaying()
         {
             var mockDriver = new Mock<IDeviceDriver>().Object;
             var mockController = new Mock<IDeviceController>();
@@ -30,8 +30,7 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent returnEvent = new DeviceListEvent("");
             mockController.Setup(mock => mock.CurrentEvent).Returns(returnEvent);
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
+            using IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
 
             int callCount = 0;
             EventHandler<DeviceStatusEventArgs> eventHandler = new EventHandler<DeviceStatusEventArgs>((sender, args) => {
@@ -42,23 +41,16 @@ namespace CBS.Siren.Test.Device
             });
             device.OnDeviceStatusChanged += eventHandler;
 
-            Task runningTask = Task.Run(() => device.Run(cancellationTokenSource.Token));
-
-            await Task.Delay(10);
+            mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
             
             Assert.Equal(1, callCount);
 
             device.OnDeviceStatusChanged -= eventHandler;
-            if(cancellationTokenSource.Token.CanBeCanceled)
-            {
-                cancellationTokenSource.Cancel();
-            }
-            await runningTask;
         }
         
         [Fact]
         [Trait("TestType","UnitTest")]
-        public async Task WhenDevice_WasPlaying_AndCurrentEventIsNull_DeviceReportsStopped_Once()
+        public void WhenDevice_WasPlaying_AndCurrentEventIsNull_DeviceReportsStopped()
         {
             var mockDriver = new Mock<IDeviceDriver>().Object;
             var mockController = new Mock<IDeviceController>();
@@ -66,8 +58,7 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent returnEvent = new DeviceListEvent("");
             mockController.Setup(mock => mock.CurrentEvent).Returns(returnEvent);
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
+            using IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
 
             int callCount = 0;
             EventHandler<DeviceStatusEventArgs> eventHandler = new EventHandler<DeviceStatusEventArgs>((sender, args) => {
@@ -84,18 +75,12 @@ namespace CBS.Siren.Test.Device
             });
             device.OnDeviceStatusChanged += eventHandler;
 
-            Task runningTask = Task.Run(() => device.Run(cancellationTokenSource.Token));
-
-            await Task.Delay(10); //Allow the thread some time to work
+            mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
+            mockController.Raise(mock => mock.OnDeviceListEnded += null, EventArgs.Empty);
 
             Assert.Equal(1, callCount);
 
             device.OnDeviceStatusChanged -= eventHandler;
-            if (cancellationTokenSource.Token.CanBeCanceled)
-            {
-                cancellationTokenSource.Cancel();
-            }
-            await runningTask;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace CBS.Siren.Device
 
     By updating the state of the Playout List Events, the device can provide feedback as well.
     */
-    public interface IDevice
+    public interface IDevice : IDisposable
     {
         public enum DeviceStatus
         {
