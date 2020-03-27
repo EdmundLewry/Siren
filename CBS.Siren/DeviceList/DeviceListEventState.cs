@@ -1,3 +1,5 @@
+using System;
+
 namespace CBS.Siren
 {
     public class DeviceListEventState
@@ -11,5 +13,10 @@ namespace CBS.Siren
         }
 
         public Status CurrentStatus { get; set; } = Status.UNSCHEDULED;
+
+        public override string ToString()
+        {
+            return Enum.GetName(typeof(Status), CurrentStatus);
+        }
     }
 }

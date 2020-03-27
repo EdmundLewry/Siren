@@ -26,6 +26,7 @@ namespace CBS.Siren.Device
                 lock (_deviceListLock)
                 {
                     _activeDeviceList = value;
+                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
                     EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
                 }
                 _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
@@ -98,6 +99,7 @@ namespace CBS.Siren.Device
             }
 
             _eventHasStarted = false;
+            endedEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
             OnEventEnded?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
         }
 
@@ -110,6 +112,7 @@ namespace CBS.Siren.Device
         private void CurrentEventStarted()
         {
             _eventHasStarted = true;
+            CurrentEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
             OnEventStarted?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
         }
     }

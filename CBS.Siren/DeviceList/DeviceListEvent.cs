@@ -49,7 +49,8 @@ namespace CBS.Siren
             return  base.ToString() +
                     $":\nId: {Id}" +
                     $"\nRelated Transmission List Event Id: {RelatedTransmissionListEventId}" +
-                    $"\nEventData: {EventData}";
+                    $"\nEventData: {EventData}" +
+                    $"\nEventStatue: {EventState}";
         }
     }
 }
