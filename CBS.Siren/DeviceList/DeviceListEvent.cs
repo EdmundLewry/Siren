@@ -13,7 +13,7 @@ namespace CBS.Siren
         public Guid Id { get; set; }
         public Guid? RelatedTransmissionListEventId { get; set; }
 
-        public DeviceListEventState EventState { get; set; }
+        public DeviceListEventState EventState { get; set; } = new DeviceListEventState();
         public string EventData {get;}
         public DateTime StartTime { get; private set; }
         public DateTime EndTime { get; private set; }
@@ -49,7 +49,8 @@ namespace CBS.Siren
             return  base.ToString() +
                     $":\nId: {Id}" +
                     $"\nRelated Transmission List Event Id: {RelatedTransmissionListEventId}" +
-                    $"\nEventData: {EventData}";
+                    $"\nEventData: {EventData}" +
+                    $"\nEventStatue: {EventState}";
         }
     }
 }
