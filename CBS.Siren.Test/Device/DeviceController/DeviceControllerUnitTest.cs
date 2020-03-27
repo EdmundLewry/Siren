@@ -218,5 +218,73 @@ namespace CBS.Siren.Test.Device
         }
 
         //Could expose and test the internal functions and make the above integration tests - But choosing not to as this is a demo implementation
+
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_DeviceController_SetsEventsStateToUnscheduled()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            Assert.Equal(DeviceListEventState.Status.CUED, generatedList.Events[0].EventState.CurrentStatus);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public async Task WhenEventStarts_DeviceController_SetsEventsStateToPlaying()
+        {
+            TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            deviceController.OnEventStarted += eventHandler;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = deviceList;
+            _ = deviceController.Run(cancellationTokenSource.Token);
+
+            await taskCompletionSource.Task;
+
+            Assert.Equal(DeviceListEventState.Status.PLAYING, deviceList.Events[0].EventState.CurrentStatus);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            deviceController.OnEventStarted -= eventHandler;
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public async Task WhenEventEnds_DeviceController_SetsEventsStateToPlayed()
+        {
+            TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            deviceController.OnEventEnded += eventHandler;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = deviceList;
+            _ = deviceController.Run(cancellationTokenSource.Token);
+
+            await taskCompletionSource.Task;
+
+            Assert.Equal(DeviceListEventState.Status.PLAYED, deviceList.Events[0].EventState.CurrentStatus);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            deviceController.OnEventEnded -= eventHandler;
+        }
     }
 }

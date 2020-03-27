@@ -13,7 +13,7 @@ namespace CBS.Siren
         public Guid Id { get; set; }
         public Guid? RelatedTransmissionListEventId { get; set; }
 
-        public DeviceListEventState EventState { get; set; }
+        public DeviceListEventState EventState { get; set; } = new DeviceListEventState();
         public string EventData {get;}
         public DateTime StartTime { get; private set; }
         public DateTime EndTime { get; private set; }
