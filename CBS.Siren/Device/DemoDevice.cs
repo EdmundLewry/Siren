@@ -10,6 +10,9 @@ namespace CBS.Siren.Device
     */
     public class DemoDevice : IDevice
     {
+        public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
+        public event EventHandler<DeviceListEventStatusChangeArgs> OnDeviceEventStatusChanged = delegate { };
+
         private IDeviceController Controller { get; set; }
         private IDeviceDriver Driver { get; set; }
 
@@ -43,7 +46,6 @@ namespace CBS.Siren.Device
             Controller.OnDeviceListEnded -= DeviceListEndEventHandler;
         }
 
-        public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
 
         public override String ToString()
         {

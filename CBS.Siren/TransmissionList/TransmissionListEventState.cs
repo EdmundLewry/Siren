@@ -6,9 +6,16 @@ namespace CBS.Siren
     */
     public class TransmissionListEventState
     {
-        public TransmissionListEventState()
+        public enum Status
         {
-            
+            UNSCHEDULED,
+            SCHEDULED,
+            CUEING,
+            CUED,
+            PLAYING,
+            PLAYED
         }
+
+        public Status CurrentStatus { get; set; } = Status.UNSCHEDULED;
     }
 }
