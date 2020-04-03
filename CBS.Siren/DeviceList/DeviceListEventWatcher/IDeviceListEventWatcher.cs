@@ -1,4 +1,5 @@
 ﻿using CBS.Siren.Device;
+using System;
 
 namespace CBS.Siren
 {
@@ -9,7 +10,7 @@ namespace CBS.Siren
      * the local device objects to updates from a REST API when the Devices are separated out eventually.
      * 
      */
-    public interface IDeviceListEventWatcher
+    public interface IDeviceListEventWatcher : IDisposable
     {
         void SubcsribeToDevice(IDeviceListEventStatusChangeListener listener, IDevice device);
         void UnsubcsribeFromDevice(IDeviceListEventStatusChangeListener listener, IDevice device);

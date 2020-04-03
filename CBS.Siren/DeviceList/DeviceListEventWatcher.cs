@@ -1,36 +1,70 @@
 ﻿using CBS.Siren.Device;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
     public class DeviceListEventWatcher : IDeviceListEventWatcher
     {
-        public EventHandler<DeviceListEventStatusChangeArgs> EventStatusChangeHandler { get; set; }
-        private Dictionary<IDevice, List<IDeviceListEventStatusChangeListener>> Subscriptions { get; set; }
+        public EventHandler<DeviceListEventStatusChangeArgs> EventStatusChangeHandler { get; private set; }
+        private Dictionary<IDevice, List<IDeviceListEventStatusChangeListener>> Subscriptions { get; set; } = new Dictionary<IDevice, List<IDeviceListEventStatusChangeListener>>();
 
         public DeviceListEventWatcher()
         {
-            EventStatusChangeHandler = new EventHandler<DeviceListEventStatusChangeArgs>((sender, args) => OnDeviceListEventStatusChange(sender, args));
+            EventStatusChangeHandler = new EventHandler<DeviceListEventStatusChangeArgs>((sender, args) => OnDeviceListEventStatusChange(sender as IDevice, args));
         }
 
         public void SubcsribeToDevice(IDeviceListEventStatusChangeListener listener, IDevice device)
         {
-            //If no active subscription for device, subscribe to device for event status changes
-            //if active subscription, add listener to list
-            throw new NotImplementedException();
+            if(!Subscriptions.ContainsKey(device))
+            {
+                Subscriptions.Add(device, new List<IDeviceListEventStatusChangeListener>());
+                device.OnDeviceEventStatusChanged += EventStatusChangeHandler;
+            }
+
+            Subscriptions[device].Add(listener);
         }
 
         public void UnsubcsribeFromDevice(IDeviceListEventStatusChangeListener listener, IDevice device)
         {
-            //Remove listener from active subscription
-            //if no more listeners, unscubscribe from device
-            throw new NotImplementedException();
+            Subscriptions[device].Remove(listener);
+
+            if(!Subscriptions[device].Any())
+            {
+                device.OnDeviceEventStatusChanged -= EventStatusChangeHandler;
+                Subscriptions.Remove(device);
+            }
         }
 
-        public void OnDeviceListEventStatusChange(object sender, DeviceListEventStatusChangeArgs args)
+        public void OnDeviceListEventStatusChange(IDevice device, DeviceListEventStatusChangeArgs args)
         {
-            //use as IDevice
+            if (device is null || !Subscriptions.ContainsKey(device))
+            {
+                return;
+            }
+
+            Subscriptions[device].ForEach((listerner) => listerner.OnDeviceListEventStatusChanged(args.EventId, args.NewState));
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue && disposing)
+            {
+                Subscriptions.Keys.ToList().ForEach((device) => device.OnDeviceEventStatusChanged -= EventStatusChangeHandler);
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
