@@ -27,7 +27,7 @@ namespace CBS.Siren.Device
             Name = name;
             Controller = controller;
             Driver = driver;
-            DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => AssessDeviceStatus());
+            DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => HandleDeviceEventChange(args));
             DeviceListEndEventHandler = new EventHandler<EventArgs>((sender, args) => AssessDeviceStatus());
             SubscribeToControllerEvents();
         }
@@ -60,6 +60,12 @@ namespace CBS.Siren.Device
         public async Task Run(CancellationToken token)
         {
             await Controller.Run(token);
+        }
+
+        private void HandleDeviceEventChange(DeviceEventChangedEventArgs args)
+        {
+            OnDeviceEventStatusChanged?.Invoke(this, new DeviceListEventStatusChangeArgs(args.AffectedEvent.Id, args.AffectedEvent.EventState));
+            AssessDeviceStatus();
         }
 
         private void AssessDeviceStatus()

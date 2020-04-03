@@ -108,7 +108,8 @@ namespace CBS.Siren.Test.Device
             mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
 
             Assert.Equal(device, receivedSender);
-            Assert.Equal(expectedArgs, receivedArgs);
+            Assert.Equal(expectedArgs.EventId, receivedArgs.EventId);
+            Assert.Equal(expectedArgs.NewState.CurrentStatus, receivedArgs.NewState.CurrentStatus);
 
             device.OnDeviceEventStatusChanged -= eventHandler;
         }
