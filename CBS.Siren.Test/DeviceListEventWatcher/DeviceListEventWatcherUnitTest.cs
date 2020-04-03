@@ -7,11 +7,6 @@ namespace CBS.Siren.Test
 {
     public class DeviceListEventWatcherUnitTest
     {
-        /* I tried to implement this test using Moq's new VerifyAdd functionality, but it didn't seem
-         * to actually work...
-         * Tests were passing wehre the event subscription was being used, but the mock never seemed to verify
-         * So checking that the callback is never made instead.
-         */
         [Fact]
         [Trait("TestType","UnitTest")]
         public void EventWatcher_ShouldUnsubscribeFromDevice_OnLastUnsubscriptionForADevice()
