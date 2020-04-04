@@ -70,7 +70,9 @@ namespace CBS.Siren
         private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature)
         {
             string eventData = GenerateEventData(transmissionEvent, feature);
-            return new DeviceListEvent(eventData, transmissionEvent.Id);
+            DeviceListEvent createdEvent = new DeviceListEvent(eventData, transmissionEvent.Id);
+            transmissionEvent.RelatedDeviceListEvents.Add(createdEvent.Id);
+            return createdEvent;
         }
 
         private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)
