@@ -61,6 +61,11 @@ namespace CBS.Siren
                         UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUEING);
                         break;
                     }
+                case DeviceListEventState.Status.PLAYING:
+                    {
+                        UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
+                        break;
+                    }
             }
             //Update state to:
 
