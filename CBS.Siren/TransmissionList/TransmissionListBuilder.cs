@@ -20,7 +20,11 @@ namespace CBS.Siren
 
             foreach(IEventFeature feature in playlistEvent.EventFeatures)
             {
-                features.Add(ConstructEventFeatureFromType(feature, videoChain));
+                IEventFeature eventFeature = ConstructEventFeatureFromType(feature, videoChain);
+                if(eventFeature != null)
+                {
+                    features.Add(eventFeature);
+                }
             }
 
             IEventTimingStrategy eventTimingStrategy = ConstructTimingStrategyFromType(playlistEvent.EventTimingStrategy);

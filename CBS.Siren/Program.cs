@@ -56,13 +56,13 @@ namespace CBS.Siren
 
             Channel channel = GenerateChannel(device);
 
-            TransmissionListService transmissionListService = new TransmissionListService(logFactory.CreateLogger<TransmissionListService>());
-            
-            //Generate TransmissionList from playlist
-            TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration);
             PrintTransmissionListContent(transmissionList);
-
+            
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
+
+            ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), logFactory.CreateLogger<TransmissionListService>());
+            transmissionListService.TransmissionList = transmissionList;
 
             SimpleScheduler scheduler = new SimpleScheduler();
             Dictionary<IDevice, DeviceList> deviceLists = scheduler.ScheduleTransmissionList(transmissionList);
@@ -83,11 +83,6 @@ namespace CBS.Siren
             cancellationTokenSource.Cancel();
             deviceThread.Join();
             LoggingManager.Shutdown();
-        }
-
-        private static TransmissionList GenerateTransmissionList(Playlist list, IVideoChain videoChain)
-        {
-            return TransmissionListBuilder.BuildFromPlaylist(list, videoChain);
         }
 
         private static void PrintPlaylistContent(Playlist list)
