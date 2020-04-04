@@ -1,6 +1,7 @@
 ﻿using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -22,18 +23,26 @@ namespace CBS.Siren.Test
             return new TransmissionListEvent(new Mock<IEventTimingStrategy>().Object, eventFeatures);
         }
 
+        private Mock<IDeviceListEventFactory> CreateMockDeviceListEventFactory(params DeviceListEvent[] deviceEvents)
+        {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            foreach(DeviceListEvent deviceListEvent in deviceEvents)
+            {
+                mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceListEvent.Id)).Returns(deviceListEvent);
+            }
+
+            return mockDeviceEventFactory;
+        }
+
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenPlayCalled_DeliversEventsToDevices()
         {
             var mockDevice = new Mock<IDevice>();
 
-            DeviceListEvent event1 = new DeviceListEvent("");
-            DeviceListEvent event2 = new DeviceListEvent("");
-
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>()
             {
-                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { event1, event2 })
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
             };
             var mockScheduler = new Mock<IScheduler>();
             mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventFactory>())).Returns(deviceLists);
@@ -57,11 +66,11 @@ namespace CBS.Siren.Test
         public void TransmissionListService_WhenTransmissionListSet_ShouldSubscribeToAllRelevantDevices()
         {
             var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
+            var mockDevice1 = new Mock<IDevice>().Object;
+            var mockDevice2 = new Mock<IDevice>().Object;
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object);
-            TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1);
+            TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2 }, null);
             using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
@@ -69,8 +78,8 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            mockEventWatcher.Verify(mock => mock.SubcsribeToDevice(serviceUnderTest, mockDevice1.Object));
-            mockEventWatcher.Verify(mock => mock.SubcsribeToDevice(serviceUnderTest, mockDevice2.Object));
+            mockEventWatcher.Verify(mock => mock.SubcsribeToDevice(serviceUnderTest, mockDevice1));
+            mockEventWatcher.Verify(mock => mock.SubcsribeToDevice(serviceUnderTest, mockDevice2));
         }
 
         [Fact]
@@ -78,11 +87,11 @@ namespace CBS.Siren.Test
         public void TransmissionListService_WhenTransmissionListSet_ShouldUnsubscribeFromAllDevicesFromPreviousList()
         {
             var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
+            var mockDevice1 = new Mock<IDevice>().Object;
+            var mockDevice2 = new Mock<IDevice>().Object;
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object);
-            TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1);
+            TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2 }, null);
             using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
@@ -90,35 +99,29 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            var mockDevice3 = new Mock<IDevice>();
-            var mockDevice4 = new Mock<IDevice>();
-            TransmissionListEvent event3 = GenerateTestTransmissionListEvent(mockDevice3.Object);
-            TransmissionListEvent event4 = GenerateTestTransmissionListEvent(mockDevice4.Object);
+            TransmissionListEvent event3 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object);
+            TransmissionListEvent event4 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object);
 
             TransmissionList replacementList = new TransmissionList(new List<TransmissionListEvent>() { event3, event4 }, null);
             serviceUnderTest.TransmissionList = replacementList;
 
-            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice1.Object));
-            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice2.Object));
+            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice1));
+            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice2));
         }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventCued_ShouldChangeTransmissionListEventToCueing()
         {
-            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
-
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent();
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -132,23 +135,17 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenAllDeviceListEventsCued_ShouldChangeTransmissionListEventToCued()
         {
-            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
-
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
-            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
+            var mockDeviceEventFactory = CreateMockDeviceListEventFactory(deviceEvent1, deviceEvent2);
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent();
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -160,24 +157,20 @@ namespace CBS.Siren.Test
 
             Assert.Equal(TransmissionListEventState.Status.CUED, event1.EventState.CurrentStatus);
         }
-        
+
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldChangeTransmissionListEventToPlaying()
         {
-            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
-
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent();
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -191,23 +184,17 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenAllDeviceListEventsPlayed_ShouldChangeTransmissionListEventToPlayed()
         {
-            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
-
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+            
+            var mockDeviceEventFactory = CreateMockDeviceListEventFactory(deviceEvent1, deviceEvent2);
 
-            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
-
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent();
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -224,23 +211,17 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventsPlayed_ShouldKeepTransmissionListEventAsPlaying()
         {
-            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
-            var mockDevice1 = new Mock<IDevice>();
-            var mockDevice2 = new Mock<IDevice>();
-
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
-            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
-            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
+            var mockDeviceEventFactory = CreateMockDeviceListEventFactory(deviceEvent1, deviceEvent2);
 
-            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent();
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
