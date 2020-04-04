@@ -38,8 +38,9 @@ namespace CBS.Siren
         {
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
             
-            transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
+            transmissionList.Events.ForEach((transmissionEvent) => {
                 TranslateListEventToDeviceEvents(transmissionEvent, deviceLists); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
+                transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
             });
 
             return deviceLists;
