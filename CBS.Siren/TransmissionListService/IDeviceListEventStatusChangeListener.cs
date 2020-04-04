@@ -2,7 +2,7 @@
 
 namespace CBS.Siren
 {
-    public interface IDeviceListEventStatusChangeListener
+    public interface IDeviceListEventStatusChangeListener : IDisposable
     {
         void OnDeviceListEventStatusChanged(Guid eventId, DeviceListEventState state);
     }

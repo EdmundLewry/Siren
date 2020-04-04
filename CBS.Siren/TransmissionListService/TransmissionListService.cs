@@ -24,14 +24,13 @@ namespace CBS.Siren
         public IDeviceListEventWatcher DeviceListEventWatcher { get; }
 
         private TransmissionList _transmissionList;
-        //TODO: If the list is playing, we shouldn't be able to replace it
         public TransmissionList TransmissionList 
         { 
             get => _transmissionList; 
             set {
-                UnsubscriveFromDeviceEventChanges();
+                UnsubscribeFromDeviceEventChanges(_transmissionList);
                 _transmissionList = value;
-                SubscribeToDeviceEvents();
+                SubscribeToDeviceEvents(_transmissionList);
             } 
         }
 
@@ -59,14 +58,51 @@ namespace CBS.Siren
             deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
         }
 
-        private void SubscribeToDeviceEvents()
+        private void SubscribeToDeviceEvents(TransmissionList transmissionList)
         {
-            throw new NotImplementedException();
+            if (transmissionList is null)
+            {
+                return;
+            }
+
+            HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
+            foreach (IDevice device in devices)
+            {
+                DeviceListEventWatcher.SubcsribeToDevice(this, device);
+            }
         }
 
-        private void UnsubscriveFromDeviceEventChanges()
+        private void UnsubscribeFromDeviceEventChanges(TransmissionList transmissionList)
         {
-            throw new NotImplementedException();
+            if(transmissionList is null)
+            {
+                return;
+            }
+
+            HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
+            foreach(IDevice device in devices)
+            {
+                DeviceListEventWatcher.UnsubcsribeFromDevice(this, device);
+            }
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue && disposing)
+            {
+                UnsubscribeFromDeviceEventChanges(_transmissionList);
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

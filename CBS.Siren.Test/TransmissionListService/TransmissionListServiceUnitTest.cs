@@ -33,7 +33,7 @@ namespace CBS.Siren.Test
             mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>())).Returns(deviceLists);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
-            TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -47,7 +47,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenTransmissionListSet_ShouldSubscribeToAllRelevantDevices()
         {
-            var mockEventWatcher = new Mock<DeviceListEventWatcher>();
+            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
             var mockDevice1 = new Mock<IDevice>();
             var mockDevice2 = new Mock<IDevice>();
 
@@ -55,7 +55,7 @@ namespace CBS.Siren.Test
             TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2.Object);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2 }, null);
-            TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -68,7 +68,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenTransmissionListSet_ShouldUnsubscribeFromAllDevicesFromPreviousList()
         {
-            var mockEventWatcher = new Mock<DeviceListEventWatcher>();
+            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
             var mockDevice1 = new Mock<IDevice>();
             var mockDevice2 = new Mock<IDevice>();
 
@@ -76,7 +76,7 @@ namespace CBS.Siren.Test
             TransmissionListEvent event2 = GenerateTestTransmissionListEvent(mockDevice2.Object);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2 }, null);
-            TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
@@ -89,8 +89,8 @@ namespace CBS.Siren.Test
             TransmissionList replacementList = new TransmissionList(new List<TransmissionListEvent>() { event3, event4 }, null);
             serviceUnderTest.TransmissionList = replacementList;
 
-            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice3.Object));
-            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice4.Object));
+            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice1.Object));
+            mockEventWatcher.Verify(mock => mock.UnsubcsribeFromDevice(serviceUnderTest, mockDevice2.Object));
         }
     }
 }
