@@ -4,10 +4,10 @@ namespace CBS.Siren.Device
 {
     public class DeviceFactory : IDeviceFactory
     {
-        public IDevice CreateDemoDevice(string name, ILogger logger)
+        public IDevice CreateDemoDevice(string name, ILoggerFactory loggerFactory)
         {
-            IDeviceController controller = new DeviceController(logger);
-            IDeviceDriver deviceDriver = new DeviceDriver(controller, logger);
+            IDeviceController controller = new DeviceController(loggerFactory.CreateLogger<DeviceController>());
+            IDeviceDriver deviceDriver = new DeviceDriver(controller, loggerFactory.CreateLogger<DeviceDriver>());
             return new DemoDevice(name, controller, deviceDriver);
         }
     }

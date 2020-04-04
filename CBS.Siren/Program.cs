@@ -38,7 +38,7 @@ namespace CBS.Siren
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logger);
+            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", logFactory);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
@@ -55,7 +55,9 @@ namespace CBS.Siren
             _logger.LogInformation("\n*** Generating Transmission List from Playlist ***\n");
 
             Channel channel = GenerateChannel(device);
-            //TODO - Create TransmissionListService - The thing that actually works on a transmission list
+
+            TransmissionListService transmissionListService = new TransmissionListService(logFactory.CreateLogger<TransmissionListService>());
+            
             //Generate TransmissionList from playlist
             TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
             PrintTransmissionListContent(transmissionList);
