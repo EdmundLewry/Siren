@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CBS.Siren.Device;
@@ -64,12 +63,9 @@ namespace CBS.Siren
             ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), logFactory.CreateLogger<TransmissionListService>());
             transmissionListService.TransmissionList = transmissionList;
 
-            SimpleScheduler scheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> deviceLists = scheduler.ScheduleTransmissionList(transmissionList);
-
-            PrintDeviceListsContent(deviceLists);
-
-            DeliverDeviceLists(deviceLists);
+            transmissionListService.PlayTransmissionList();
+            
+            PrintDeviceListsContent(channel.ChainConfiguration);            
 
             Task inputTask = Task.Run(() => Console.ReadLine());
             while(!playoutComplete && !inputTask.IsCompleted)
@@ -126,15 +122,15 @@ namespace CBS.Siren
             Console.ResetColor();
         }
 
-        private static void PrintDeviceListsContent(Dictionary<IDevice, DeviceList> deviceLists)
+        private static void PrintDeviceListsContent(IVideoChain videoChain)
         {
-            foreach (KeyValuePair<IDevice, DeviceList> deviceListPair in deviceLists)
+            videoChain.ChainDevices.ForEach((device) =>
             {
-                _logger.LogInformation($"Device:{deviceListPair.Key.Name} will have a Device List containing the following events:");
+                _logger.LogInformation($"Device:{device.Name} will have a Device List containing the following events:");
                 Console.ForegroundColor = ConsoleColor.Green;
-                _logger.LogInformation(deviceListPair.Value.ToString());
+                _logger.LogInformation(device.ActiveList.ToString());
                 Console.ResetColor();
-            }
+            });
         }
 
         private static Channel GenerateChannel(IDevice device)
@@ -144,11 +140,6 @@ namespace CBS.Siren
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);
-        }
-
-        private static void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
-        {
-            deviceLists.ToList().ForEach((pair) => pair.Key.SetDeviceList(pair.Value));
         }
     }
 }

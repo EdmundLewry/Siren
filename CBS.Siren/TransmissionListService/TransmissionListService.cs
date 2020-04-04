@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CBS.Siren.Device;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -36,9 +39,14 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            //Runs scheduler to get the device list 
-            //Delivers the lists to the devices
-            throw new NotImplementedException();
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList);
+
+            DeliverDeviceLists(deviceLists);
+        }
+
+        private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
+        {
+            deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
         }
     }
 }

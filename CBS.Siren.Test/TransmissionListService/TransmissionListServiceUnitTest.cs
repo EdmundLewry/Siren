@@ -8,14 +8,6 @@ namespace CBS.Siren.Test
 {
     public class TransmissionListServiceUnitTest
     {
-        private TransmissionListEvent GenerateTransmissionEvent(IDevice device)
-        {
-            var mockFeature = new Mock<IEventFeature>();
-            mockFeature.Setup(mock => mock.Device).Returns(device);
-            List<IEventFeature> features = new List<IEventFeature>() { mockFeature.Object };
-
-            return new TransmissionListEvent(new Mock<IEventTimingStrategy>().Object, features, null);
-        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -23,17 +15,23 @@ namespace CBS.Siren.Test
         {
             var mockDevice = new Mock<IDevice>();
 
-            TransmissionListEvent event1 = GenerateTransmissionEvent(mockDevice.Object);
-            TransmissionListEvent event2 = GenerateTransmissionEvent(mockDevice.Object);
+            DeviceListEvent event1 = new DeviceListEvent("");
+            DeviceListEvent event2 = new DeviceListEvent("");
 
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2 }, null);
-            TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<ILogger<TransmissionListService>>().Object);
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>() { 
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { event1, event2 })
+            };
+            var mockScheduler = new Mock<IScheduler>();
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>())).Returns(deviceLists);
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object, new Mock<ILogger<TransmissionListService>>().Object);
 
             serviceUnderTest.TransmissionList = transmissionList;
 
             serviceUnderTest.PlayTransmissionList();
 
-            mockDevice.Verify(mock => mock.SetDeviceList(It.IsAny<DeviceList>()));
+            mockDevice.VerifySet(mock => mock.ActiveList = It.IsAny<DeviceList>());
         }
     }
 }

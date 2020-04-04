@@ -21,9 +21,9 @@ namespace CBS.Siren.Device
 
         string Name { get; }
         DeviceStatus CurrentStatus { get; }
+        DeviceList ActiveList { get; set; }
 
         Task Run(CancellationToken token);
-        void SetDeviceList(DeviceList deviceList);
         event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged;
         event EventHandler<DeviceListEventStatusChangeArgs> OnDeviceEventStatusChanged;
     }

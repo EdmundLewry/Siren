@@ -22,6 +22,10 @@ namespace CBS.Siren.Device
         public String Name { get; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
+
+        public DeviceList ActiveList { get => Controller.ActiveDeviceList; set => Controller.ActiveDeviceList = value; }
+
+
         public DemoDevice(String name, IDeviceController controller, IDeviceDriver driver)
         {
             Name = name;
@@ -50,11 +54,6 @@ namespace CBS.Siren.Device
         public override String ToString()
         {
             return base.ToString() + " Name: " + Name;
-        }
-
-        public void SetDeviceList(DeviceList deviceList)
-        {
-            Controller.ActiveDeviceList = deviceList;
         }
 
         public async Task Run(CancellationToken token)
