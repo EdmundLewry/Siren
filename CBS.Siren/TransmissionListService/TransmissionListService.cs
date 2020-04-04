@@ -52,7 +52,7 @@ namespace CBS.Siren
             {
                 case DeviceListEventState.Status.CUED:
                     {
-                        if (IsTransmissionListEventCued(effectedEvent))
+                        if (IsTransmissionListEventCued(effectedEvent, DeviceListEventFactory))
                         {
                             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUED);
                             break;
@@ -64,15 +64,13 @@ namespace CBS.Siren
             }
             //Update state to:
 
-            //Cueing if new state is cued and not all related device list events are cued
-            //Cued is all related device list events are cued
             //Playing if new state is playing
             //Played if new state is played and all related events are played
         }
 
-        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent)
+        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory)
         {
-            return false; // effectedEvent.RelatedDeviceListEvents.All(eventId => /*Find out if DeviceListEvent is Cued*/);
+            return effectedEvent.RelatedDeviceListEvents.All(eventId => deviceListEventFactory.GetEventById(eventId)?.EventState.CurrentStatus == DeviceListEventState.Status.CUED);
         }
 
         private void UpdateTransmissionListEventStatus(TransmissionListEvent effectedEvent, TransmissionListEventState.Status status)

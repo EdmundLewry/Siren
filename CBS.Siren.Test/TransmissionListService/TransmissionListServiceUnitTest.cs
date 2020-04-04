@@ -139,17 +139,23 @@ namespace CBS.Siren.Test
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
             DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
+
             TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
             event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
             event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
-            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, new Mock<IDeviceListEventFactory>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
             {
                 TransmissionList = transmissionList
             };
 
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
 
             Assert.Equal(TransmissionListEventState.Status.CUED, event1.EventState.CurrentStatus);
