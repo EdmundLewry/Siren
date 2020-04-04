@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CBS.Siren.Device;
@@ -38,7 +37,7 @@ namespace CBS.Siren
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logger);
+            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", logFactory);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
@@ -55,19 +54,18 @@ namespace CBS.Siren
             _logger.LogInformation("\n*** Generating Transmission List from Playlist ***\n");
 
             Channel channel = GenerateChannel(device);
-            //TODO - Create TransmissionListService - The thing that actually works on a transmission list
-            //Generate TransmissionList from playlist
-            TransmissionList transmissionList = GenerateTransmissionList(list, channel.ChainConfiguration);
-            PrintTransmissionListContent(transmissionList);
 
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration);
+            PrintTransmissionListContent(transmissionList);
+            
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
 
-            SimpleScheduler scheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> deviceLists = scheduler.ScheduleTransmissionList(transmissionList);
+            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), logFactory.CreateLogger<TransmissionListService>());
+            transmissionListService.TransmissionList = transmissionList;
 
-            PrintDeviceListsContent(deviceLists);
-
-            DeliverDeviceLists(deviceLists);
+            transmissionListService.PlayTransmissionList();
+            
+            PrintDeviceListsContent(channel.ChainConfiguration);            
 
             Task inputTask = Task.Run(() => Console.ReadLine());
             while(!playoutComplete && !inputTask.IsCompleted)
@@ -81,11 +79,6 @@ namespace CBS.Siren
             cancellationTokenSource.Cancel();
             deviceThread.Join();
             LoggingManager.Shutdown();
-        }
-
-        private static TransmissionList GenerateTransmissionList(Playlist list, IVideoChain videoChain)
-        {
-            return TransmissionListBuilder.BuildFromPlaylist(list, videoChain);
         }
 
         private static void PrintPlaylistContent(Playlist list)
@@ -129,15 +122,15 @@ namespace CBS.Siren
             Console.ResetColor();
         }
 
-        private static void PrintDeviceListsContent(Dictionary<IDevice, DeviceList> deviceLists)
+        private static void PrintDeviceListsContent(IVideoChain videoChain)
         {
-            foreach (KeyValuePair<IDevice, DeviceList> deviceListPair in deviceLists)
+            videoChain.ChainDevices.ForEach((device) =>
             {
-                _logger.LogInformation($"Device:{deviceListPair.Key.Name} will have a Device List containing the following events:");
+                _logger.LogInformation($"Device:{device.Name} will have a Device List containing the following events:");
                 Console.ForegroundColor = ConsoleColor.Green;
-                _logger.LogInformation(deviceListPair.Value.ToString());
+                _logger.LogInformation(device.ActiveList.ToString());
                 Console.ResetColor();
-            }
+            });
         }
 
         private static Channel GenerateChannel(IDevice device)
@@ -147,11 +140,6 @@ namespace CBS.Siren
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);
-        }
-
-        private static void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
-        {
-            deviceLists.ToList().ForEach((pair) => pair.Key.SetDeviceList(pair.Value));
         }
     }
 }

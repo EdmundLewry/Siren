@@ -10,6 +10,9 @@ namespace CBS.Siren.Device
     */
     public class DemoDevice : IDevice
     {
+        public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
+        public event EventHandler<DeviceListEventStatusChangeArgs> OnDeviceEventStatusChanged = delegate { };
+
         private IDeviceController Controller { get; set; }
         private IDeviceDriver Driver { get; set; }
 
@@ -19,12 +22,16 @@ namespace CBS.Siren.Device
         public String Name { get; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
+
+        public DeviceList ActiveList { get => Controller.ActiveDeviceList; set => Controller.ActiveDeviceList = value; }
+
+
         public DemoDevice(String name, IDeviceController controller, IDeviceDriver driver)
         {
             Name = name;
             Controller = controller;
             Driver = driver;
-            DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => AssessDeviceStatus());
+            DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => HandleDeviceEventChange(args));
             DeviceListEndEventHandler = new EventHandler<EventArgs>((sender, args) => AssessDeviceStatus());
             SubscribeToControllerEvents();
         }
@@ -43,21 +50,21 @@ namespace CBS.Siren.Device
             Controller.OnDeviceListEnded -= DeviceListEndEventHandler;
         }
 
-        public event EventHandler<DeviceStatusEventArgs> OnDeviceStatusChanged = delegate { };
 
         public override String ToString()
         {
             return base.ToString() + " Name: " + Name;
         }
 
-        public void SetDeviceList(DeviceList deviceList)
-        {
-            Controller.ActiveDeviceList = deviceList;
-        }
-
         public async Task Run(CancellationToken token)
         {
             await Controller.Run(token);
+        }
+
+        private void HandleDeviceEventChange(DeviceEventChangedEventArgs args)
+        {
+            OnDeviceEventStatusChanged?.Invoke(this, new DeviceListEventStatusChangeArgs(args.AffectedEvent.Id, args.AffectedEvent.EventState));
+            AssessDeviceStatus();
         }
 
         private void AssessDeviceStatus()
