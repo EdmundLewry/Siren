@@ -3,6 +3,7 @@ using CBS.Siren.Time;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Xunit;
 
@@ -146,6 +147,28 @@ namespace CBS.Siren.Test
             
             DeviceList deviceThreeList = lists[mockDevice3.Object];
             Assert.Equal(event3.Id, deviceThreeList.Events[0].RelatedTransmissionListEventId);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTranmissionList_ShouldSetDeviceListEventIdsOnEachTranmissionListEvent()
+        {
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            DeviceList deviceList = lists[mockDevice1.Object];
+
+            Assert.All(deviceList.Events.Where(listEvent => listEvent.RelatedTransmissionListEventId == event1.Id), 
+                       (listEvent) => Assert.Contains(listEvent.Id, event1.RelatedDeviceListEvents));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTranmissionList_ShouldSetTransmissionListEventStatus_ToScheduled()
+        {
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            _ = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+
+            Assert.All(transmissionList.Events, (listEvent) => Assert.Equal(TransmissionListEventState.Status.SCHEDULED, listEvent.EventState.CurrentStatus));
         }
     }
 }

@@ -14,9 +14,9 @@ namespace CBS.Siren
     */
     public class TransmissionListEvent
     {
-        public TransmissionListEventState EventState { get; set; }
+        public TransmissionListEventState EventState { get; set; } = new TransmissionListEventState();
         //We may want more human readable identifiers
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }
@@ -30,14 +30,13 @@ namespace CBS.Siren
         //There may not be a related event, so this could be null. We may choose to do
         //this with an id, but no reason not to store the event right now
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
+        public List<Guid> RelatedDeviceListEvents { get; set; } = new List<Guid>();
 
         public TransmissionListEvent(IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
             RelatedPlaylistEvent = PlaylistEvent;
             EventFeatures = features;
             EventTimingStrategy = eventTiming;
-            EventState = new TransmissionListEventState();
-            Id = Guid.NewGuid();
         }
 
         public override String ToString()
@@ -46,8 +45,8 @@ namespace CBS.Siren
                     $":\nId: {Id}" +
                     $"\nExpectedStartTime: {ExpectedStartTime}" +
                     $"\nExpectedDuration: {ExpectedDuration}" +
-                    $"\nTimingStategy - {EventTimingStrategy.ToString()}" +
-                    $"\nRelated Playlist Event Id: {RelatedPlaylistEvent.Id}";
+                    $"\nTimingStategy - {EventTimingStrategy?.ToString()}" +
+                    $"\nRelated Playlist Event Id: {RelatedPlaylistEvent?.Id}";
 
             EventFeatures.ForEach((feature) => {
                 returnValue = returnValue + $"\nEventFeature - {feature.ToString()}";
