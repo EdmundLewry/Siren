@@ -1,7 +1,6 @@
 ﻿using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
 using System.Collections.Generic;
 using Xunit;
 
