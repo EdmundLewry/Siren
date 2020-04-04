@@ -66,16 +66,26 @@ namespace CBS.Siren
                         UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
                         break;
                     }
-            }
-            //Update state to:
+                case DeviceListEventState.Status.PLAYED:
+                    {
+                        if(IsTransmissionListEventPlayed(effectedEvent, DeviceListEventFactory))
+                        {
+                            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
+                        }
+                        break;
+                    }
 
-            //Playing if new state is playing
-            //Played if new state is played and all related events are played
+            }
         }
 
         private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory)
         {
             return effectedEvent.RelatedDeviceListEvents.All(eventId => deviceListEventFactory.GetEventById(eventId)?.EventState.CurrentStatus == DeviceListEventState.Status.CUED);
+        }
+
+        private bool IsTransmissionListEventPlayed(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory)
+        {
+            return effectedEvent.RelatedDeviceListEvents.All(eventId => deviceListEventFactory.GetEventById(eventId)?.EventState.CurrentStatus == DeviceListEventState.Status.PLAYED);
         }
 
         private void UpdateTransmissionListEventStatus(TransmissionListEvent effectedEvent, TransmissionListEventState.Status status)

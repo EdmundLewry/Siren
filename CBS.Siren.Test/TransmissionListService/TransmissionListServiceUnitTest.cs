@@ -191,14 +191,66 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenAllDeviceListEventsPlayed_ShouldChangeTransmissionListEventToPlayed()
         {
+            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
+            var mockDevice1 = new Mock<IDevice>();
+            var mockDevice2 = new Mock<IDevice>();
 
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
+            event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+
+            Assert.Equal(TransmissionListEventState.Status.PLAYED, event1.EventState.CurrentStatus);
         }
         
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventsPlayed_ShouldKeepTransmissionListEventAsPlaying()
         {
+            var mockEventWatcher = new Mock<IDeviceListEventWatcher>();
+            var mockDevice1 = new Mock<IDevice>();
+            var mockDevice2 = new Mock<IDevice>();
 
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent1.Id)).Returns(deviceEvent1);
+            mockDeviceEventFactory.Setup(mock => mock.GetEventById(deviceEvent2.Id)).Returns(deviceEvent2);
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(mockDevice1.Object, mockDevice2.Object);
+            event1.RelatedDeviceListEvents.Add(deviceEvent1.Id);
+            event1.RelatedDeviceListEvents.Add(deviceEvent2.Id);
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, mockEventWatcher.Object, mockDeviceEventFactory.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+
+            Assert.Equal(TransmissionListEventState.Status.PLAYING, event1.EventState.CurrentStatus);
         }
     }
 }
