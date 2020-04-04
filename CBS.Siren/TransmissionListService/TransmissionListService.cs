@@ -21,15 +21,25 @@ namespace CBS.Siren
     {
         public ILogger<TransmissionListService> Logger { get; }
         public IScheduler Scheduler { get; private set; }
+        public IDeviceListEventWatcher DeviceListEventWatcher { get; }
 
         private TransmissionList _transmissionList;
         //TODO: If the list is playing, we shouldn't be able to replace it
-        public TransmissionList TransmissionList { get => _transmissionList; 
-                                                   set => _transmissionList = value; }
-        public TransmissionListService(IScheduler scheduler, ILogger<TransmissionListService> logger)
+        public TransmissionList TransmissionList 
+        { 
+            get => _transmissionList; 
+            set {
+                UnsubscriveFromDeviceEventChanges();
+                _transmissionList = value;
+                SubscribeToDeviceEvents();
+            } 
+        }
+
+        public TransmissionListService(IScheduler scheduler, IDeviceListEventWatcher deviceListEventWatcher, ILogger<TransmissionListService> logger)
         {
             Logger = logger;
             Scheduler = scheduler;
+            DeviceListEventWatcher = deviceListEventWatcher;
         }
 
         public void OnDeviceListEventStatusChanged(Guid eventId, DeviceListEventState state)
@@ -47,6 +57,16 @@ namespace CBS.Siren
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
         {
             deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
+        }
+
+        private void SubscribeToDeviceEvents()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UnsubscriveFromDeviceEventChanges()
+        {
+            throw new NotImplementedException();
         }
     }
 }
