@@ -22,6 +22,7 @@ namespace CBS.Siren
         public ILogger<TransmissionListService> Logger { get; }
         public IScheduler Scheduler { get; private set; }
         public IDeviceListEventWatcher DeviceListEventWatcher { get; }
+        public IDeviceListEventFactory DeviceListEventFactory { get; }
 
         private TransmissionList _transmissionList;
         public TransmissionList TransmissionList 
@@ -34,11 +35,12 @@ namespace CBS.Siren
             } 
         }
 
-        public TransmissionListService(IScheduler scheduler, IDeviceListEventWatcher deviceListEventWatcher, ILogger<TransmissionListService> logger)
+        public TransmissionListService(IScheduler scheduler, IDeviceListEventWatcher deviceListEventWatcher, IDeviceListEventFactory deviceListEventFactory, ILogger<TransmissionListService> logger)
         {
             Logger = logger;
             Scheduler = scheduler;
             DeviceListEventWatcher = deviceListEventWatcher;
+            DeviceListEventFactory = deviceListEventFactory;
         }
 
         public void OnDeviceListEventStatusChanged(Guid eventId, DeviceListEventState state)
@@ -46,20 +48,31 @@ namespace CBS.Siren
             //Find the transmission list event that relates to this id
             TransmissionListEvent effectedEvent = FindTransmissionListEventByDeviceListEventId(eventId);
 
-            switch(state.CurrentStatus)
+            switch (state.CurrentStatus)
             {
                 case DeviceListEventState.Status.CUED:
-                {
-                    UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUEING);
-                    break;
-                }
-            };
+                    {
+                        if (IsTransmissionListEventCued(effectedEvent))
+                        {
+                            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUED);
+                            break;
+                        }
+
+                        UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUEING);
+                        break;
+                    }
+            }
             //Update state to:
 
             //Cueing if new state is cued and not all related device list events are cued
             //Cued is all related device list events are cued
             //Playing if new state is playing
             //Played if new state is played and all related events are played
+        }
+
+        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent)
+        {
+            return false; // effectedEvent.RelatedDeviceListEvents.All(eventId => /*Find out if DeviceListEvent is Cued*/);
         }
 
         private void UpdateTransmissionListEventStatus(TransmissionListEvent effectedEvent, TransmissionListEventState.Status status)
@@ -77,7 +90,7 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventFactory);
 
             DeliverDeviceLists(deviceLists);
         }

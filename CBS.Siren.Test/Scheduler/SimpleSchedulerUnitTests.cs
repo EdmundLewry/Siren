@@ -56,8 +56,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListForEachDevice()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             Assert.True(lists.ContainsKey(mockDevice1.Object));
             Assert.True(lists.ContainsKey(mockDevice2.Object));
@@ -68,8 +72,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateListsOfOnlyEventsRelatedToOneDevice()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
 
@@ -92,8 +100,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateDeviceListWithCorrectOrder()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
 
@@ -110,8 +122,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListEventsWithCorrectData()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             DeviceList deviceOneList = lists[mockDevice1.Object];
             DeviceListEvent deviceListEvent = deviceOneList.Events[0];
@@ -139,8 +155,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateAnEventPerFeature()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             DeviceList deviceTwoList = lists[mockDevice2.Object];
             Assert.Equal(event3.Id, deviceTwoList.Events[0].RelatedTransmissionListEventId);
@@ -153,8 +173,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTranmissionList_ShouldSetDeviceListEventIdsOnEachTranmissionListEvent()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
             DeviceList deviceList = lists[mockDevice1.Object];
 
             Assert.All(deviceList.Events.Where(listEvent => listEvent.RelatedTransmissionListEventId == event1.Id), 
@@ -165,8 +189,12 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void ScheduleTranmissionList_ShouldSetTransmissionListEventStatus_ToScheduled()
         {
+            var mockDeviceEventFactory = new Mock<IDeviceListEventFactory>();
+            mockDeviceEventFactory.Setup(mockDeviceEventFactory => mockDeviceEventFactory.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<Guid>()))
+                                  .Returns((string s, Guid id) => new DeviceListEvent(s, id));
+
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
-            _ = simpleChannelScheduler.ScheduleTransmissionList(transmissionList);
+            _ = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventFactory.Object);
 
             Assert.All(transmissionList.Events, (listEvent) => Assert.Equal(TransmissionListEventState.Status.SCHEDULED, listEvent.EventState.CurrentStatus));
         }
