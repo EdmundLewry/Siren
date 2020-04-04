@@ -44,6 +44,12 @@ namespace CBS.Siren
         public void OnDeviceListEventStatusChanged(Guid eventId, DeviceListEventState state)
         {
             Logger.LogWarning("OnDeviceListEventStatusChanged: Not implemented yet");
+            //Find the transmission list event that relates to this id
+            //Update state to:
+            //Cueing if new state is cued and not all related device list events are cued
+            //Cued is all related device list events are cued
+            //Playing if new state is playing
+            //Played if new state is played and all related events are played
         }
 
         public void PlayTransmissionList()

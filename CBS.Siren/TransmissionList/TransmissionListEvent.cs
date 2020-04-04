@@ -30,7 +30,7 @@ namespace CBS.Siren
         //There may not be a related event, so this could be null. We may choose to do
         //this with an id, but no reason not to store the event right now
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
-        public List<Guid> RelatedDeviceListEvents { get; set; } = new List<Guid>();
+        public List<Guid> RelatedDeviceListEvents { get; private set; } = new List<Guid>();
 
         public TransmissionListEvent(IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
