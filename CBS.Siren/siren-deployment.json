@@ -1,0 +1,59 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {},
+  "items": [
+    {
+      "kind": "Pod",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "siren",
+        "labels": {
+          "app": "siren",
+          "io.kompose.service": "siren"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "siren",
+            "image": "siren:0.0",
+            "ports": [
+              {
+                "containerPort": 80,
+                "protocol": "TCP"
+              }
+            ],
+            "resources": {},
+            "imagePullPolicy": "IfNotPresent"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "siren"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "http-5000",
+            "protocol": "TCP",
+            "port": 5000,
+            "targetPort": 80
+          }
+        ],
+        "selector": {
+          "io.kompose.service": "siren"
+        },
+        "type": "ClusterIP",
+        "sessionAffinity": "None"
+      },
+      "status": {
+        "loadBalancer": {}
+      }
+    }
+  ]
+}

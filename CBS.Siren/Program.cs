@@ -65,14 +65,22 @@ namespace CBS.Siren
 
             transmissionListService.PlayTransmissionList();
             
-            PrintDeviceListsContent(channel.ChainConfiguration);            
+            PrintDeviceListsContent(channel.ChainConfiguration);
 
-            Task inputTask = Task.Run(() => Console.ReadLine());
-            while(!playoutComplete && !inputTask.IsCompleted)
+            Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs args) {
+                args.Cancel = true;
+                cancellationTokenSource.Cancel();
+            };
+
+            while(!playoutComplete && !cancellationTokenSource.IsCancellationRequested)
             {
                 Task.Delay(1000).Wait();
             }
 
+            if(playoutComplete)
+            {
+                _logger.LogInformation($"Playout of triggered list, has completed.");
+            }
             _logger.LogInformation("*** Completed Siren Program ***");
 
             device.OnDeviceStatusChanged -= statusEventHandler;

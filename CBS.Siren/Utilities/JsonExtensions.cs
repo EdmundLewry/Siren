@@ -8,6 +8,7 @@ namespace CBS.Siren.Utilities
         {
             JsonSerializerOptions documentOptions = new JsonSerializerOptions();
             documentOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            documentOptions.WriteIndented = true;
             return JsonSerializer.Serialize(objData, documentOptions);
         }
     }
