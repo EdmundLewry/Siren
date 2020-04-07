@@ -15,8 +15,8 @@ namespace CBS.Siren.Device
         {
             Controller = controller;
             _logger = logger;
-            _deviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Playing: {args.AffectedEvent.ToString()}"));
-            _deviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Stopped Playing: {args.AffectedEvent.ToString()}"));
+            _deviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Playing:\n{args.AffectedEvent.ToString()}\n"));
+            _deviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Stopped Playing:\n{args.AffectedEvent.ToString()}\n"));
             Controller.OnEventStarted += _deviceEventStart;
             Controller.OnEventEnded += _deviceEventEnd;
         }
