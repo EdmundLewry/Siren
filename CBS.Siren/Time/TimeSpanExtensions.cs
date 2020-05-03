@@ -56,10 +56,10 @@ namespace CBS.Siren.Time
             return string.Empty;
         }
 
-        public static int TotalFrames(this TimeSpan timeSpan) => TotalFrames(timeSpan, TimeSource.SourceFrameRate);
-        public static int TotalFrames(this TimeSpan timeSpan, FrameRate frameRate)
+        public static long TotalFrames(this TimeSpan timeSpan) => TotalFrames(timeSpan, TimeSource.SourceFrameRate);
+        public static long TotalFrames(this TimeSpan timeSpan, FrameRate frameRate)
         {
-            return 0;
+            return timeSpan.TotalMilliseconds.MillisecondsToFrames(frameRate);
         }
     }
 }

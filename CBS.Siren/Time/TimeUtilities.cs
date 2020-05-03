@@ -8,10 +8,11 @@ namespace CBS.Siren.Time
         //Should implement this in full sometimes
         public static int FramesToSeconds(this int frameCount, FrameRate frameRate) => frameCount / (int)Math.Round(frameRate.FrameCount());
 
-        public static long MsToFrames(this double msCount)
+        public static long MillisecondsToFrames(this double msCount) => MillisecondsToFrames(msCount, TimeSource.SourceFrameRate);
+        public static long MillisecondsToFrames(this double msCount, FrameRate frameRate)
         {
-            int msPerFrame = 1000 / TimeSource.SOURCE_FRAMERATE; //Doesn't account for drop frame
-            return (long)msCount / msPerFrame;
+            double msPerFrame = 1000 / frameRate.FrameCount();
+            return (long)Math.Round(msCount / msPerFrame);
         }
 
         public static int FramesToMiliseconds(int frames, FrameRate frameRate)
@@ -49,9 +50,9 @@ namespace CBS.Siren.Time
             long ticksDifference = rhs.Ticks - lhs.Ticks;
             TimeSpan timeSpanDifference = new TimeSpan(ticksDifference);
 
-            double framesDifference = timeSpanDifference.TotalMilliseconds.MsToFrames();
+            long framesDifference = timeSpanDifference.TotalMilliseconds.MillisecondsToFrames();
 
-            return (long)framesDifference;
+            return framesDifference;
         }
     }
 }

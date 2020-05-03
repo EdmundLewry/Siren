@@ -67,13 +67,20 @@ namespace CBS.Siren.Test.Time
         
         [Theory]
         [Trait("TestType", "UnitTest")]
-        [InlineData(0, 0)]
-        [InlineData(20, 0)]
-        [InlineData(40, 1)]
-        [InlineData(1000, 25)]
-        public void MsToFrames_ReportsCorrectNumberOfFrames(double ms, int frames)
+        [InlineData(0, 0, FrameRate.FPS25)]
+        [InlineData(20, 0, FrameRate.FPS25)]
+        [InlineData(40, 1, FrameRate.FPS25)]
+        [InlineData(200, 5, FrameRate.FPS25)]
+        [InlineData(200, 5, FrameRate.FPS24)]
+        [InlineData(200, 6, FrameRate.FPS30)]
+        [InlineData(200, 6, FrameRate.DF30)]
+        [InlineData(1000, 25, FrameRate.FPS25)]
+        [InlineData(1000, 24, FrameRate.FPS24)]
+        [InlineData(1000, 30, FrameRate.FPS30)]
+        [InlineData(1001, 30, FrameRate.DF30)]
+        public void MillisecondsToFrames_ReportsCorrectNumberOfFrames(double ms, int frames, FrameRate frameRate)
         {
-            Assert.Equal(frames, ms.MsToFrames());
+            Assert.Equal(frames, ms.MillisecondsToFrames(frameRate));
         }
 
         [Theory]
