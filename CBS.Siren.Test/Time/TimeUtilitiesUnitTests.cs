@@ -62,7 +62,7 @@ namespace CBS.Siren.Test.Time
         [InlineData(100, 4)]
         public void FramesToSeconds_ReportsCorrectNumberOfSeconds(int frames, int seconds)
         {
-            Assert.Equal(seconds, frames.FramesToSeconds());
+            Assert.Equal(seconds, frames.FramesToSeconds(FrameRate.FPS25));
         }
         
         [Theory]
@@ -74,6 +74,22 @@ namespace CBS.Siren.Test.Time
         public void MsToFrames_ReportsCorrectNumberOfFrames(double ms, int frames)
         {
             Assert.Equal(frames, ms.MsToFrames());
+        }
+
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData(0, 0, FrameRate.FPS25)]
+        [InlineData(4, 160, FrameRate.FPS25)]
+        [InlineData(4, 167, FrameRate.FPS24)]
+        [InlineData(4, 133, FrameRate.FPS30)]
+        [InlineData(4, 133, FrameRate.DF30)]
+        [InlineData(25, 1000, FrameRate.FPS25)]
+        [InlineData(24, 1000, FrameRate.FPS24)]
+        [InlineData(30, 1000, FrameRate.FPS30)]
+        [InlineData(30, 1001, FrameRate.DF30)]
+        public void FramesToMilliseconds_ReportsCorrectNumberOfFrames(int frames, int milliseconds, FrameRate frameRate)
+        {
+            Assert.Equal(milliseconds, TimeUtilities.FramesToMiliseconds(frames, frameRate));
         }
     }
 }

@@ -4,7 +4,10 @@ namespace CBS.Siren.Time
 {
     public static class TimeUtilities
     {
-        public static int FramesToSeconds(this int frameCount) => frameCount / TimeSource.SOURCE_FRAMERATE;
+        public static int FramesToSeconds(this int frameCount) => FramesToSeconds(frameCount, TimeSource.SourceFrameRate);
+        //Should implement this in full sometimes
+        public static int FramesToSeconds(this int frameCount, FrameRate frameRate) => frameCount / (int)Math.Round(frameRate.FrameCount());
+
         public static long MsToFrames(this double msCount)
         {
             int msPerFrame = 1000 / TimeSource.SOURCE_FRAMERATE; //Doesn't account for drop frame
