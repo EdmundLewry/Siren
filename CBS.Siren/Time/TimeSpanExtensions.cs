@@ -59,9 +59,9 @@ namespace CBS.Siren.Time
             string minutes = timeSpan.Minutes.ToString().PadLeft(2,'0');
             string seconds = timeSpan.Seconds.ToString().PadLeft(2,'0');
             string seperator = frameRate.IsDropFrame() ? ";" : ":";
-            string millis = TimeUtilities.MillisecondsToFrames(timeSpan.Milliseconds, frameRate).ToString().PadLeft(2,'0');
+            string frames = TimeUtilities.MillisecondsToFrames(timeSpan.Milliseconds, frameRate).ToString().PadLeft(2,'0');
 
-            return timecode + $"{hours}:{minutes}:{seconds}{seperator}{millis}";
+            return timecode + $"{hours}:{minutes}:{seconds}{seperator}{frames}";
         }
 
         public static long TotalFrames(this TimeSpan timeSpan) => TotalFrames(timeSpan, TimeSource.SourceFrameRate);

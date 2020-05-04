@@ -37,5 +37,20 @@ namespace CBS.Siren.Test.Time
         {
             Assert.Throws<ArgumentException>(() => DateTimeExtensions.FromTimecodeString(input, frameRate));
         }
+
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData("22/03/2020 00:00:00.000", "2020-03-22T00:00:00:00", FrameRate.FPS25)]
+        [InlineData("22/12/2020 00:00:10.000", "2020-12-22T00:00:10:00", FrameRate.FPS25)]
+        [InlineData("02/03/2020 00:00:00.960", "2020-03-02T00:00:00:24", FrameRate.FPS25)]
+        [InlineData("22/03/1999 01:02:01.500", "1999-03-22T01:02:01:12", FrameRate.FPS24)]
+        [InlineData("22/03/2020 01:02:01.867", "2020-03-22T01:02:01:26", FrameRate.FPS30)]
+        [InlineData("22/03/2020 01:02:01.867", "2020-03-22T01:02:01;26", FrameRate.DF30)]
+        [InlineData("22/03/2020 11:22:41.867", "2020-03-22T11:22:41;26", FrameRate.DF30)]
+        public void ToTimecodeString_GivenTimeSpan_ReturnsExpectedString(string input, string expected, FrameRate frameRate)
+        {
+            string output = DateTime.Parse(input).ToTimecodeString(frameRate);
+            Assert.Equal(expected, output);
+        }
     }
 }

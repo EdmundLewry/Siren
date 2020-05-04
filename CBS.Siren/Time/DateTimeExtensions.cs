@@ -69,9 +69,11 @@ namespace CBS.Siren.Time
         public static string ToTimecodeString(this DateTime dateTime) => ToTimecodeString(dateTime, TimeSource.SourceFrameRate);
         public static string ToTimecodeString(this DateTime dateTime, FrameRate frameRate)
         {
-            //Convert to date
-            //Convert to time from total frames
-            return string.Empty;
+            string timecode = dateTime.ToString("s");
+            string seperator = frameRate.IsDropFrame() ? ";" : ":";
+            string frame = TimeUtilities.MillisecondsToFrames(dateTime.Millisecond, frameRate).ToString().PadLeft(2, '0');
+
+            return timecode + $"{seperator}{frame}";
         }
     }
 }
