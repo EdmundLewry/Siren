@@ -53,7 +53,15 @@ namespace CBS.Siren.Time
         public static string ToTimecodeString(this TimeSpan timeSpan) => ToTimecodeString(timeSpan, TimeSource.SourceFrameRate);
         public static string ToTimecodeString(this TimeSpan timeSpan, FrameRate frameRate)
         {
-            return string.Empty;
+            string timecode = timeSpan.Days > 0 ? $"{timeSpan.Days.ToString().PadLeft(3,'0')}:" : "";
+            
+            string hours = timeSpan.Hours.ToString().PadLeft(2,'0');
+            string minutes = timeSpan.Minutes.ToString().PadLeft(2,'0');
+            string seconds = timeSpan.Seconds.ToString().PadLeft(2,'0');
+            string seperator = frameRate.IsDropFrame() ? ";" : ":";
+            string millis = TimeUtilities.MillisecondsToFrames(timeSpan.Milliseconds, frameRate).ToString().PadLeft(2,'0');
+
+            return timecode + $"{hours}:{minutes}:{seconds}{seperator}{millis}";
         }
 
         public static long TotalFrames(this TimeSpan timeSpan) => TotalFrames(timeSpan, TimeSource.SourceFrameRate);

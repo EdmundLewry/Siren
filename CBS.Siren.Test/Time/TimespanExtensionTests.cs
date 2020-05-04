@@ -40,5 +40,18 @@ namespace CBS.Siren.Test.Time
             Assert.Throws<ArgumentException>(() => TimeSpanExtensions.FromTimecodeString(input, framerate));
         }
 
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData("00:00:00.000", "00:00:00:00", FrameRate.FPS25)]
+        [InlineData("00:00:10.000", "00:00:10:00", FrameRate.FPS25)]
+        [InlineData("00:00:00.960", "00:00:00:24", FrameRate.FPS25)]
+        [InlineData("01:02:01.500", "01:02:01:12", FrameRate.FPS24)]
+        [InlineData("01:02:01.867", "01:02:01:26", FrameRate.FPS30)]
+        [InlineData("01:02:01.867", "01:02:01;26", FrameRate.DF30)]
+        public void ToTimecodeString_GivenTimeSpan_ReturnsExpectedString(string input, string expected, FrameRate frameRate)
+        {
+            string output = TimeSpan.Parse(input).ToTimecodeString(frameRate);
+            Assert.Equal(expected, output);
+        }
     }
 }
