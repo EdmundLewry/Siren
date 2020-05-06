@@ -99,12 +99,10 @@ namespace CBS.Siren
 
         private static MediaInstance CreateDemoMediaInstance()
         {
-            const int FPS = 25;
-            const int mediaDurationSeconds = 5;
-            const int secondsAsFrames = FPS * mediaDurationSeconds;
+            TimeSpan duration = TimeSpanExtensions.FromTimecodeString("00:00:05:00", FrameRate.FPS25);
             const String mediaName = "DemoMedia1";
             const String mediaPath = "\\Media\\DemoMedia1.txt";
-            return new MediaInstance(mediaName, secondsAsFrames, mediaPath, FileType.TEXT);
+            return new MediaInstance(mediaName, duration, mediaPath, FileType.TEXT);
         }
 
         private static List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
@@ -112,7 +110,7 @@ namespace CBS.Siren
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             for (int i = 0; i < eventCount; ++i)
             {
-                int additionalSeconds = demoMedia.Duration.FramesToSeconds() * i;
+                int additionalSeconds = (int)demoMedia.Duration.TotalSeconds * i;
                 FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
                 VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
                 PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);

@@ -12,7 +12,7 @@ namespace CBS.Siren.Test
         {
             IFeaturePropertiesFactory featurePropertiesFactory = new FeaturePropertiesFactory();
 
-            MediaInstance mediaInstance = new MediaInstance("test");
+            MediaInstance mediaInstance = new MediaInstance("test", TimeSpan.Zero);
             Assert.IsType<MediaSourceStrategy>(featurePropertiesFactory.CreateMediaSourceStrategy(mediaInstance));
         }
         

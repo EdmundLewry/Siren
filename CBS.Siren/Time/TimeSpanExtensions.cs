@@ -20,7 +20,7 @@ namespace CBS.Siren.Time
             int hours = int.Parse(match.Groups["hours"].Value);
             int minutes = int.Parse(match.Groups["minutes"].Value);
             int seconds = int.Parse(match.Groups["seconds"].Value);
-            int milliseconds = TimeUtilities.FramesToMiliseconds(int.Parse(match.Groups["frames"].Value), frameRate);
+            int milliseconds = (int)TimeUtilities.FramesToMiliseconds(int.Parse(match.Groups["frames"].Value), frameRate);
 
             return new TimeSpan(days, hours, minutes, seconds, milliseconds);
         }
@@ -68,6 +68,12 @@ namespace CBS.Siren.Time
         public static long TotalFrames(this TimeSpan timeSpan, FrameRate frameRate)
         {
             return timeSpan.TotalMilliseconds.MillisecondsToFrames(frameRate);
+        }
+
+        public static TimeSpan FromFrames(long frames) => FromFrames(frames, TimeSource.SourceFrameRate);
+        public static TimeSpan FromFrames(long frames, FrameRate frameRate)
+        {
+            return TimeSpan.FromMilliseconds(TimeUtilities.FramesToMiliseconds(frames, frameRate));
         }
     }
 }

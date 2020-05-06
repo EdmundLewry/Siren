@@ -24,7 +24,7 @@ namespace CBS.Siren.Test.Device
 
         private DeviceListEvent GenerateDeviceListEvent(DateTime startTime, DateTime endTime)
         {
-            string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToString("o")}\",\"duration\":25,\"endTime\":\"{endTime.ToString("o")}\"}}}}";
+            string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToTimecodeString()}\",\"duration\":\"00:00:25:00\",\"endTime\":\"{endTime.ToTimecodeString()}\"}}}}";
 
             DeviceListEvent deviceListEvent = new DeviceListEvent(eventData);
 

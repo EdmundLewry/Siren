@@ -1,4 +1,5 @@
 using CBS.Siren.Device;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace CBS.Siren
@@ -39,7 +40,7 @@ namespace CBS.Siren
                     Device?.Name == other.Device?.Name;
         }
 
-        public int CalculateDuration()
+        public TimeSpan CalculateDuration()
         {
             //For our duration, we only care about the length of the Media Source Strategy
             return SourceStrategy.GetDuration();

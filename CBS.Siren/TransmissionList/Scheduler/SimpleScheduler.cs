@@ -1,8 +1,9 @@
-using CBS.Siren.Time;
 using System.Collections.Generic;
 using System.Linq;
 using CBS.Siren.Utilities;
 using CBS.Siren.Device;
+using System;
+using CBS.Siren.Time;
 
 namespace CBS.Siren
 {
@@ -29,7 +30,7 @@ namespace CBS.Siren
             return transmissionList;
         }
 
-        private int CalculateLongestFeatureDuration(List<IEventFeature> eventFeatures)
+        private TimeSpan CalculateLongestFeatureDuration(List<IEventFeature> eventFeatures)
         {
             return eventFeatures.Select(feature => feature.CalculateDuration()).Max();
         }
@@ -79,9 +80,9 @@ namespace CBS.Siren
         private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)
         {
             var timing = new { 
-                StartTime = transmissionEvent.ExpectedStartTime,
-                Duration = transmissionEvent.ExpectedDuration,
-                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(transmissionEvent.ExpectedDuration.FramesToSeconds())
+                StartTime = transmissionEvent.ExpectedStartTime.ToTimecodeString(),
+                Duration = transmissionEvent.ExpectedDuration.ToTimecodeString(),
+                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(transmissionEvent.ExpectedDuration.TotalSeconds).ToTimecodeString()
             };
 
             var source = new {

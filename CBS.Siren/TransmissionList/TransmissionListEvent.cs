@@ -1,3 +1,4 @@
+using CBS.Siren.Time;
 using System;
 using System.Collections.Generic;
 
@@ -21,9 +22,7 @@ namespace CBS.Siren
         public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }
 
-        //This should be in timecode
-        public int ExpectedDuration { get; set; } //Currently in frames (assuming 25FPS)
-        //Should be in timecode
+        public TimeSpan ExpectedDuration { get; set; }
         public DateTime ExpectedStartTime { get; set; }
 
         //I think this should just be a way to reference the related playlist event
@@ -43,8 +42,8 @@ namespace CBS.Siren
         {
             string returnValue = base.ToString() +
                     $":\nId: {Id}" +
-                    $"\nExpectedStartTime: {ExpectedStartTime}" +
-                    $"\nExpectedDuration: {ExpectedDuration}" +
+                    $"\nExpectedStartTime: {ExpectedStartTime.ToTimecodeString()}" +
+                    $"\nExpectedDuration: {ExpectedDuration.ToTimecodeString()}" +
                     $"\nTimingStategy - {EventTimingStrategy?.ToString()}" +
                     $"\nRelated Playlist Event Id: {RelatedPlaylistEvent?.Id}";
 

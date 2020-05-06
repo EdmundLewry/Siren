@@ -1,3 +1,4 @@
+using CBS.Siren.Time;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -14,17 +15,15 @@ namespace CBS.Siren
     {
         public MediaInstance Instance { get; }
         
-        //Will need a timecode for this. Currently in frames
         //SOM = Start of Media
-        public int SOM { get; set; } //Currently in 25 FPS
+        public TimeSpan SOM { get; set; }
         
-        //Will need a timecode for this. Currently in frames
         //EOM = EOM of Media
-        public int EOM { get; set; } //Currently in 25 FPS
+        public TimeSpan EOM { get; set; }
 
         public string StrategyType => "mediaSource";
 
-        public MediaSourceStrategy(MediaInstance instance, int som, int eom)
+        public MediaSourceStrategy(MediaInstance instance, TimeSpan som, TimeSpan eom)
         {
             Instance = instance;
             SOM = som;
@@ -49,8 +48,8 @@ namespace CBS.Siren
         {
             return "MediaSourceStrategy:" +
             $"\nMedia Name:  {Instance.Name}" +
-            $"\nSOM: {SOM}" +
-            $"\nEOM: {EOM}";
+            $"\nSOM: {SOM.ToTimecodeString()}" +
+            $"\nEOM: {EOM.ToTimecodeString()}";
         }
 
         public virtual bool Equals([AllowNull] ISourceStrategy other)
@@ -61,9 +60,10 @@ namespace CBS.Siren
                 EOM == sourceStrategy.EOM;
         }
 
-        public int GetDuration()
+        public TimeSpan GetDuration()
         {
-            return Math.Min(Instance.Duration, EOM) - SOM;
+            long durationFrames = Math.Min(Instance.Duration.TotalFrames(), EOM.TotalFrames()) - SOM.TotalFrames();
+            return TimeSpanExtensions.FromFrames(durationFrames);
         }
 
         public object BuildStrategyData()
@@ -71,9 +71,15 @@ namespace CBS.Siren
             var strategyData = new
             {
                 type = StrategyType,
-                mediaInstance = Instance,
-                som = SOM,
-                eom = EOM
+                mediaInstance = new
+                {
+                    Instance.Name,
+                    Duration = Instance.Duration.ToTimecodeString(),
+                    Instance.FilePath,
+                    Instance.InstanceFileType
+                },
+                som = SOM.ToTimecodeString(),
+                eom = EOM.ToTimecodeString()
             };
 
             return strategyData;

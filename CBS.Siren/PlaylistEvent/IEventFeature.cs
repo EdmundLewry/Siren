@@ -9,6 +9,6 @@ namespace CBS.Siren
         IPlayoutStrategy PlayoutStrategy { get; set; }
         ISourceStrategy SourceStrategy { get; set; }
         IDevice Device { get; set; }
-        int CalculateDuration();
+        TimeSpan CalculateDuration();
     }
 }

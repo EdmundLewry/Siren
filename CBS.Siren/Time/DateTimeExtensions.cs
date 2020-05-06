@@ -30,7 +30,7 @@ namespace CBS.Siren.Time
             int hour = match.Groups["hour"].Success ? int.Parse(match.Groups["hour"].Value) : 0;
             int minute = match.Groups["minute"].Success ? int.Parse(match.Groups["minute"].Value) : 0;
             int second = match.Groups["second"].Success ? int.Parse(match.Groups["second"].Value) : 0;
-            int millisecond = match.Groups["frame"].Success ? TimeUtilities.FramesToMiliseconds(int.Parse(match.Groups["frame"].Value), frameRate) : 0;
+            int millisecond = match.Groups["frame"].Success ? (int)TimeUtilities.FramesToMiliseconds(int.Parse(match.Groups["frame"].Value), frameRate) : 0;
 
             return new DateTime(year, month, day, hour, minute, second, millisecond);
         }

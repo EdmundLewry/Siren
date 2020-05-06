@@ -34,7 +34,7 @@ namespace CBS.Siren
             
             foreach(IEventFeature feature in EventFeatures)
             {
-                returnValue = returnValue + $"\nEvent Feature: {feature.ToString()}";
+                returnValue += $"\nEvent Feature: {feature.ToString()}";
             }
 
             return returnValue;

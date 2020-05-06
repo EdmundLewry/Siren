@@ -1,4 +1,6 @@
-﻿namespace CBS.Siren
+﻿using System;
+
+namespace CBS.Siren
 {
     public class FeaturePropertiesFactory : IFeaturePropertiesFactory
     {
@@ -10,7 +12,7 @@
 
         public ISourceStrategy CreateMediaSourceStrategy(MediaInstance mediaInstance)
         {
-            return new MediaSourceStrategy(mediaInstance, 0, mediaInstance.Duration);
+            return new MediaSourceStrategy(mediaInstance, TimeSpan.Zero, mediaInstance.Duration);
         }
     }
 }

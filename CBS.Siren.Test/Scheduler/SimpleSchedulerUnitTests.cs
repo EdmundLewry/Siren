@@ -32,9 +32,9 @@ namespace CBS.Siren.Test
             mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Parse("01/01/2020 14:30:00"));
 
             var mockFeature = new Mock<IEventFeature>();
-            MediaInstance mediaInstance = new MediaInstance("test1");
-            mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, 0, 750));
-            mockFeature.Setup(mock => mock.CalculateDuration()).Returns(750);
+            MediaInstance mediaInstance = new MediaInstance("test1", TimeSpan.Zero);
+            mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, TimeSpan.Zero, new TimeSpan(0, 0, 30)));
+            mockFeature.Setup(mock => mock.CalculateDuration()).Returns(new TimeSpan(0,0,30));
             mockFeature.Setup(mock => mock.Device).Returns(mockDevice1.Object);
             List<IEventFeature> eventFeatures = new List<IEventFeature>() { mockFeature.Object };
 
@@ -135,18 +135,18 @@ namespace CBS.Siren.Test
             JsonElement eventDataJson = JsonDocument.Parse(deviceListEvent.EventData).RootElement;
             
             JsonElement timingElement = eventDataJson.GetProperty("timing");
-            Assert.Equal(event1.ExpectedStartTime, timingElement.GetProperty("startTime").GetDateTime());
-            Assert.Equal(event1.ExpectedDuration, timingElement.GetProperty("duration").GetInt32());
+            Assert.Equal(event1.ExpectedStartTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("startTime").GetString()));
+            Assert.Equal(event1.ExpectedDuration, TimeSpanExtensions.FromTimecodeString(timingElement.GetProperty("duration").GetString()));
 
-            DateTime expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.FramesToSeconds());
-            Assert.Equal(expectedEndTime, timingElement.GetProperty("endTime").GetDateTime());
+            DateTime expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.TotalSeconds);
+            Assert.Equal(expectedEndTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("endTime").GetString()));
 
             JsonElement sourceElement = eventDataJson.GetProperty("source");
             JsonElement sourceDataElement = sourceElement.GetProperty("strategyData");
             Assert.Equal("mediaSource", sourceDataElement.GetProperty("type").GetString());
             Assert.Equal("test1", sourceDataElement.GetProperty("mediaInstance").GetProperty("name").ToString());
-            Assert.Equal(0, sourceDataElement.GetProperty("som").GetInt32());
-            Assert.Equal(750, sourceDataElement.GetProperty("eom").GetInt32());
+            Assert.Equal(0, TimeSpanExtensions.FromTimecodeString(sourceDataElement.GetProperty("som").GetString()).TotalFrames());
+            Assert.Equal(750, TimeSpanExtensions.FromTimecodeString(sourceDataElement.GetProperty("eom").GetString()).TotalFrames());
             
             Assert.Equal(event1.Id, deviceListEvent.RelatedTransmissionListEventId);
         }

@@ -69,7 +69,7 @@ namespace CBS.Siren.Device
 
         private bool TimeHasPassed(string timeToCheck)
         {
-            DateTime expectedTime = DateTime.Parse(timeToCheck);
+            DateTime expectedTime = DateTimeExtensions.FromTimecodeString(timeToCheck);
 
             if (expectedTime.DifferenceInFrames(DateTime.Now) >= 0)
             {
