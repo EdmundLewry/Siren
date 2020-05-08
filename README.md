@@ -4,7 +4,7 @@ Siren currently is an implementation of a particular domain model for Linear Pla
 Eventually, I'd like for Siren to become a service-based event driven Linear Playout Broadcast Automation system which expresses this model.
 
 ## Model Documentation
-https://docs.google.com/document/d/1essfdaSvxf9eSKffh3dk0FKroHp4fk4vMZXy155610U/edit?usp=sharing
+[Siren Domain Model](https://docs.google.com/document/d/1essfdaSvxf9eSKffh3dk0FKroHp4fk4vMZXy155610U/edit?usp=sharing)
 
 ## Model Implementation Challenges
 ### Disconnect Between Transmission List Events and Playout Events
