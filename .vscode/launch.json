@@ -10,12 +10,20 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/application/Siren/bin/Debug/netcoreapp3.0/Siren.dll",
+            "program": "${workspaceFolder}/CBS.Siren/bin/Debug/netcoreapp3.1/CBS.Siren.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/src/application/Siren",
+            "cwd": "${workspaceFolder}/CBS.Siren",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
-            "stopAtEntry": false
+            "console":"externalTerminal",
+            "stopAtEntry": false,
+            // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "^\\s*Now listening on:\\s+(https?://\\S+)"                
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
         },
         {
             "name": ".NET Core Attach",
