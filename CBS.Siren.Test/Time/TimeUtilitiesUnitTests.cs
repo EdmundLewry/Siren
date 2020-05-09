@@ -45,7 +45,7 @@ namespace CBS.Siren.Test.Time
         [Trait("TestType", "UnitTest")]
         [InlineData("01/01/2015 00:00:10", 125)]
         [InlineData("01/01/2015 00:00:05.050", 1)]
-        [InlineData("01/01/2015 00:00:04.919", -2)]
+        [InlineData("01/01/2015 00:00:04.919", -3)]
         public void DifferenceInFrames_ReportsCorrectFrameCount(string comparison, int expected)
         {
             DateTime before = DateTime.Parse("01/01/2015 00:00:05");
@@ -71,13 +71,13 @@ namespace CBS.Siren.Test.Time
         [InlineData(20, 0, FrameRate.FPS25)]
         [InlineData(40, 1, FrameRate.FPS25)]
         [InlineData(200, 5, FrameRate.FPS25)]
-        [InlineData(200, 5, FrameRate.FPS24)]
+        [InlineData(200, 4, FrameRate.FPS24)]
         [InlineData(200, 6, FrameRate.FPS30)]
-        [InlineData(200, 6, FrameRate.DF30)]
+        [InlineData(200, 5, FrameRate.DF30)]
         [InlineData(1000, 25, FrameRate.FPS25)]
         [InlineData(1000, 24, FrameRate.FPS24)]
         [InlineData(1000, 30, FrameRate.FPS30)]
-        [InlineData(1001, 30, FrameRate.DF30)]
+        [InlineData(1000, 29, FrameRate.DF30)]
         public void MillisecondsToFrames_ReportsCorrectNumberOfFrames(double ms, int frames, FrameRate frameRate)
         {
             Assert.Equal(frames, ms.MillisecondsToFrames(frameRate));
