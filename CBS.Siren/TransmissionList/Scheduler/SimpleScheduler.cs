@@ -23,7 +23,7 @@ namespace CBS.Siren
         private TransmissionList CalculateListTimings(TransmissionList transmissionList)
         {
             transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
-                transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime();
+                transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
                 transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
             });
 

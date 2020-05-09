@@ -55,6 +55,7 @@ namespace CBS.Siren
             return eventTimingStrategy.StrategyType switch
             {
                 "fixed" => new FixedStartEventTimingStrategy(eventTimingStrategy),
+                "sequential" => new SequentialStartEventTimingStrategy(eventTimingStrategy),
                 _ => null
             };
         }

@@ -29,7 +29,7 @@ namespace CBS.Siren.Test
         public TransmissionList GenerateTransmissionList()
         {
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
-            mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime()).Returns(DateTime.Parse("01/01/2020 14:30:00"));
+            mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime(It.IsAny<Guid>(), It.IsAny<TransmissionList>())).Returns(DateTime.Parse("01/01/2020 14:30:00"));
 
             var mockFeature = new Mock<IEventFeature>();
             MediaInstance mediaInstance = new MediaInstance("test1", TimeSpan.Zero);

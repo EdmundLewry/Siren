@@ -24,7 +24,7 @@ namespace CBS.Siren
             throw new ArgumentException("Failed to construct timing strategy. Given strategy was not the same type", "other");
         }
 
-        public DateTime CalculateStartTime()
+        public DateTime CalculateStartTime(Guid eventId, TransmissionList list)
         {
             //Fixed time is really easy! We just send back what we got in
             return TargetStartTime;
