@@ -9,12 +9,23 @@ namespace CBS.Siren.Test
 {
     public class TransmissionListBuilderTest
     {
-        private PlaylistEvent GenerateTestPlaylistEvent()
+        enum TimingStrategyType{
+            Fixed,
+            Sequential
+        }
+
+        private PlaylistEvent GenerateTestPlaylistEvent(TimingStrategyType strategyType = TimingStrategyType.Fixed)
         {
             List<IEventFeature> features = new List<IEventFeature>() {
                 new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), new MediaInstance())
             };
-            return new PlaylistEvent(features, new FixedStartEventTimingStrategy(DateTime.Now));
+            IEventTimingStrategy timingStrategy = strategyType switch
+            {
+                TimingStrategyType.Fixed => new FixedStartEventTimingStrategy(DateTime.Now),
+                TimingStrategyType.Sequential => new SequentialStartEventTimingStrategy(),
+                _ => null
+            };
+            return new PlaylistEvent(features, timingStrategy);
         }
 
         [Fact]
@@ -69,10 +80,12 @@ namespace CBS.Siren.Test
         public void GivenAPlaylist_BuildTransmissionList_CreatesTransmissionEventWithSameTiming()
         {
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
-            IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1 });
+            PlaylistEvent event2 = GenerateTestPlaylistEvent(TimingStrategyType.Sequential);
+            IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1, event2 });
             TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
 
             Assert.Equal(event1.EventTimingStrategy, transmissionList.Events[0].EventTimingStrategy);
+            Assert.Equal(event2.EventTimingStrategy, transmissionList.Events[1].EventTimingStrategy);
         }
         
         [Fact]

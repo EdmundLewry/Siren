@@ -1,8 +1,5 @@
 using Xunit;
-using Moq;
-
 using System;
-using System.Collections.Generic;
 
 using CBS.Siren;
 
@@ -23,7 +20,7 @@ namespace CBS.Siren.Test
             DateTime target = DateTime.Parse(targetTimeString);
             FixedStartEventTimingStrategy strategy = new FixedStartEventTimingStrategy(target);
 
-            DateTime startTime = strategy.CalculateStartTime();
+            DateTime startTime = strategy.CalculateStartTime(Guid.Empty, null);
             Assert.Equal(target, startTime);
         }
     }

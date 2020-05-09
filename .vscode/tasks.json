@@ -58,6 +58,16 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/CBS.Siren.Test/CBS.Siren.Test.csproj"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

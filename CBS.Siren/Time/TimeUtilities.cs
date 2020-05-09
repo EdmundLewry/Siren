@@ -11,8 +11,9 @@ namespace CBS.Siren.Time
         public static long MillisecondsToFrames(this double msCount) => MillisecondsToFrames(msCount, TimeSource.SourceFrameRate);
         public static long MillisecondsToFrames(this double msCount, FrameRate frameRate)
         {
-            double msPerFrame = 1000 / frameRate.FrameCount();
-            return (long)Math.Round(msCount / msPerFrame);
+            decimal msPerFrame = 1000 / (decimal)frameRate.FrameCount();
+            decimal frames = (decimal)msCount / msPerFrame;
+            return (long)Math.Floor(frames);
         }
 
         public static long FramesToMiliseconds(long frames) => FramesToMiliseconds(frames, TimeSource.SourceFrameRate);

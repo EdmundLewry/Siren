@@ -47,8 +47,8 @@ namespace CBS.Siren.Test.Time
         [InlineData("00:00:00.960", "00:00:00:24", FrameRate.FPS25)]
         [InlineData("01:02:01.500", "01:02:01:12", FrameRate.FPS24)]
         [InlineData("01:02:01.867", "01:02:01:26", FrameRate.FPS30)]
-        [InlineData("01:02:01.867", "01:02:01;26", FrameRate.DF30)]
-        [InlineData("11:22:41.867", "11:22:41;26", FrameRate.DF30)]
+        [InlineData("01:02:01.867", "01:02:01;25", FrameRate.DF30)]
+        [InlineData("11:22:41.867", "11:22:41;25", FrameRate.DF30)]
         [InlineData("005:05:55:05.500", "005:05:55:05:12", FrameRate.FPS25)]
         public void ToTimecodeString_GivenTimeSpan_ReturnsExpectedString(string input, string expected, FrameRate frameRate)
         {
