@@ -9,11 +9,6 @@ namespace CBS.Siren
 {
     public class SimpleScheduler : IScheduler
     {
-        public SimpleScheduler()
-        {
-            
-        }
-
         public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventFactory deviceListEventFactory)
         {
             TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList);
