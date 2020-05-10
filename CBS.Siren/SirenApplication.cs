@@ -106,16 +106,20 @@ namespace CBS.Siren
         private List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
         {
             List<PlaylistEvent> events = new List<PlaylistEvent>();
+            FixedStartEventTimingStrategy fixedStart = new FixedStartEventTimingStrategy(startTime);
+            events.Add(GeneratePlaylistEvent(fixedStart, demoMedia));
             for (int i = 0; i < eventCount; ++i)
-            {
-                int additionalSeconds = (int)demoMedia.Duration.TotalSeconds * i;
-                FixedStartEventTimingStrategy timingStrategy = new FixedStartEventTimingStrategy(startTime.AddSeconds(additionalSeconds));
-                VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), demoMedia);
-                PlaylistEvent playlistEvent = new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
-                events.Add(playlistEvent);
+            {                
+                events.Add(GeneratePlaylistEvent(new SequentialStartEventTimingStrategy(), demoMedia));
             }
 
             return events;
+        }
+
+        private PlaylistEvent GeneratePlaylistEvent(IEventTimingStrategy timingStrategy, MediaInstance mediaInstance)
+        {
+                VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), mediaInstance);
+                return new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
         }
 
         private void PrintTransmissionListContent(TransmissionList list)
