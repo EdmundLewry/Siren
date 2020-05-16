@@ -6,7 +6,7 @@ using CBS.Siren.Device;
 using CBS.Siren.Time;
 using Microsoft.Extensions.Logging;
 
-namespace CBS.Siren
+namespace CBS.Siren.Application
 {
     /* This is a temporary application layer that places the domain logic together so that we can see
     how the pieces might interact. It is triggered via the Demo API controller, but both will be removed

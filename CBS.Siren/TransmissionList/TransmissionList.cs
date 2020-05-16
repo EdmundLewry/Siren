@@ -8,6 +8,7 @@ namespace CBS.Siren
         public IPlaylist SourceList { get; set; }
         public List<TransmissionListEvent> Events { get; }
         
+        public TransmissionList() : this(new List<TransmissionListEvent>()) {}
         public TransmissionList(List<TransmissionListEvent> events, IPlaylist list = null)
         {
             SourceList = list;
@@ -16,7 +17,7 @@ namespace CBS.Siren
 
         public override string ToString()
         {
-            string result = "";
+            string result = $"Id: {Id}";
             for (int i = 0; i < Events.Count; ++i)
             {
                 result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";

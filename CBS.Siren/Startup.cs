@@ -1,3 +1,5 @@
+using CBS.Siren.Application;
+using CBS.Siren.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -5,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CBS.Siren
 {
-    class Startup
+    public class Startup
     {
         public IConfiguration Configuration { get; }
 
@@ -19,6 +21,8 @@ namespace CBS.Siren
             services.AddControllers();
 
             services.AddTransient<SirenApplication>();
+            services.AddSingleton<IDataLayer, CollectionDataLayer>();
+            services.AddTransient<ITransmissionListHandler, TransmissionListHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
