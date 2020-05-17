@@ -1,3 +1,4 @@
+using AutoMapper;
 using CBS.Siren.Application;
 using CBS.Siren.Data;
 using Microsoft.AspNetCore.Builder;
@@ -20,6 +21,8 @@ namespace CBS.Siren
         {
             services.AddControllers();
 
+            services.AddAutoMapper(typeof(Startup));
+            
             services.AddTransient<SirenApplication>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
             services.AddTransient<ITransmissionListHandler, TransmissionListHandler>();

@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Collections.Generic;
+using CBS.Siren.DTO;
+using System.Linq;
 
 namespace CBS.Siren.Test
 {
@@ -19,9 +21,11 @@ namespace CBS.Siren.Test
             HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/transmissionlist");
             
             string content = await response.Content.ReadAsStringAsync();
-            List<TransmissionList> returnedLists = JsonSerializer.Deserialize<List<TransmissionList>>(content);
+            List<TransmissionListDTO> returnedLists = JsonSerializer.Deserialize<List<TransmissionListDTO>>(content, new JsonSerializerOptions(){PropertyNameCaseInsensitive = true});
 
             Assert.Single(returnedLists);
+            //Attempt to parse id to ensure it's valid
+            int.Parse(returnedLists.First().Id);
         }
     }
 }
