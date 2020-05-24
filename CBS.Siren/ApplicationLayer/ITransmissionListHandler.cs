@@ -6,5 +6,6 @@ namespace CBS.Siren.Application
     public interface ITransmissionListHandler
     {
         Task<IEnumerable<TransmissionList>> GetAllLists();
+        Task<IEnumerable<TransmissionListEvent>> GetListEvents(string id);
     }
 }

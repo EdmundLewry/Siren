@@ -30,5 +30,12 @@ namespace CBS.Siren.Controllers
             var lists = await _handler.GetAllLists();
             return _mapper.Map<List<TransmissionListDTO>>(lists.ToList());
         }
+
+        [HttpGet("{id}/events")]
+        public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(string id)
+        {
+            var transmissionEvents = await _handler.GetListEvents(id);
+            return _mapper.Map<List<TransmissionListEventDTO>>(transmissionEvents.ToList());
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CBS.Siren.Data;
 using CBS.Siren.Device;
@@ -42,6 +43,14 @@ namespace CBS.Siren.Application
         public async Task<IEnumerable<TransmissionList>> GetAllLists()
         {
             return await DataLayer.TransmissionLists();
+        }
+
+        public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(string id)
+        {
+            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
+            TransmissionList transmissionList = transmissionLists.ToList().FirstOrDefault(list => list.Id == id);
+
+            return transmissionList == null ? new List<TransmissionListEvent>() : transmissionList.Events;
         }
     }
 }
