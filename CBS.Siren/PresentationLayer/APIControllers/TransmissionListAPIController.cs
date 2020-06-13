@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using AutoMapper;
 using CBS.Siren.DTO;
+using System;
 
 namespace CBS.Siren.Controllers
 {
@@ -34,8 +35,29 @@ namespace CBS.Siren.Controllers
         [HttpGet("{id}/events")]
         public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(string id)
         {
-            var transmissionEvents = await _handler.GetListEvents(id);
-            return _mapper.Map<List<TransmissionListEventDTO>>(transmissionEvents.ToList());
+            try
+            {
+                var transmissionEvents = await _handler.GetListEvents(id);
+                return _mapper.Map<List<TransmissionListEventDTO>>(transmissionEvents.ToList());
+            }
+            catch(Exception)
+            {
+                return NotFound(id);
+            }
+        }
+
+        [HttpPost("{id/events}")]
+        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(string id, TransmissionListEventCreationDTO listEvent)
+        {
+            try
+            {
+                var createdListEvent = await _handler.AddEvent(id, listEvent);
+                return CreatedAtAction(nameof(AddEvent), createdListEvent);
+            }
+            catch(Exception)
+            {
+                return NotFound(id);
+            }
         }
     }
 }

@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CBS.Siren.Controllers;
 using CBS.Siren.Data;
 using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace CBS.Siren.Application
 {
@@ -50,7 +52,26 @@ namespace CBS.Siren.Application
             IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
             TransmissionList transmissionList = transmissionLists.ToList().FirstOrDefault(list => list.Id == id);
 
-            return transmissionList == null ? new List<TransmissionListEvent>() : transmissionList.Events;
+            if(transmissionList == null)
+            {
+                throw new ArgumentException($"Unable to find list with id: {id}", "id");
+            }
+
+            return transmissionList.Events;
+        }
+
+        public async Task<TransmissionListEvent> AddEvent(string id, TransmissionListEventCreationDTO listEvent)
+        {
+            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
+            TransmissionList transmissionList = transmissionLists.ToList().FirstOrDefault(list => list.Id == id);
+
+            if(transmissionList == null)
+            {
+                throw new ArgumentException($"Unable to find list with id: {id}", "id");
+            }
+
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent();
+            return createdEvent;
         }
     }
 }

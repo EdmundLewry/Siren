@@ -6,13 +6,14 @@ using System.Text.Json;
 using System.Collections.Generic;
 using CBS.Siren.DTO;
 using System.Linq;
+using CBS.Siren.Controllers;
 
 namespace CBS.Siren.Test
 {
     public class TransmissionListIntegrationTests
     {
         [Fact]
-        [Trait("TestType", "UnitTest")]
+        [Trait("TestType", "IntegrationTest")]
         public async Task Service_WhenTransmissionListsRequested_ReturnsCollectionOfTransmissionLists()
         {
             WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
@@ -29,7 +30,7 @@ namespace CBS.Siren.Test
         }
 
         [Fact]
-        [Trait("TestType", "UnitTest")]
+        [Trait("TestType", "IntegrationTest")]
         public async Task Service_WhenTransmissionListEventsRequested_ReturnsCollectionOfTransmissionListEvents()
         {
             WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
@@ -42,6 +43,28 @@ namespace CBS.Siren.Test
 
             //Should use API to add event later
             //Assert.NotEmpty(returnedList);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenAddEventIsCalled_ReturnsCreatedEvent()
+        {
+            WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            HttpClient clientUnderTest = factory.CreateClient();
+            
+            TransmissionListEventCreationDTO creationDTO = new TransmissionListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO));
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
+            
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions(){PropertyNameCaseInsensitive = true});
+
+            TransmissionListEventDTO expectedDTO = new TransmissionListEventDTO(){
+                
+            };
+            
+            Assert.Equal(expectedDTO, returnedEvent);
         }
     }
 }
