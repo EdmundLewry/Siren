@@ -7,9 +7,9 @@ namespace CBS.Siren
 {
     public static class TransmissionListEventFactory
     {
-        public static TransmissionListEvent BuildTransmissionListEvent(List<JsonElement> featureData, IVideoChain videoChain)
+        public static TransmissionListEvent BuildTransmissionListEvent(JsonElement timingData, List<JsonElement> featureData, IVideoChain videoChain)
         {
-            IEventTimingStrategy timingStrategy;
+            IEventTimingStrategy timingStrategy = CreateTimingStrategyFromJson(timingData);
             List<IEventFeature> features = new List<IEventFeature>();
             return new TransmissionListEvent(timingStrategy, features, null);
         }
