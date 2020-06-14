@@ -6,6 +6,7 @@ using CBS.Siren.Data;
 using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text.Json;
 
 namespace CBS.Siren.Application
 {
@@ -70,7 +71,7 @@ namespace CBS.Siren.Application
                 throw new ArgumentException($"Unable to find list with id: {id}", "id");
             }
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent();
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, new List<JsonElement>(), null);
             return createdEvent;
         }
     }

@@ -2,14 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using CBS.Siren.Device;
 using System.Text.Json;
+using CBS.Siren.Controllers;
+using CBS.Siren.Time;
 
 namespace CBS.Siren
 {
     public static class TransmissionListEventFactory
     {
-        public static TransmissionListEvent BuildTransmissionListEvent(JsonElement timingData, List<JsonElement> featureData, IVideoChain videoChain)
+        public static TransmissionListEvent BuildTransmissionListEvent(TimingStrategyCreationDTO timingData, List<JsonElement> featureData, IVideoChain videoChain)
         {
-            IEventTimingStrategy timingStrategy = CreateTimingStrategyFromJson(timingData);
+            IEventTimingStrategy timingStrategy = ConstructTimingStrategyFromType(timingData);
             List<IEventFeature> features = new List<IEventFeature>();
             return new TransmissionListEvent(timingStrategy, features, null);
         }
@@ -39,6 +41,16 @@ namespace CBS.Siren
             {
                 "fixed" => new FixedStartEventTimingStrategy(eventTimingStrategy),
                 "sequential" => new SequentialStartEventTimingStrategy(eventTimingStrategy),
+                _ => null
+            };
+        }
+
+        private static IEventTimingStrategy ConstructTimingStrategyFromType(TimingStrategyCreationDTO timingData)
+        {
+            return timingData.StrategyType switch
+            {
+                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime.ConvertTimecodeStringToDateTime()),
+                "sequential" => new SequentialStartEventTimingStrategy(),
                 _ => null
             };
         }
