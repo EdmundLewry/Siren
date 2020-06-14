@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CBS.Siren.Controllers;
+using CBS.Siren.DTO;
 using CBS.Siren.Data;
 using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
@@ -71,7 +71,7 @@ namespace CBS.Siren.Application
                 throw new ArgumentException($"Unable to find list with id: {id}", "id");
             }
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, new List<JsonElement>(), null);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, new List<ListEventFeatureCreationDTO>(), null);
             return createdEvent;
         }
     }

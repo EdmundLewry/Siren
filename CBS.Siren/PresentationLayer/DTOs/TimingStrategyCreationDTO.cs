@@ -1,4 +1,4 @@
-namespace CBS.Siren.Controllers
+namespace CBS.Siren.DTO
 {
     public class TimingStrategyCreationDTO
     {

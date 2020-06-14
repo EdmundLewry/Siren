@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using CBS.Siren.Controllers;
+using CBS.Siren.DTO;
 using CBS.Siren.Time;
 using CBS.Siren.Utilities;
+using System;
 using Xunit;
 
 namespace CBS.Siren.Test
@@ -18,7 +19,7 @@ namespace CBS.Siren.Test
                 TargetStartTime = "2020-03-22T00:00:10:05"
             };
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<JsonElement>(), null);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureCreationDTO>(), null);
 
             FixedStartEventTimingStrategy expectedStrategy = new FixedStartEventTimingStrategy(DateTimeExtensions.FromTimecodeString("2020-03-22T00:00:10:05"));
             Assert.Equal(expectedStrategy, createdEvent.EventTimingStrategy);
@@ -32,10 +33,31 @@ namespace CBS.Siren.Test
                 StrategyType = "sequential"
             };
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<JsonElement>(), null);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureCreationDTO>(), null);
 
             SequentialStartEventTimingStrategy expectedStrategy = new SequentialStartEventTimingStrategy();
             Assert.Equal(expectedStrategy, createdEvent.EventTimingStrategy);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void BuildTransmissionListEvent_WithVideoFeature_CreatesEventWithVideoFeature()
+        {
+            ListEventFeatureCreationDTO featureData = new ListEventFeatureCreationDTO(){
+
+            };
+
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(null, 
+                                                                                                        new List<ListEventFeatureCreationDTO>(){featureData}, 
+                                                                                                        null);
+            PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
+            MediaInstance instance = new MediaInstance("TestInstance", TimeSpanExtensions.FromTimecodeString("00:00:30:00"));
+            TimeSpan som = TimeSpanExtensions.FromTimecodeString("00:00:00:00");
+            TimeSpan eom = TimeSpanExtensions.FromTimecodeString("00:00:30:00");
+            MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(instance, som, eom);
+            VideoPlaylistEventFeature expectedFeature = new VideoPlaylistEventFeature(playoutStrategy, sourceStrategy);
+
+            Assert.Equal(expectedFeature, createdEvent.EventFeatures[0]);
         }
     }
 }

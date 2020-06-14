@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CBS.Siren.Controllers;
+using CBS.Siren.DTO;
 
 namespace CBS.Siren.Application
 {

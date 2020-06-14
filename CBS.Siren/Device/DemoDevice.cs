@@ -19,7 +19,8 @@ namespace CBS.Siren.Device
         private EventHandler<DeviceEventChangedEventArgs> DeviceEventChangeEventHandler { get; set; }
         private EventHandler<EventArgs> DeviceListEndEventHandler { get; set; }
 
-        public String Name { get; }
+        public string Name { get; }
+        public int Id { get; set; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
 
