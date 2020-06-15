@@ -44,19 +44,28 @@ namespace CBS.Siren.Test
         public void BuildTransmissionListEvent_WithVideoFeature_CreatesEventWithVideoFeature()
         {
             ListEventFeatureCreationDTO featureData = new ListEventFeatureCreationDTO(){
-
+                FeatureType = "video",
+                PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
+                SourceStrategy = new SourceStrategyCreationDTO() {
+                    StrategyType = "mediaSource",
+                    SOM = new TimeSpan(0,0,0,0,0),
+                    EOM = new TimeSpan(0,0,0,30,0),
+                    MediaInstanceId = 0
+                }
             };
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(null, 
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(new TimingStrategyCreationDTO(), 
                                                                                                         new List<ListEventFeatureCreationDTO>(){featureData}, 
                                                                                                         null);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
+
             MediaInstance instance = new MediaInstance("TestInstance", TimeSpanExtensions.FromTimecodeString("00:00:30:00"));
             TimeSpan som = TimeSpanExtensions.FromTimecodeString("00:00:00:00");
             TimeSpan eom = TimeSpanExtensions.FromTimecodeString("00:00:30:00");
             MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(instance, som, eom);
             VideoPlaylistEventFeature expectedFeature = new VideoPlaylistEventFeature(playoutStrategy, sourceStrategy);
 
+            Assert.Single(createdEvent.EventFeatures);
             Assert.Equal(expectedFeature, createdEvent.EventFeatures[0]);
         }
     }

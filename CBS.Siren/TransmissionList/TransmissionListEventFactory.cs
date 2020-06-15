@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CBS.Siren.Device;
-using System.Text.Json;
 using CBS.Siren.DTO;
 using CBS.Siren.Time;
 
@@ -12,8 +11,13 @@ namespace CBS.Siren
         public static TransmissionListEvent BuildTransmissionListEvent(TimingStrategyCreationDTO timingData, List<ListEventFeatureCreationDTO> featureData, IVideoChain videoChain)
         {
             IEventTimingStrategy timingStrategy = ConstructTimingStrategyFromType(timingData);
-            List<IEventFeature> features = new List<IEventFeature>();
+            List<IEventFeature> features = ConstructEventFeaturesFromList(featureData);
             return new TransmissionListEvent(timingStrategy, features, null);
+        }
+
+        private static List<IEventFeature> ConstructEventFeaturesFromList(List<ListEventFeatureCreationDTO> featureData)
+        {
+            return new List<IEventFeature>();
         }
 
         private static IEventFeature ConstructEventFeatureFromType(IEventFeature feature, IVideoChain videoChain)
