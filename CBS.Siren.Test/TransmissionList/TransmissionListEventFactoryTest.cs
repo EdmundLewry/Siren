@@ -50,7 +50,7 @@ namespace CBS.Siren.Test
                     StrategyType = "mediaSource",
                     SOM = new TimeSpan(0,0,0,0,0),
                     EOM = new TimeSpan(0,0,0,30,0),
-                    MediaInstanceId = 0
+                    MediaName = "TestInstance"
                 }
             };
 
