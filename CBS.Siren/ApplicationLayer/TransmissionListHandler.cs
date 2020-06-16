@@ -71,7 +71,7 @@ namespace CBS.Siren.Application
                 throw new ArgumentException($"Unable to find list with id: {id}", "id");
             }
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, new List<ListEventFeatureCreationDTO>(), null);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
             return createdEvent;
         }
     }

@@ -7,5 +7,7 @@ namespace CBS.Siren.Data
     {
         Task<IEnumerable<TransmissionList>> TransmissionLists();
         Task AddUpdateTransmissionLists(params TransmissionList[] lists);
+
+        Task<IEnumerable<MediaInstance>> MediaInstances();
     }
 }

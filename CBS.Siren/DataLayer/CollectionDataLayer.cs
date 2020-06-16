@@ -7,8 +7,9 @@ namespace CBS.Siren.Data
 {
     public class CollectionDataLayer : IDataLayer
     {
-        private static long nextId = 0;
+        private static long nextListId = 0;
         private List<TransmissionList> StoredTransmissionLists { get; set; } = new List<TransmissionList>();
+        private List<MediaInstance> StoredMediaInstances { get; set; } = new List<MediaInstance>();
 
         public Task<IEnumerable<TransmissionList>> TransmissionLists()
         {
@@ -26,7 +27,7 @@ namespace CBS.Siren.Data
                     continue;
                 }
 
-                list.Id = nextId++.ToString();
+                list.Id = nextListId++.ToString();
                 StoredTransmissionLists.Add(list);
             }
 
@@ -36,6 +37,11 @@ namespace CBS.Siren.Data
         private TransmissionList GetTransmissionListById(string id)
         {
             return StoredTransmissionLists.FirstOrDefault((list) => list.Id == id);
+        }
+
+        public Task<IEnumerable<MediaInstance>> MediaInstances()
+        {
+            return Task.FromResult<IEnumerable<MediaInstance>>(StoredMediaInstances);
         }
     }
 }
