@@ -72,6 +72,8 @@ namespace CBS.Siren.Application
             }
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
+            transmissionList.Events.Add(createdEvent);
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
             return createdEvent;
         }
     }

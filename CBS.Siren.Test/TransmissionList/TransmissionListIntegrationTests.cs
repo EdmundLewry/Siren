@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using CBS.Siren.DTO;
 using System.Linq;
 using CBS.Siren.Controllers;
+using System;
 
 namespace CBS.Siren.Test
 {
@@ -52,19 +53,35 @@ namespace CBS.Siren.Test
             WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
             HttpClient clientUnderTest = factory.CreateClient();
             
-            TransmissionListEventCreationDTO creationDTO = new TransmissionListEventCreationDTO();
+            TransmissionListEventCreationDTO creationDTO = new TransmissionListEventCreationDTO(){
+                TimingData = new TimingStrategyCreationDTO(){
+                    StrategyType = "fixed",
+                    TargetStartTime = DateTime.Parse("2020-03-22 12:30:10")
+                },
+                Features = new List<ListEventFeatureCreationDTO>(){
+                    new ListEventFeatureCreationDTO(){
+                        FeatureType = "video",
+                        PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
+                        SourceStrategy = new SourceStrategyCreationDTO() {
+                            StrategyType = "mediaSource",
+                            SOM = new TimeSpan(0,0,0,0,0),
+                            EOM = new TimeSpan(0,0,0,30,0),
+                            MediaName = "TestInstance"
+                        }
+                    }
+                }
+            };
             var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO));
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
             
             string content = await response.Content.ReadAsStringAsync();
             TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions(){PropertyNameCaseInsensitive = true});
-
-            TransmissionListEventDTO expectedDTO = new TransmissionListEventDTO(){
-                
-            };
             
-            Assert.Equal(expectedDTO, returnedEvent);
+            Assert.Equal("UNSCHEDULED", returnedEvent.EventState);
+            Assert.Equal(1, returnedEvent.EventFeatureCount);
+            Assert.Equal(0, returnedEvent.RelatedDeviceListEventCount);
+            Assert.Equal("fixed", returnedEvent.EventTimingStrategy);
         }
     }
 }

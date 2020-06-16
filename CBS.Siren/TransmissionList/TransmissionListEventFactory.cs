@@ -100,7 +100,7 @@ namespace CBS.Siren
         {
             return timingData.StrategyType switch
             {
-                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime.ConvertTimecodeStringToDateTime()),
+                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime),
                 "sequential" => new SequentialStartEventTimingStrategy(),
                 _ => null
             };
@@ -144,7 +144,7 @@ namespace CBS.Siren
         private static async Task<MediaInstance> GetMediaInstanceByNameAsync(string mediaName, IDevice device, IDataLayer dataLayer)
         {
             var instances = await dataLayer.MediaInstances();
-            return instances.First((instance)=> instance.Name == mediaName);
+            return instances.FirstOrDefault((instance)=> instance.Name == mediaName);
         }
     }
 }

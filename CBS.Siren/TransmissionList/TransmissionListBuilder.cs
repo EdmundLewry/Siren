@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace CBS.Siren
 {
-    //TODO: Refactor this to use the new TransmissionListEventFactory
     public static class TransmissionListBuilder
     {
         public static TransmissionList BuildFromPlaylist(IPlaylist list, IVideoChain videoChain, IDataLayer dataLayer)

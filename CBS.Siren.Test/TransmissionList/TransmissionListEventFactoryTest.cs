@@ -17,14 +17,15 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void BuildTransmissionListEvent_WithFixedTimingData_CreatesEventWithFixedTiming()
         {
+            DateTime targetStartTime = DateTime.Parse("2020-03-22 00:00:10");
             TimingStrategyCreationDTO timingData = new TimingStrategyCreationDTO(){
                 StrategyType = "fixed",
-                TargetStartTime = "2020-03-22T00:00:10:05"
+                TargetStartTime = targetStartTime
             };
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureCreationDTO>(), null, new Mock<IDataLayer>().Object);
 
-            FixedStartEventTimingStrategy expectedStrategy = new FixedStartEventTimingStrategy(DateTimeExtensions.FromTimecodeString("2020-03-22T00:00:10:05"));
+            FixedStartEventTimingStrategy expectedStrategy = new FixedStartEventTimingStrategy(targetStartTime);
             Assert.Equal(expectedStrategy, createdEvent.EventTimingStrategy);
         }
 
