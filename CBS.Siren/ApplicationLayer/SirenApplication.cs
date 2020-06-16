@@ -55,7 +55,7 @@ namespace CBS.Siren.Application
 
             Channel channel = GenerateChannel(device);
 
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration, null);
             PrintTransmissionListContent(transmissionList);
 
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");

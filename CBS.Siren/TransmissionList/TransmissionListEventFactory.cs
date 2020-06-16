@@ -17,6 +17,13 @@ namespace CBS.Siren
             List<IEventFeature> features = ConstructEventFeaturesFromList(featureData, videoChain, dataLayer);
             return new TransmissionListEvent(timingStrategy, features, null);
         }
+        
+        public static TransmissionListEvent BuildTransmissionListEvent(PlaylistEvent playlistEvent, IVideoChain videoChain, IDataLayer dataLayer)
+        {
+            IEventTimingStrategy timingStrategy = ConstructTimingStrategyFromType(playlistEvent.EventTimingStrategy);
+            List<IEventFeature> features = ConstructEventFeaturesFromList(playlistEvent.EventFeatures, videoChain, dataLayer);
+            return new TransmissionListEvent(timingStrategy, features, playlistEvent);
+        }
 
         private static List<IEventFeature> ConstructEventFeaturesFromList(List<ListEventFeatureCreationDTO> featureData, IVideoChain videoChain, IDataLayer dataLayer)
         {
@@ -24,6 +31,17 @@ namespace CBS.Siren
 
             featureData.ForEach((featureItem) => {
                 features.Add(ConstructEventFeatureFromType(featureItem, videoChain, dataLayer));
+            });
+
+            return features;
+        }
+        
+        private static List<IEventFeature> ConstructEventFeaturesFromList(IEnumerable<IEventFeature> featureData, IVideoChain videoChain, IDataLayer dataLayer)
+        {
+            List<IEventFeature> features = new List<IEventFeature>();
+
+            featureData.ToList().ForEach((featureItem) => {
+                features.Add(ConstructEventFeatureFromType(featureItem, videoChain));
             });
 
             return features;
