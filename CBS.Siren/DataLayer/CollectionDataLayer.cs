@@ -7,7 +7,7 @@ namespace CBS.Siren.Data
 {
     public class CollectionDataLayer : IDataLayer
     {
-        private static long nextListId = 0;
+        private long nextListId = 0;
         private List<TransmissionList> StoredTransmissionLists { get; set; } = new List<TransmissionList>();
         private List<MediaInstance> StoredMediaInstances { get; set; } = new List<MediaInstance>();
 

@@ -16,7 +16,7 @@ namespace CBS.Siren.Controllers
     {
         private readonly ILogger<TransmissionListAPIController> _logger;
         private readonly ITransmissionListHandler _handler;
-        public IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public TransmissionListAPIController(ILogger<TransmissionListAPIController> logger, ITransmissionListHandler handler, IMapper mapper)
         {
@@ -42,6 +42,7 @@ namespace CBS.Siren.Controllers
             }
             catch(Exception)
             {
+                throw;
                 return NotFound(id);
             }
         }
@@ -52,10 +53,11 @@ namespace CBS.Siren.Controllers
             try
             {
                 var createdListEvent = await _handler.AddEvent(id, listEvent);
-                return CreatedAtAction(nameof(AddEvent), createdListEvent);
+                return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDTO>(createdListEvent));
             }
             catch(Exception)
             {
+                throw;
                 return NotFound(id);
             }
         }

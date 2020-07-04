@@ -13,15 +13,15 @@ namespace CBS.Siren.DTO
             
             CreateMap<TransmissionListEvent, TransmissionListEventDTO>()
                         .ForMember(dto => dto.EventState,
-                                config => config.MapFrom(list => Enum.GetName(typeof(TransmissionListEventState.Status), list.EventState.CurrentStatus)))
+                                config => config.MapFrom(listEvent => Enum.GetName(typeof(TransmissionListEventState.Status), listEvent.EventState.CurrentStatus)))
                         .ForMember(dto => dto.EventTimingStrategy,
-                                config => config.MapFrom(list => list.EventTimingStrategy.StrategyType))
+                                config => config.MapFrom(listEvent => listEvent.EventTimingStrategy.StrategyType))
                         .ForMember(dto => dto.EventFeatureCount,
-                                config => config.MapFrom(list => list.EventFeatures.Count))
+                                config => config.MapFrom(listEvent => listEvent.EventFeatures.Count))
                         .ForMember(dto => dto.RelatedPlaylistEvent,
-                            config => config.MapFrom(list => list.RelatedPlaylistEvent.Id))
+                            config => config.MapFrom(listEvent => listEvent.RelatedPlaylistEvent.Id))
                         .ForMember(dto => dto.RelatedDeviceListEventCount,
-                            config => config.MapFrom(list => list.RelatedDeviceListEvents.Count));
+                            config => config.MapFrom(listEvent => listEvent.RelatedDeviceListEvents.Count));
         }
     }
 }

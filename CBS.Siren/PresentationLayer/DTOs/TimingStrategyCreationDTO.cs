@@ -4,7 +4,7 @@ namespace CBS.Siren.DTO
 {
     public class TimingStrategyCreationDTO
     {
-        public string StrategyType;
-        public DateTime TargetStartTime;
+        public string StrategyType {get; set;}
+        public DateTime TargetStartTime {get; set;}
     }
 }
