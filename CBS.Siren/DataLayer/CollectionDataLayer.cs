@@ -23,7 +23,15 @@ namespace CBS.Siren.Data
                 TransmissionList foundList = GetTransmissionListById(list.Id);
                 if(foundList != null)
                 {
-                    foundList = list;
+                    /* For an in memory collection, we don't actually need to do anything
+                     * if the user is updating the original object, since they would have updated the
+                     * object reference.
+                     
+                    Note: Not sure exactly what I want this to behave like. Should Get pass back a new object?
+                     */
+
+                    foundList.SourceList = list.SourceList ?? foundList.SourceList;
+                    foundList.Events = list.Events ?? foundList.Events;
                     continue;
                 }
 

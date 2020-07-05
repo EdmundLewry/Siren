@@ -6,9 +6,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using CBS.Siren.DTO;
 using System.Linq;
-using CBS.Siren.Controllers;
 using System;
-using System.Text.Unicode;
 using System.Text;
 using Xunit.Abstractions;
 

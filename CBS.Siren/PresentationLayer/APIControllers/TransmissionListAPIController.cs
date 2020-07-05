@@ -42,7 +42,6 @@ namespace CBS.Siren.Controllers
             }
             catch(Exception)
             {
-                throw;
                 return NotFound(id);
             }
         }
@@ -57,7 +56,6 @@ namespace CBS.Siren.Controllers
             }
             catch(Exception)
             {
-                throw;
                 return NotFound(id);
             }
         }
