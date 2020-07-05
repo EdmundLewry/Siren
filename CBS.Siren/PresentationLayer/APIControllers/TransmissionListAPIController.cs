@@ -40,7 +40,7 @@ namespace CBS.Siren.Controllers
                 var transmissionEvents = await _handler.GetListEvents(id);
                 return _mapper.Map<List<TransmissionListEventDTO>>(transmissionEvents.ToList());
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return NotFound(id);
             }
@@ -53,6 +53,19 @@ namespace CBS.Siren.Controllers
             {
                 var createdListEvent = await _handler.AddEvent(id, listEvent);
                 return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDTO>(createdListEvent));
+            }
+            catch (Exception)
+            {
+                return NotFound(id);
+            }
+        }
+
+        [HttpDelete("{id}/events/{eventId}")]
+        public async Task<ActionResult> DeleteEvent(string id)
+        {
+            try
+            {
+                return null;
             }
             catch(Exception)
             {

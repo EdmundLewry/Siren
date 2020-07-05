@@ -9,6 +9,7 @@ using System.Linq;
 using System;
 using System.Text;
 using Xunit.Abstractions;
+using System.Net;
 
 namespace CBS.Siren.Test
 {
@@ -102,6 +103,69 @@ namespace CBS.Siren.Test
             Assert.Equal(1, returnedEvent.EventFeatureCount);
             Assert.Equal(0, returnedEvent.RelatedDeviceListEventCount);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenAddEventIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/1000/events", eventCreationData);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenRemoveEventIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.DeleteAsync("api/1/transmissionlist/1000/events/0");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenRemoveEventIsCalledWithBadEventId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.DeleteAsync("api/1/transmissionlist/0/events/1000");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenRemoveEventIsCalled_RemovesEventFromList()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            response = await clientUnderTest.DeleteAsync("api/1/transmissionlist/0/events/0");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            response = await clientUnderTest.GetAsync("api/1/transmissionlist/0/events");
+
+            string content = await response.Content.ReadAsStringAsync();
+            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            Assert.Empty(returnedList);
         }
     }
 }
