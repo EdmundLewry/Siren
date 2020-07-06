@@ -32,6 +32,20 @@ namespace CBS.Siren.Controllers
             return _mapper.Map<List<TransmissionListDTO>>(lists.ToList());
         }
 
+        [HttpPost("{id}/clear")]
+        public async Task<ActionResult> ClearList(string id)
+        {
+            try
+            {
+                await _handler.ClearList(id);
+                return NoContent();
+            }
+            catch (Exception)
+            {
+                return NotFound(id);
+            }
+        }
+
         [HttpGet("{id}/events")]
         public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(string id)
         {

@@ -6,7 +6,6 @@ using CBS.Siren.Data;
 using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Text.Json;
 
 namespace CBS.Siren.Application
 {
@@ -43,6 +42,19 @@ namespace CBS.Siren.Application
             return new Channel(chainConfiguration);
         }
 
+        private async Task<TransmissionList> GetListBydId(string id)
+        {
+            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
+            TransmissionList transmissionList = transmissionLists.FirstOrDefault(list => list.Id == id);
+
+            if (transmissionList == null)
+            {
+                throw new ArgumentException($"Unable to find list with id: {id}", "id");
+            }
+
+            return transmissionList;
+        }
+
         public async Task<IEnumerable<TransmissionList>> GetAllLists()
         {
             return await DataLayer.TransmissionLists();
@@ -50,26 +62,13 @@ namespace CBS.Siren.Application
 
         public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(string id)
         {
-            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
-            TransmissionList transmissionList = transmissionLists.ToList().FirstOrDefault(list => list.Id == id);
-
-            if(transmissionList == null)
-            {
-                throw new ArgumentException($"Unable to find list with id: {id}", "id");
-            }
-
+            TransmissionList transmissionList = await GetListBydId(id);
             return transmissionList.Events;
         }
 
         public async Task<TransmissionListEvent> AddEvent(string id, TransmissionListEventCreationDTO listEvent)
         {
-            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
-            TransmissionList transmissionList = transmissionLists.ToList().FirstOrDefault(list => list.Id == id);
-
-            if(transmissionList == null)
-            {
-                throw new ArgumentException($"Unable to find list with id: {id}", "id");
-            }
+            TransmissionList transmissionList = await GetListBydId(id);
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
             transmissionList.Events.Add(createdEvent);
@@ -79,13 +78,7 @@ namespace CBS.Siren.Application
 
         public async Task RemoveEvent(string listId, string eventId)
         {
-            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
-            TransmissionList transmissionList = transmissionLists.FirstOrDefault(list => list.Id == listId);
-
-            if (transmissionList == null)
-            {
-                throw new ArgumentException($"Unable to find list with id: {listId}", "listId");
-            }
+            TransmissionList transmissionList = await GetListBydId(listId);
 
             TransmissionListEvent listEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id.ToString() == eventId);
             if(listEvent == null)
@@ -94,6 +87,14 @@ namespace CBS.Siren.Application
             }
 
             transmissionList.Events.Remove(listEvent);
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+        }
+
+        public async Task ClearList(string id)
+        {
+            TransmissionList transmissionList = await GetListBydId(id);
+            transmissionList.Events.Clear();
+
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
     }

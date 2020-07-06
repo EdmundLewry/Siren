@@ -251,7 +251,75 @@ namespace CBS.Siren.Test
             string eventId = list.Events[0].Id.ToString();
             await codeUnderTest.RemoveEvent("1", eventId);
 
-            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce);
+            //Account for one extra call while we initialize the handler with an extra list during dev
+            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeast(2));
+        }
+
+        #endregion
+
+        #region Clear
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithInvalidListId_ThrowsException()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ClearList("30"));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithValidInput_RemovesAllEventsFromList()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null),
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            await codeUnderTest.ClearList("1");
+
+            Assert.Empty(list.Events);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithValidInput_UpdatesDataLayer()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            await codeUnderTest.ClearList("1");
+
+            //Account for one extra call while we initialize the handler with an extra list during dev
+            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeast(2));
         }
 
         #endregion
