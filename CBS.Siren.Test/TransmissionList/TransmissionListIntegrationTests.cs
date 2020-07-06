@@ -157,12 +157,15 @@ namespace CBS.Siren.Test
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-            response = await clientUnderTest.DeleteAsync("api/1/transmissionlist/0/events/0");
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            response = await clientUnderTest.DeleteAsync($"api/1/transmissionlist/0/events/{returnedEvent.Id}");
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
             response = await clientUnderTest.GetAsync("api/1/transmissionlist/0/events");
 
-            string content = await response.Content.ReadAsStringAsync();
+            content = await response.Content.ReadAsStringAsync();
             List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             Assert.Empty(returnedList);

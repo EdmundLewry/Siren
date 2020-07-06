@@ -61,11 +61,12 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpDelete("{id}/events/{eventId}")]
-        public async Task<ActionResult> DeleteEvent(string id)
+        public async Task<ActionResult> DeleteEvent(string id, string eventId)
         {
             try
             {
-                return null;
+                await _handler.RemoveEvent(id, eventId);
+                return NoContent();
             }
             catch(Exception)
             {

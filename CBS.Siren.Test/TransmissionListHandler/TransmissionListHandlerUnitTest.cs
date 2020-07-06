@@ -36,7 +36,8 @@ namespace CBS.Siren.Test
 
             return creationDTO;
         }
-        
+
+        #region GET        
         [Fact]
         [Trait("TestType", "UnitTest")]
         public async Task GetListEvents_WithInvalidId_ThrowsException()
@@ -74,7 +75,9 @@ namespace CBS.Siren.Test
 
             Assert.Equal(2, events.ToList().Count);
         }
+        #endregion
 
+        #region Add
         [Fact]
         [Trait("TestType", "UnitTest")]
         public async Task AddEvents_WithInvalidId_ThrowsException()
@@ -141,12 +144,11 @@ namespace CBS.Siren.Test
             TransmissionListEvent addedEvent = await codeUnderTest.AddEvent("1", creationDTO);
             Assert.Equal(3, savedList.Events.Count);
             Assert.Equal(addedEvent.Id, savedList.Events[2].Id);
-
         }
         
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public async Task AddEvents_WithInvalidInput_ReturnsThrowsException()
+        public async Task AddEvents_WithInvalidInput_ThrowsException()
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
@@ -154,12 +156,104 @@ namespace CBS.Siren.Test
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
                 new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
+            })
+            {
+                Id = "1"
+            };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent("1", new TransmissionListEventCreationDTO()));
         }
+
+        #endregion
+
+        #region Remove
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task RemoveEvent_WithInvalidListId_ThrowsException()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("30", list.Events[0].Id.ToString()));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task RemoveEvent_WithInvalidEventId_ThrowsException()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("1", "30"));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task RemoveEvent_WithValidInput_RemovesEventFromList()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null),
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            string eventId = list.Events[0].Id.ToString();
+            await codeUnderTest.RemoveEvent("1", eventId);
+
+            Assert.Single(list.Events);
+            Assert.Null(list.Events.FirstOrDefault(listEvent => listEvent.Id.ToString() == eventId));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task RemoveEvent_WithValidInput_UpdatesDataLayer()
+        {
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+
+            string eventId = list.Events[0].Id.ToString();
+            await codeUnderTest.RemoveEvent("1", eventId);
+
+            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce);
+        }
+
+        #endregion
     }
 }

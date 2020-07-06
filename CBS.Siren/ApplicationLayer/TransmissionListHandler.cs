@@ -76,5 +76,25 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
             return createdEvent;
         }
+
+        public async Task RemoveEvent(string listId, string eventId)
+        {
+            IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
+            TransmissionList transmissionList = transmissionLists.FirstOrDefault(list => list.Id == listId);
+
+            if (transmissionList == null)
+            {
+                throw new ArgumentException($"Unable to find list with id: {listId}", "listId");
+            }
+
+            TransmissionListEvent listEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id.ToString() == eventId);
+            if(listEvent == null)
+            {
+                throw new ArgumentException($"Unable to find list event with id: {eventId}", "eventId");
+            }
+
+            transmissionList.Events.Remove(listEvent);
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+        }
     }
 }
