@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CBS.Siren.Data;
+using CBS.Siren.Device;
 using Xunit;
 
 namespace CBS.Siren.Test
@@ -41,6 +42,40 @@ namespace CBS.Siren.Test
             Assert.Single(lists);
 
             Assert.NotNull(lists[0].SourceList);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task AddUpdateDevices_WhenDeviceDoesNotExist_CreatesNewDevice()
+        {
+            DeviceModel initialDevice = new DeviceModel(){ Name = "Test" };
+            CollectionDataLayer codeUnderTest = new CollectionDataLayer();
+            await codeUnderTest.AddUpdateDevices(initialDevice);
+
+            DeviceModel expectedDevice = new DeviceModel() { Name = "Test2" };
+            await codeUnderTest.AddUpdateDevices(expectedDevice);
+
+            List<DeviceModel> devices = (await codeUnderTest.Devices()).ToList(); 
+            Assert.Equal(2, devices.Count);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task AddUpdateDevices_WhenDeviceExists_UpdatesDevice()
+        {
+            DeviceModel initialDevice = new DeviceModel() { Name = "Test" };
+            CollectionDataLayer codeUnderTest = new CollectionDataLayer();
+            await codeUnderTest.AddUpdateDevices(initialDevice);
+            
+            string updatedName = "Updated";
+            DeviceModel changedDevice = new DeviceModel() { Id = initialDevice.Id, Name = updatedName };
+
+            await codeUnderTest.AddUpdateDevices(changedDevice);
+
+            List<DeviceModel> devices = (await codeUnderTest.Devices()).ToList();
+            Assert.Single(devices);
+
+            Assert.Equal(updatedName, devices[0].Name);
         }
     }
 }

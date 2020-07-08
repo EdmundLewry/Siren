@@ -11,5 +11,9 @@ namespace CBS.Siren.Application
         Task<TransmissionListEvent> AddEvent(string id, TransmissionListEventCreationDTO listEvent);
         Task RemoveEvent(string listId, string eventId);
         Task ClearList(string id);
+
+        Task PlayTransmissionList(string id);
+        Task PauseTransmissionList(string id);
+        Task NextTransmissionList(string id);
     }
 }

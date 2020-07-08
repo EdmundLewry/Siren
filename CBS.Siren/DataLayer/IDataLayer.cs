@@ -1,3 +1,4 @@
+using CBS.Siren.Device;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,5 +10,8 @@ namespace CBS.Siren.Data
         Task AddUpdateTransmissionLists(params TransmissionList[] lists);
 
         Task<IEnumerable<MediaInstance>> MediaInstances();
+
+        Task<IEnumerable<DeviceModel>> Devices();
+        Task AddUpdateDevices(params DeviceModel[] devices);
     }
 }

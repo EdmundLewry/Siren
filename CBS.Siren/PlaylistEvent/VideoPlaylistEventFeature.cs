@@ -33,11 +33,11 @@ namespace CBS.Siren
 
         public virtual bool Equals([AllowNull] IEventFeature other)
         {
-            return other is VideoPlaylistEventFeature videoEvent &&
+            return other is VideoPlaylistEventFeature &&
                     FeatureType == other.FeatureType &&
                     PlayoutStrategy.Equals(other.PlayoutStrategy) &&
                     SourceStrategy.Equals(other.SourceStrategy) &&
-                    Device?.Name == other.Device?.Name;
+                    Device?.Model?.Name == other.Device?.Model?.Name;
         }
 
         public TimeSpan CalculateDuration()

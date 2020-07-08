@@ -193,6 +193,8 @@ namespace CBS.Siren.Test
             Assert.Single(returnedList);
         }
         #endregion
+
+        #region ClearList
         [Fact]
         [Trait("TestType", "IntegrationTest")]
         public async Task Service_WhenClearListIsCalledWithBadListId_ReturnsNotFound()
@@ -230,7 +232,48 @@ namespace CBS.Siren.Test
 
             Assert.Empty(returnedList);
         }
-        #region ClearList
+        #endregion
+        
+        #region Play
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenPlayTransmissionListIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/1000/play", new StringContent(""));
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenPlayTransmissionListIsCalled_CreatesRelatedDeviceListEvents()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            response = await clientUnderTest.PostAsync("api/1/transmissionlist/0/play", new StringContent(""));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+            response = await clientUnderTest.GetAsync("api/1/transmissionlist/0/events");
+
+            string content = await response.Content.ReadAsStringAsync();
+            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            Assert.Equal(2, returnedList.Count);
+            Assert.True(returnedList[0].RelatedDeviceListEventCount > 0);
+            Assert.True(returnedList[1].RelatedDeviceListEventCount > 0);
+        }
         #endregion
     }
 }

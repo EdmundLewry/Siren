@@ -4,6 +4,6 @@ namespace CBS.Siren.Device
 {
     public interface IDeviceFactory
     {
-        IDevice CreateDemoDevice(string name, ILoggerFactory loggerFactory);
+        IDevice CreateDemoDevice(DeviceModel model, ILoggerFactory loggerFactory);
     }
 }

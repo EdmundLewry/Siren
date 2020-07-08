@@ -1,3 +1,4 @@
+using CBS.Siren.Device;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,10 @@ namespace CBS.Siren.Data
     public class CollectionDataLayer : IDataLayer
     {
         private long nextListId = 0;
+        private int nextDeviceId = 0;
         private List<TransmissionList> StoredTransmissionLists { get; set; } = new List<TransmissionList>();
         private List<MediaInstance> StoredMediaInstances { get; set; } = new List<MediaInstance>();
+        private List<DeviceModel> StoredDevices { get; set; } = new List<DeviceModel>();
 
         public Task<IEnumerable<TransmissionList>> TransmissionLists()
         {
@@ -50,6 +53,29 @@ namespace CBS.Siren.Data
         public Task<IEnumerable<MediaInstance>> MediaInstances()
         {
             return Task.FromResult<IEnumerable<MediaInstance>>(StoredMediaInstances);
+        }
+
+        public Task<IEnumerable<DeviceModel>> Devices()
+        {
+            return Task.FromResult<IEnumerable<DeviceModel>>(StoredDevices);
+        }
+
+        public Task AddUpdateDevices(params DeviceModel[] devices)
+        {
+            foreach (var device in devices)
+            {
+                DeviceModel foundDevice = device.Id == null ? null : StoredDevices.FirstOrDefault((storedDevice) => storedDevice.Id == device.Id);
+                if (foundDevice != null)
+                {
+                    foundDevice.Name = string.IsNullOrWhiteSpace(device.Name) ? foundDevice.Name : device.Name;
+                    continue;
+                }
+
+                device.Id = nextDeviceId++;
+                StoredDevices.Add(device);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

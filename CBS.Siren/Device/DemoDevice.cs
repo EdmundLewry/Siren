@@ -19,17 +19,16 @@ namespace CBS.Siren.Device
         private EventHandler<DeviceEventChangedEventArgs> DeviceEventChangeEventHandler { get; set; }
         private EventHandler<EventArgs> DeviceListEndEventHandler { get; set; }
 
-        public string Name { get; }
-        public int Id { get; set; }
+        public DeviceModel Model { get; set; }
 
         public IDevice.DeviceStatus CurrentStatus { get; set; } = IDevice.DeviceStatus.STOPPED;
 
         public DeviceList ActiveList { get => Controller.ActiveDeviceList; set => Controller.ActiveDeviceList = value; }
 
 
-        public DemoDevice(String name, IDeviceController controller, IDeviceDriver driver)
+        public DemoDevice(DeviceModel model, IDeviceController controller, IDeviceDriver driver)
         {
-            Name = name;
+            Model = model;
             Controller = controller;
             Driver = driver;
             DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => HandleDeviceEventChange(args));
@@ -51,10 +50,9 @@ namespace CBS.Siren.Device
             Controller.OnDeviceListEnded -= DeviceListEndEventHandler;
         }
 
-
         public override String ToString()
         {
-            return base.ToString() + " Name: " + Name;
+            return base.ToString() + " Name: " + Model.Name;
         }
 
         public async Task Run(CancellationToken token)

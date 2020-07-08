@@ -26,6 +26,10 @@ namespace CBS.Siren
             services.AddTransient<SirenApplication>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
             services.AddTransient<ITransmissionListHandler, TransmissionListHandler>();
+            services.AddTransient<IScheduler, SimpleScheduler>();
+            services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
+            services.AddTransient<IDeviceListEventFactory, DeviceListEventFactory>();
+            services.AddTransient<ITransmissionListService, TransmissionListService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

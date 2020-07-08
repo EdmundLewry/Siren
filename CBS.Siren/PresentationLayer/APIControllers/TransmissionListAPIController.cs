@@ -33,7 +33,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpPost("{id}/clear")]
-        public async Task<ActionResult> ClearList(string id)
+        public async Task<ActionResult> ClearListById(string id)
         {
             try
             {
@@ -42,6 +42,21 @@ namespace CBS.Siren.Controllers
             }
             catch (Exception)
             {
+                return NotFound(id);
+            }
+        }
+        
+        [HttpPost("{id}/play")]
+        public async Task<ActionResult> PlayTransmissionListById(string id)
+        {
+            try
+            {
+                await _handler.PlayTransmissionList(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                throw;
                 return NotFound(id);
             }
         }

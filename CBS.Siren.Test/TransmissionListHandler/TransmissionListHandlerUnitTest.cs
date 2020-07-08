@@ -37,21 +37,31 @@ namespace CBS.Siren.Test
             return creationDTO;
         }
 
-        #region GET        
-        [Fact]
-        [Trait("TestType", "UnitTest")]
-        public async Task GetListEvents_WithInvalidId_ThrowsException()
+        private TransmissionListHandler CreateHandlerUnderTest(Mock<IDataLayer> dataLayer = null)
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
+
+            if(dataLayer == null)
+            {
+                dataLayer = new Mock<IDataLayer>();
+            }
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
                 new TransmissionListEvent(null, null)
             });
             list.Id = "1";
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+            return new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
+        }
+
+        #region GET        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListEvents_WithInvalidId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListEvents("30"));
         }
@@ -60,16 +70,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public async Task GetListEvents_WithValidId_ReturnsEventsFromList()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
-
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null),
-                new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             IEnumerable<TransmissionListEvent> events = await codeUnderTest.GetListEvents("1");
 
@@ -82,16 +83,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public async Task AddEvents_WithInvalidId_ThrowsException()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
-
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null),
-                new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent("30", new TransmissionListEventCreationDTO()));
         }
@@ -100,17 +92,10 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public async Task AddEvents_WithValidId_ReturnsEvent()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
             dataLayer.Setup(mock => mock.MediaInstances()).ReturnsAsync(new List<MediaInstance>(){new MediaInstance("TestInstance", new TimeSpan(0,0,30))});
 
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null),
-                new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest(dataLayer);
 
             TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
             
@@ -128,6 +113,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
@@ -137,7 +123,7 @@ namespace CBS.Siren.Test
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
             TransmissionList savedList = null;
             dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
             
@@ -148,20 +134,9 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public async Task AddEvents_WithInvalidInput_ThrowsException()
+        public async Task AddEvent_WithInvalidInput_ThrowsException()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
-
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null),
-                new TransmissionListEvent(null, null)
-            })
-            {
-                Id = "1"
-            };
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent("1", new TransmissionListEventCreationDTO()));
         }
@@ -175,6 +150,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null)
@@ -183,7 +159,7 @@ namespace CBS.Siren.Test
                 Id = "1"
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("30", list.Events[0].Id.ToString()));
         }
@@ -192,17 +168,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public async Task RemoveEvent_WithInvalidEventId_ThrowsException()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
-
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null)
-            })
-            {
-                Id = "1"
-            };
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("1", "30"));
         }
@@ -213,6 +179,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
@@ -222,7 +189,7 @@ namespace CBS.Siren.Test
                 Id = "1"
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             string eventId = list.Events[0].Id.ToString();
             await codeUnderTest.RemoveEvent("1", eventId);
@@ -237,6 +204,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null)
@@ -246,7 +214,7 @@ namespace CBS.Siren.Test
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             string eventId = list.Events[0].Id.ToString();
             await codeUnderTest.RemoveEvent("1", eventId);
@@ -262,17 +230,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public async Task ClearList_WithInvalidListId_ThrowsException()
         {
-            var logger = new Mock<ILogger<TransmissionListHandler>>();
-            var dataLayer = new Mock<IDataLayer>();
-
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, null)
-            })
-            {
-                Id = "1"
-            };
-            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ClearList("30"));
         }
@@ -283,6 +241,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
@@ -292,7 +251,7 @@ namespace CBS.Siren.Test
                 Id = "1"
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             await codeUnderTest.ClearList("1");
 
@@ -305,6 +264,7 @@ namespace CBS.Siren.Test
         {
             var logger = new Mock<ILogger<TransmissionListHandler>>();
             var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
 
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null)
@@ -314,7 +274,7 @@ namespace CBS.Siren.Test
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
-            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object);
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
 
             await codeUnderTest.ClearList("1");
 
@@ -322,6 +282,41 @@ namespace CBS.Siren.Test
             dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeast(2));
         }
 
+        #endregion
+
+        #region Play
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task PlayTransmisionList_WithInvalidListId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.PlayTransmissionList("30"));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task PlayTransmisionList_WithValidId_InvokesTransmissionListServicePlay()
+        {
+            //Should clean these up
+            var logger = new Mock<ILogger<TransmissionListHandler>>();
+            var dataLayer = new Mock<IDataLayer>();
+            var listService = new Mock<ITransmissionListService>();
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, null)
+            })
+            {
+                Id = "1"
+            };
+            dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
+
+            TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object);
+
+            await codeUnderTest.PlayTransmissionList("1");
+
+            listService.Verify(mock => mock.PlayTransmissionList(), Times.Once);
+        }
         #endregion
     }
 }

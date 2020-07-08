@@ -13,12 +13,14 @@ namespace CBS.Siren.Application
     {
         public ILogger<TransmissionListHandler> Logger { get; }
         public IDataLayer DataLayer { get; }
+        public ITransmissionListService TransmissionListService { get; }
         public Channel Channel { get; }
 
-        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer)
+        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer, ITransmissionListService transmissionListService)
         {
             Logger = logger;
             DataLayer = dataLayer;
+            TransmissionListService = transmissionListService;
 
             Channel = GenerateChannel(null);
 
@@ -96,6 +98,24 @@ namespace CBS.Siren.Application
             transmissionList.Events.Clear();
 
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
+        }
+
+        public async Task PlayTransmissionList(string id)
+        {
+            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionListService.TransmissionList = transmissionList;
+
+            TransmissionListService.PlayTransmissionList();
+        }
+
+        public Task PauseTransmissionList(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task NextTransmissionList(string id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Device\DeviceManager\" />
     <Folder Include="Scheduler\BenchMarkTests\" />
   </ItemGroup>
 </Project>
