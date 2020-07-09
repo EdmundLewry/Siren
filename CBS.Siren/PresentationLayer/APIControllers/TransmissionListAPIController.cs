@@ -54,9 +54,8 @@ namespace CBS.Siren.Controllers
                 await _handler.PlayTransmissionList(id);
                 return NoContent();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw;
                 return NotFound(id);
             }
         }

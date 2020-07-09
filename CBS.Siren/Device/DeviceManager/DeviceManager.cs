@@ -3,26 +3,36 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CBS.Siren.Device
 {
     public class DeviceManager : IDeviceManager, IDisposable
     {
-        /*On Creation, takes the data layer and creates a new Device process for each device*/
-        /*Has AddDevice functionality which adds a device to the data layer and then creates a process in memory for that device*/
-        /*Has GetDeviceById functionality which returns the device object*/
         public IDataLayer DataLayer { get; }
-        public ILogger Logger { get; }
+        public ILogger<DeviceManager> Logger { get; }
         public ILoggerFactory LoggerFactory { get; }
         public IDeviceFactory DeviceFactory { get; }
         public Dictionary<int, DeviceProcess> Devices { get; } = new Dictionary<int, DeviceProcess>();
 
-        public DeviceManager(IDataLayer dataLayer, ILogger logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory)
+        public DeviceManager(IDataLayer dataLayer, ILogger<DeviceManager> logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory)
         {
             DataLayer = dataLayer;
             Logger = logger;
             LoggerFactory = loggerFactory;
             DeviceFactory = deviceFactory;
+
+            ConstructExistingDevices();
+        }
+
+        private void ConstructExistingDevices()
+        {
+            List<DeviceModel> models = DataLayer.Devices().Result.ToList();
+            models.ForEach(model =>
+            {
+                CreateDevice(model);
+            });
         }
 
         public void AddDevice(string name)
@@ -32,25 +42,44 @@ namespace CBS.Siren.Device
                 throw new ArgumentException("Name parameter cannot be null or empty", "name");
             }
 
-            DeviceModel deviceModel = new DeviceModel() { Name = name };
-            DataLayer.AddUpdateDevices(deviceModel);
+            DeviceModel model = StoreDevice(name).Result;
+            CreateDevice(model);
+        }
 
-            CreateDevice(deviceModel);
+        public async Task<DeviceModel> StoreDevice(string name)
+        {
+            DeviceModel deviceModel = new DeviceModel() { Name = name };
+            List<DeviceModel> addedModels = await DataLayer.AddUpdateDevices(deviceModel);
+
+            return addedModels[0];
+        }
+
+        private async Task StartDeviceThread(object deviceProcess)
+        {
+            //Feels bad man =(
+            DeviceProcess process = deviceProcess as DeviceProcess;
+            await process.Device.Run(process.CancellationTokenSource.Token);
         }
 
         private void CreateDevice(DeviceModel deviceModel)
         {
             IDevice device = DeviceFactory.CreateDemoDevice(deviceModel, LoggerFactory);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
+            Thread deviceThread = new Thread(async (deviceProcess) => await StartDeviceThread(deviceProcess));
 
-            Devices.Add(deviceModel.Id ?? 0, new DeviceProcess(device, cancellationTokenSource, deviceThread));
-            deviceThread.Start();
+            DeviceProcess deviceProcess = new DeviceProcess(device, cancellationTokenSource, deviceThread);
+            int id = deviceModel.Id ?? 0;
+            Devices.Add(id, deviceProcess);
+            deviceProcess.DeviceThread.Start(Devices[id]);
         }
 
         public IDevice GetDevice(int id)
         {
-            throw new System.NotImplementedException();
+            if(!Devices.ContainsKey(id))
+            {
+                throw new ArgumentException("There is no device available with the given id", "id");
+            }
+            return Devices[id].Device;
         }
 
         #region IDisposable Support

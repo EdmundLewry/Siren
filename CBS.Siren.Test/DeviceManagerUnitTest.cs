@@ -3,21 +3,36 @@ using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CBS.Siren.Test
 {
     public class DeviceManagerUnitTest
     {
-        //DeviceManager on creation should create a device process for each device in the data layer
-        //DeviceManager on destruction should end all device processes
-        //GetDeviceById when id doesn't exist should throw an exception
-        //GetDeviceById when id exists, should return a valid Device Object
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void DeviceManager_OnConstruction_CreatesADeviceForEachDeviceModel()
         {
-        }
+            var dataLayer = new Mock<IDataLayer>();
+            List<DeviceModel> deviceModels = new List<DeviceModel>()
+            {
+                new DeviceModel(){ Id = 1, Name = "1" },
+                new DeviceModel(){ Id = 2, Name = "2" },
+                new DeviceModel(){ Id = 3, Name = "3" }
+            };
+            dataLayer.Setup(mock => mock.Devices()).Returns(Task.FromResult<IEnumerable<DeviceModel>>(deviceModels));
+
+            var logger = new Mock<ILogger<DeviceManager>>();
+            var loggerFactory = new Mock<ILoggerFactory>();
+            var deviceFactory = new Mock<IDeviceFactory>();
+            var mockDevice = new Mock<IDevice>();
+            deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(mockDevice.Object);
+            DeviceManager codeUnderTest = new DeviceManager(dataLayer.Object, logger.Object, loggerFactory.Object, deviceFactory.Object);
+
+            Assert.Equal(3, codeUnderTest.Devices.Count);
+        }        
 
         #region Add
         [Fact]
@@ -25,9 +40,12 @@ namespace CBS.Siren.Test
         public void AddDevice_WhenEmptyNameProvided_ThrowsException()
         {
             var dataLayer = new Mock<IDataLayer>();
-            var logger = new Mock<ILogger>();
+            dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>())).ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } });
+            var logger = new Mock<ILogger<DeviceManager>>();
             var loggerFactory = new Mock<ILoggerFactory>();
             var deviceFactory = new Mock<IDeviceFactory>();
+            var mockDevice = new Mock<IDevice>();
+            deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(mockDevice.Object);
             DeviceManager codeUnderTest = new DeviceManager(dataLayer.Object, logger.Object, loggerFactory.Object, deviceFactory.Object);
 
             Assert.ThrowsAny<ArgumentException>(() => codeUnderTest.AddDevice(""));
@@ -38,7 +56,8 @@ namespace CBS.Siren.Test
         public void AddDevice_WhenCalled_AddsDeviceToDataLayer()
         {
             var dataLayer = new Mock<IDataLayer>();
-            var logger = new Mock<ILogger>();
+            dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>())).ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } });
+            var logger = new Mock<ILogger<DeviceManager>>();
             var loggerFactory = new Mock<ILoggerFactory>();
             var deviceFactory = new Mock<IDeviceFactory>();
             var mockDevice = new Mock<IDevice>();
@@ -55,12 +74,14 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void AddDevice_WhenCalled_StartDeviceProcess()
         {
+            string name = "Test";
+
             var dataLayer = new Mock<IDataLayer>();
-            var logger = new Mock<ILogger>();
+            dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>())).ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = name } });
+            var logger = new Mock<ILogger<DeviceManager>>();
             var loggerFactory = new Mock<ILoggerFactory>();
             var deviceFactory = new Mock<IDeviceFactory>();
 
-            string name = "Test";
 
             var mockDevice = new Mock<IDevice>();
             mockDevice.Setup(mock => mock.Model).Returns(new DeviceModel() { Name = name });
@@ -71,6 +92,46 @@ namespace CBS.Siren.Test
 
             Assert.Single(codeUnderTest.Devices);
             Assert.Equal(name, codeUnderTest.Devices[0].Device.Model.Name);
+        }
+        #endregion
+
+        #region Get
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void GetDevice_WhenIdDoesntExist_ThrowsException()
+        {
+            var dataLayer = new Mock<IDataLayer>();
+            var logger = new Mock<ILogger<DeviceManager>>();
+            var loggerFactory = new Mock<ILoggerFactory>();
+            var deviceFactory = new Mock<IDeviceFactory>();
+            var mockDevice = new Mock<IDevice>();
+            deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(mockDevice.Object);
+            DeviceManager codeUnderTest = new DeviceManager(dataLayer.Object, logger.Object, loggerFactory.Object, deviceFactory.Object);
+
+            Assert.ThrowsAny<ArgumentException>(() => codeUnderTest.GetDevice(100));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void GetDevice_WhenIdExists_ReturnsDevice()
+        {
+            string expectedName = "Test";
+
+            var dataLayer = new Mock<IDataLayer>();
+            DeviceModel deviceModel = new DeviceModel() { Id = 1, Name = expectedName };
+            dataLayer.Setup(mock => mock.Devices()).Returns(Task.FromResult<IEnumerable<DeviceModel>>(new List<DeviceModel>() { deviceModel }));
+
+            var logger = new Mock<ILogger<DeviceManager>>();
+            var loggerFactory = new Mock<ILoggerFactory>();
+            var deviceFactory = new Mock<IDeviceFactory>();
+            var mockDevice = new Mock<IDevice>();
+            mockDevice.Setup(mock => mock.Model).Returns(deviceModel);
+            deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(mockDevice.Object);
+
+            DeviceManager codeUnderTest = new DeviceManager(dataLayer.Object, logger.Object, loggerFactory.Object, deviceFactory.Object);
+
+            IDevice device = codeUnderTest.GetDevice(1);
+            Assert.Equal(expectedName, device.Model.Name);
         }
         #endregion
     }

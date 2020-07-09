@@ -1,10 +1,13 @@
 using AutoMapper;
 using CBS.Siren.Application;
 using CBS.Siren.Data;
+using CBS.Siren.Device;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 
 namespace CBS.Siren
 {
@@ -25,6 +28,8 @@ namespace CBS.Siren
             
             services.AddTransient<SirenApplication>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
+            services.AddTransient<IDeviceFactory, DeviceFactory>();
+            services.AddSingleton<IDeviceManager, DeviceManager>();
             services.AddTransient<ITransmissionListHandler, TransmissionListHandler>();
             services.AddTransient<IScheduler, SimpleScheduler>();
             services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
@@ -40,6 +45,21 @@ namespace CBS.Siren
             {
                 endpoints.MapControllers();
             });
+
+            IDeviceManager deviceManager = app.ApplicationServices.GetService<IDeviceManager>();
+            deviceManager.AddDevice("DemoDevice");
+
+            /* For this early stage we're just going to create a single transmission list to work on.
+            This is because sat this stage of the application, it's not possible to add transmission lists
+            to channels */
+            InitializeTransmissionList(app.ApplicationServices);
+        }
+
+        private void InitializeTransmissionList(IServiceProvider services)
+        {
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            IDataLayer dataLayer = services.GetService<IDataLayer>();
+            dataLayer.AddUpdateTransmissionLists(transmissionList);
         }
     }
 }

@@ -60,22 +60,26 @@ namespace CBS.Siren.Data
             return Task.FromResult<IEnumerable<DeviceModel>>(StoredDevices);
         }
 
-        public Task AddUpdateDevices(params DeviceModel[] devices)
+        public Task<List<DeviceModel>> AddUpdateDevices(params DeviceModel[] devices)
         {
+            List<DeviceModel> addedUpdatedDevices = new List<DeviceModel>();
+
             foreach (var device in devices)
             {
                 DeviceModel foundDevice = device.Id == null ? null : StoredDevices.FirstOrDefault((storedDevice) => storedDevice.Id == device.Id);
                 if (foundDevice != null)
                 {
                     foundDevice.Name = string.IsNullOrWhiteSpace(device.Name) ? foundDevice.Name : device.Name;
+                    addedUpdatedDevices.Add(foundDevice);
                     continue;
                 }
 
                 device.Id = nextDeviceId++;
                 StoredDevices.Add(device);
+                addedUpdatedDevices.Add(device);
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult(addedUpdatedDevices);
         }
     }
 }

@@ -219,8 +219,7 @@ namespace CBS.Siren.Test
             string eventId = list.Events[0].Id.ToString();
             await codeUnderTest.RemoveEvent("1", eventId);
 
-            //Account for one extra call while we initialize the handler with an extra list during dev
-            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeast(2));
+            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
 
         #endregion
@@ -278,8 +277,7 @@ namespace CBS.Siren.Test
 
             await codeUnderTest.ClearList("1");
 
-            //Account for one extra call while we initialize the handler with an extra list during dev
-            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeast(2));
+            dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
 
         #endregion

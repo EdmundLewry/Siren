@@ -123,6 +123,10 @@ namespace CBS.Siren
             HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
             foreach (IDevice device in devices)
             {
+                if(device is null)
+                {
+                    continue;
+                }
                 DeviceListEventWatcher.SubcsribeToDevice(this, device);
             }
         }
@@ -137,6 +141,10 @@ namespace CBS.Siren
             HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
             foreach(IDevice device in devices)
             {
+                if(device is null)
+                {
+                    continue;
+                }
                 DeviceListEventWatcher.UnsubcsribeFromDevice(this, device);
             }
         }

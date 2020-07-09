@@ -10,7 +10,6 @@ using System;
 using System.Text;
 using Xunit.Abstractions;
 using System.Net;
-using Microsoft.AspNetCore.Http;
 
 namespace CBS.Siren.Test
 {
