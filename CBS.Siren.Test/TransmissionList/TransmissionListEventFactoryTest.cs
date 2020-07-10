@@ -52,8 +52,8 @@ namespace CBS.Siren.Test
                 PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
                 SourceStrategy = new SourceStrategyCreationDTO() {
                     StrategyType = "mediaSource",
-                    SOM = new TimeSpan(0,0,0,0,0),
-                    EOM = new TimeSpan(0,0,0,30,0),
+                    SOM = "00:00:00:00",
+                    EOM = "00:00:30:00",
                     MediaName = "TestInstance"
                 }
             };

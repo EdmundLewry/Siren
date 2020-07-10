@@ -135,8 +135,8 @@ namespace CBS.Siren
             return sourceStrategy.StrategyType switch
             {
                 "mediaSource" => new MediaSourceStrategy(GetMediaInstanceByNameAsync(sourceStrategy.MediaName, device, dataLayer).Result, 
-                                                         sourceStrategy.SOM, 
-                                                         sourceStrategy.EOM),
+                                                         sourceStrategy.SOM.ConvertTimecodeStringToTimeSpan(), 
+                                                         sourceStrategy.EOM.ConvertTimecodeStringToTimeSpan()),
                 _ => null
             };
         }

@@ -16,18 +16,19 @@ namespace CBS.Siren.Application
         public ITransmissionListService TransmissionListService { get; }
         public Channel Channel { get; }
 
-        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer, ITransmissionListService transmissionListService)
+        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer, ITransmissionListService transmissionListService, IDeviceManager deviceManager)
         {
             Logger = logger;
             DataLayer = dataLayer;
             TransmissionListService = transmissionListService;
 
-            Channel = GenerateChannel(null);
+            Channel = GenerateChannel(deviceManager);
         }
 
-        private Channel GenerateChannel(IDevice device)
+        private Channel GenerateChannel(IDeviceManager deviceManager)
         {
-            List<IDevice> devices = new List<IDevice>() { device };
+            List<DeviceModel> deviceModels = DataLayer.Devices().Result.ToList();
+            List<IDevice> devices = deviceModels.Select(model => deviceManager.GetDevice(model.Id.GetValueOrDefault())).ToList();
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);
@@ -95,6 +96,7 @@ namespace CBS.Siren.Application
             TransmissionListService.TransmissionList = transmissionList;
 
             TransmissionListService.PlayTransmissionList();
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
         public Task PauseTransmissionList(string id)

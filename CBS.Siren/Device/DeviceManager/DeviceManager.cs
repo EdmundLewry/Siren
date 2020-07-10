@@ -68,7 +68,7 @@ namespace CBS.Siren.Device
             Thread deviceThread = new Thread(async (deviceProcess) => await StartDeviceThread(deviceProcess));
 
             DeviceProcess deviceProcess = new DeviceProcess(device, cancellationTokenSource, deviceThread);
-            int id = deviceModel.Id ?? 0;
+            int id = deviceModel.Id.GetValueOrDefault();
             Devices.Add(id, deviceProcess);
             deviceProcess.DeviceThread.Start(Devices[id]);
         }

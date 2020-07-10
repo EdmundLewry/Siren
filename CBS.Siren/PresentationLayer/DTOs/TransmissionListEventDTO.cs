@@ -11,6 +11,6 @@ namespace CBS.Siren.DTO
         public TimeSpan ExpectedDuration { get; set; }
         public DateTime ExpectedStartTime { get; set; }
         public string RelatedPlaylistEvent { get; set; }
-        public int RelatedDeviceListEventCount { get; private set; }
+        public int RelatedDeviceListEventCount { get; set; }
     }
 }

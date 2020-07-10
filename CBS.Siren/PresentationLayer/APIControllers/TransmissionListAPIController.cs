@@ -11,7 +11,7 @@ using System;
 namespace CBS.Siren.Controllers
 {
     [ApiController]
-    [Route("api/1/transmissionlist")]
+    [Route("api/1/automation/transmissionlist")]
     public class TransmissionListAPIController : ControllerBase
     {
         private readonly ILogger<TransmissionListAPIController> _logger;
