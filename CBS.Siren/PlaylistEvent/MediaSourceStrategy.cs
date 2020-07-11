@@ -62,7 +62,11 @@ namespace CBS.Siren
 
         public TimeSpan GetDuration()
         {
-            long durationFrames = Math.Min(Instance.Duration.TotalFrames(), EOM.TotalFrames()) - SOM.TotalFrames();
+            long durationFrames = 0;
+            if ( Instance != null)
+            {
+                durationFrames = Math.Min(Instance.Duration.TotalFrames(), EOM.TotalFrames()) - SOM.TotalFrames();
+            }
             return TimeSpanExtensions.FromFrames(durationFrames);
         }
 
@@ -73,10 +77,10 @@ namespace CBS.Siren
                 type = StrategyType,
                 mediaInstance = new
                 {
-                    Instance.Name,
-                    Duration = Instance.Duration.ToTimecodeString(),
-                    Instance.FilePath,
-                    Instance.InstanceFileType
+                    Instance?.Name,
+                    Duration = Instance?.Duration.ToTimecodeString(),
+                    Instance?.FilePath,
+                    Instance?.InstanceFileType
                 },
                 som = SOM.ToTimecodeString(),
                 eom = EOM.ToTimecodeString()

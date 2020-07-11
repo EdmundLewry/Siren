@@ -37,7 +37,8 @@ namespace CBS.Siren
             services.AddTransient<ITransmissionListService, TransmissionListService>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment 
+            env)
         {
             app.UseRouting();
             
@@ -49,16 +50,18 @@ namespace CBS.Siren
             IDeviceManager deviceManager = app.ApplicationServices.GetService<IDeviceManager>();
             deviceManager.AddDevice("DemoDevice");
 
+            IDataLayer dataLayer = app.ApplicationServices.GetService<IDataLayer>();
+            dataLayer.AddUpdateMediaInstances();
             /* For this early stage we're just going to create a single transmission list to work on.
             This is because sat this stage of the application, it's not possible to add transmission lists
             to channels */
-            InitializeTransmissionList(app.ApplicationServices);
+            InitializeTransmissionList(dataLayer);
         }
 
-        private void InitializeTransmissionList(IServiceProvider services)
+        private void InitializeTransmissionList(IDataLayer dataLayer)
         {
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
-            IDataLayer dataLayer = services.GetService<IDataLayer>();
+            
             dataLayer.AddUpdateTransmissionLists(transmissionList);
         }
     }

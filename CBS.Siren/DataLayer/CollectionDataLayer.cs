@@ -8,8 +8,9 @@ namespace CBS.Siren.Data
 {
     public class CollectionDataLayer : IDataLayer
     {
-        private int nextListId = 0;
-        private int nextDeviceId = 0;
+        private int _nextListId = 0;
+        private int _nextDeviceId = 0;
+        private int _nextInstanceeId = 0;
         private List<TransmissionList> StoredTransmissionLists { get; set; } = new List<TransmissionList>();
         private List<MediaInstance> StoredMediaInstances { get; set; } = new List<MediaInstance>();
         private List<DeviceModel> StoredDevices { get; set; } = new List<DeviceModel>();
@@ -38,7 +39,7 @@ namespace CBS.Siren.Data
                     continue;
                 }
 
-                list.Id = nextListId++;
+                list.Id = _nextListId++;
                 StoredTransmissionLists.Add(list);
             }
 
@@ -48,6 +49,31 @@ namespace CBS.Siren.Data
         private TransmissionList GetTransmissionListById(int? id)
         {
             return StoredTransmissionLists.FirstOrDefault((list) => list.Id == id);
+        }
+
+        public Task<List<MediaInstance>> AddUpdateMediaInstances(params MediaInstance[] instances)
+        {
+            List<MediaInstance> addedUpdatedInstances = new List<MediaInstance>();
+
+            foreach (var mediaInstance in instances)
+            {
+                MediaInstance foundInstance = mediaInstance.Id == null ? null : StoredMediaInstances.FirstOrDefault((storedInstance) => storedInstance.Id == mediaInstance.Id);
+                if (foundInstance != null)
+                {
+                    foundInstance.Name = string.IsNullOrWhiteSpace(mediaInstance.Name) ? foundInstance.Name : mediaInstance.Name;
+                    foundInstance.Duration = mediaInstance.Duration == default ? foundInstance.Duration : mediaInstance.Duration;
+                    foundInstance.FilePath = string.IsNullOrWhiteSpace(mediaInstance.FilePath) ? foundInstance.FilePath : mediaInstance.FilePath;
+                    foundInstance.InstanceFileType = mediaInstance.InstanceFileType != foundInstance.InstanceFileType ? foundInstance.InstanceFileType : mediaInstance.InstanceFileType;
+                    addedUpdatedInstances.Add(foundInstance);
+                    continue;
+                }
+
+                mediaInstance.Id = _nextInstanceeId++;
+                StoredMediaInstances.Add(mediaInstance);
+                addedUpdatedInstances.Add(mediaInstance);
+            }
+
+            return Task.FromResult(addedUpdatedInstances);
         }
 
         public Task<IEnumerable<MediaInstance>> MediaInstances()
@@ -74,7 +100,7 @@ namespace CBS.Siren.Data
                     continue;
                 }
 
-                device.Id = nextDeviceId++;
+                device.Id = _nextDeviceId++;
                 StoredDevices.Add(device);
                 addedUpdatedDevices.Add(device);
             }

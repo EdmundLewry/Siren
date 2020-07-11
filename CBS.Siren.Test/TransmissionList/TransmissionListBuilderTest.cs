@@ -17,7 +17,7 @@ namespace CBS.Siren.Test
         private PlaylistEvent GenerateTestPlaylistEvent(TimingStrategyType strategyType = TimingStrategyType.Fixed)
         {
             List<IEventFeature> features = new List<IEventFeature>() {
-                new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), new MediaInstance())
+                new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), new MediaInstance("", new TimeSpan()))
             };
             IEventTimingStrategy timingStrategy = strategyType switch
             {
