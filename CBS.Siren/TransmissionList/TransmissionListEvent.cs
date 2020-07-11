@@ -49,7 +49,7 @@ namespace CBS.Siren
                     $"\nRelated Playlist Event Id: {RelatedPlaylistEvent?.Id}";
 
             EventFeatures.ForEach((feature) => {
-                returnValue = returnValue + $"\nEventFeature - {feature.ToString()}";
+                returnValue += $"\nEventFeature - {feature}";
             });
 
             return returnValue;

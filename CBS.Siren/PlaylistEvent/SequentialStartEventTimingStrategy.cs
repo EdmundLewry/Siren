@@ -10,7 +10,7 @@ namespace CBS.Siren
         public SequentialStartEventTimingStrategy() {}
         public SequentialStartEventTimingStrategy(IEventTimingStrategy other)
         {
-            if(other is SequentialStartEventTimingStrategy sequentialStrategy)
+            if(other is SequentialStartEventTimingStrategy)
             {
                 return;
             }
@@ -52,7 +52,7 @@ namespace CBS.Siren
 
         public virtual bool Equals([AllowNull] IEventTimingStrategy other)
         {
-            return other is SequentialStartEventTimingStrategy sequentialStrategy;
+            return other is SequentialStartEventTimingStrategy;
         }
     }
 }

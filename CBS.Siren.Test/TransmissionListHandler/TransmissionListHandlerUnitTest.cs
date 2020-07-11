@@ -52,8 +52,10 @@ namespace CBS.Siren.Test
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
                 new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
+            })
+            {
+                Id = 1
+            };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
             return new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
         }
@@ -65,7 +67,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListEvents("30"));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListEvents(30));
         }
         
         [Fact]
@@ -74,7 +76,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            IEnumerable<TransmissionListEvent> events = await codeUnderTest.GetListEvents("1");
+            IEnumerable<TransmissionListEvent> events = await codeUnderTest.GetListEvents(1);
 
             Assert.Equal(2, events.ToList().Count);
         }
@@ -87,7 +89,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent("30", new TransmissionListEventCreationDTO()));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent(30, new TransmissionListEventCreationDTO()));
         }
         
         [Fact]
@@ -101,7 +103,7 @@ namespace CBS.Siren.Test
 
             TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
             
-            TransmissionListEvent createdEvent = await codeUnderTest.AddEvent("1", creationDTO);
+            TransmissionListEvent createdEvent = await codeUnderTest.AddEvent(1, creationDTO);
 
             Assert.Equal(TransmissionListEventState.Status.UNSCHEDULED, createdEvent.EventState.CurrentStatus);
             Assert.Single(createdEvent.EventFeatures);
@@ -121,8 +123,10 @@ namespace CBS.Siren.Test
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(null, null),
                 new TransmissionListEvent(null, null)
-            });
-            list.Id = "1";
+            })
+            {
+                Id = 1
+            };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>(){list});
             TransmissionList savedList = null;
             dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
@@ -130,7 +134,7 @@ namespace CBS.Siren.Test
 
             TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
             
-            TransmissionListEvent addedEvent = await codeUnderTest.AddEvent("1", creationDTO);
+            TransmissionListEvent addedEvent = await codeUnderTest.AddEvent(1, creationDTO);
             Assert.Equal(3, savedList.Events.Count);
             Assert.Equal(addedEvent.Id, savedList.Events[2].Id);
         }
@@ -141,7 +145,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent("1", new TransmissionListEventCreationDTO()));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent(1, new TransmissionListEventCreationDTO()));
         }
 
         #endregion
@@ -160,12 +164,12 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("30", list.Events[0].Id.ToString()));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent(30, list.Events[0].Id));
         }
         
         [Fact]
@@ -174,7 +178,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent("1", "30"));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent(1, 30));
         }
         
         [Fact]
@@ -191,16 +195,16 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            string eventId = list.Events[0].Id.ToString();
-            await codeUnderTest.RemoveEvent("1", eventId);
+            int eventId = list.Events[0].Id;
+            await codeUnderTest.RemoveEvent(1, eventId);
 
             Assert.Single(list.Events);
-            Assert.Null(list.Events.FirstOrDefault(listEvent => listEvent.Id.ToString() == eventId));
+            Assert.Null(list.Events.FirstOrDefault(listEvent => listEvent.Id == eventId));
         }
         
         [Fact]
@@ -216,14 +220,14 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            string eventId = list.Events[0].Id.ToString();
-            await codeUnderTest.RemoveEvent("1", eventId);
+            int eventId = list.Events[0].Id;
+            await codeUnderTest.RemoveEvent(1, eventId);
 
             dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
@@ -237,7 +241,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ClearList("30"));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ClearList(30));
         }
 
         [Fact]
@@ -254,12 +258,12 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            await codeUnderTest.ClearList("1");
+            await codeUnderTest.ClearList(1);
 
             Assert.Empty(list.Events);
         }
@@ -277,13 +281,13 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            await codeUnderTest.ClearList("1");
+            await codeUnderTest.ClearList(1);
 
             dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
@@ -297,7 +301,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.PlayTransmissionList("30"));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.PlayTransmissionList(30));
         }
 
         [Fact]
@@ -313,13 +317,13 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            await codeUnderTest.PlayTransmissionList("1");
+            await codeUnderTest.PlayTransmissionList(1);
 
             dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
@@ -338,13 +342,13 @@ namespace CBS.Siren.Test
                 new TransmissionListEvent(null, null)
             })
             {
-                Id = "1"
+                Id = 1
             };
             dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { list });
 
             TransmissionListHandler codeUnderTest = new TransmissionListHandler(logger.Object, dataLayer.Object, listService.Object, deviceManager.Object);
 
-            await codeUnderTest.PlayTransmissionList("1");
+            await codeUnderTest.PlayTransmissionList(1);
 
             listService.Verify(mock => mock.PlayTransmissionList(), Times.Once);
         }

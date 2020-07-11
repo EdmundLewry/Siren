@@ -34,7 +34,7 @@ namespace CBS.Siren.Application
             return new Channel(chainConfiguration);
         }
 
-        private async Task<TransmissionList> GetListBydId(string id)
+        private async Task<TransmissionList> GetListBydId(int id)
         {
             IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
             TransmissionList transmissionList = transmissionLists.FirstOrDefault(list => list.Id == id);
@@ -52,13 +52,13 @@ namespace CBS.Siren.Application
             return await DataLayer.TransmissionLists();
         }
 
-        public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(string id)
+        public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(int id)
         {
             TransmissionList transmissionList = await GetListBydId(id);
             return transmissionList.Events;
         }
 
-        public async Task<TransmissionListEvent> AddEvent(string id, TransmissionListEventCreationDTO listEvent)
+        public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
         {
             TransmissionList transmissionList = await GetListBydId(id);
 
@@ -68,11 +68,11 @@ namespace CBS.Siren.Application
             return createdEvent;
         }
 
-        public async Task RemoveEvent(string listId, string eventId)
+        public async Task RemoveEvent(int listId, int eventId)
         {
             TransmissionList transmissionList = await GetListBydId(listId);
 
-            TransmissionListEvent listEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id.ToString() == eventId);
+            TransmissionListEvent listEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id == eventId);
             if(listEvent == null)
             {
                 throw new ArgumentException($"Unable to find list event with id: {eventId}", "eventId");
@@ -82,7 +82,7 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
-        public async Task ClearList(string id)
+        public async Task ClearList(int id)
         {
             TransmissionList transmissionList = await GetListBydId(id);
             transmissionList.Events.Clear();
@@ -90,7 +90,7 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
-        public async Task PlayTransmissionList(string id)
+        public async Task PlayTransmissionList(int id)
         {
             TransmissionList transmissionList = await GetListBydId(id);
             TransmissionListService.TransmissionList = transmissionList;
@@ -99,12 +99,12 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
-        public Task PauseTransmissionList(string id)
+        public Task PauseTransmissionList(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task NextTransmissionList(string id)
+        public Task NextTransmissionList(int id)
         {
             throw new NotImplementedException();
         }

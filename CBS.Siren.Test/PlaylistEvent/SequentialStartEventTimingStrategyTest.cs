@@ -57,9 +57,11 @@ namespace CBS.Siren.Test
         public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventIsValid_ReportsStartAfterPreviousEvent()
         {
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
-            TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>());
-            precedingEvent.ExpectedDuration = new TimeSpan(0,30,0);
-            precedingEvent.ExpectedStartTime = DateTime.Parse("01/01/2020 14:30:00");
+            TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
+            {
+                ExpectedDuration = new TimeSpan(0, 30, 0),
+                ExpectedStartTime = DateTime.Parse("01/01/2020 14:30:00")
+            };
 
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>());

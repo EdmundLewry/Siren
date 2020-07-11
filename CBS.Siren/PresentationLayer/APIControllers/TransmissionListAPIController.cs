@@ -18,6 +18,8 @@ namespace CBS.Siren.Controllers
         private readonly ITransmissionListHandler _handler;
         private readonly IMapper _mapper;
 
+        public ILogger<TransmissionListAPIController> Logger => _logger;
+
         public TransmissionListAPIController(ILogger<TransmissionListAPIController> logger, ITransmissionListHandler handler, IMapper mapper)
         {
             _logger = logger;
@@ -33,7 +35,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpPost("{id}/clear")]
-        public async Task<ActionResult> ClearListById(string id)
+        public async Task<ActionResult> ClearListById(int id)
         {
             try
             {
@@ -47,7 +49,7 @@ namespace CBS.Siren.Controllers
         }
         
         [HttpPost("{id}/play")]
-        public async Task<ActionResult> PlayTransmissionListById(string id)
+        public async Task<ActionResult> PlayTransmissionListById(int id)
         {
             try
             {
@@ -61,7 +63,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpGet("{id}/events")]
-        public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(string id)
+        public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(int id)
         {
             try
             {
@@ -75,7 +77,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpPost("{id}/events")]
-        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(string id, TransmissionListEventCreationDTO listEvent)
+        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
         {
             try
             {
@@ -89,7 +91,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpDelete("{id}/events/{eventId}")]
-        public async Task<ActionResult> DeleteEvent(string id, string eventId)
+        public async Task<ActionResult> DeleteEvent(int id, int eventId)
         {
             try
             {

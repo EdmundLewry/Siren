@@ -6,7 +6,7 @@ namespace CBS.Siren.Device
     public class DeviceDriver : IDeviceDriver
     {
         private IDeviceController Controller { get; set; }
-        private ILogger _logger { get; set; }
+        private ILogger Logger { get; set; }
 
         private readonly EventHandler<DeviceEventChangedEventArgs> _deviceEventStart;
         private readonly EventHandler<DeviceEventChangedEventArgs> _deviceEventEnd;
@@ -14,9 +14,9 @@ namespace CBS.Siren.Device
         public DeviceDriver(IDeviceController controller, ILogger logger)
         {
             Controller = controller;
-            _logger = logger;
-            _deviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Playing:\n{args.AffectedEvent.ToString()}\n"));
-            _deviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => _logger.LogInformation($"Demo Device Stopped Playing:\n{args.AffectedEvent.ToString()}\n"));
+            Logger = logger;
+            _deviceEventStart = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => Logger.LogInformation($"Demo Device Playing:\n{args.AffectedEvent}\n"));
+            _deviceEventEnd = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => Logger.LogInformation($"Demo Device Stopped Playing:\n{args.AffectedEvent}\n"));
             Controller.OnEventStarted += _deviceEventStart;
             Controller.OnEventEnded += _deviceEventEnd;
         }

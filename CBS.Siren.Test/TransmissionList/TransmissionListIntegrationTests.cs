@@ -60,8 +60,6 @@ namespace CBS.Siren.Test
             List<TransmissionListDTO> returnedLists = JsonSerializer.Deserialize<List<TransmissionListDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             Assert.Single(returnedLists);
-            //Attempt to parse id to ensure it's valid
-            int.Parse(returnedLists.First().Id);
         }
         #endregion
 

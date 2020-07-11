@@ -26,8 +26,8 @@ namespace CBS.Siren
         public override string ToString()
         {
             return "VideoPlaylistEventFeature:" +
-            $"\nPlayout Strategy: {PlayoutStrategy.ToString()}" +
-            $"\nSource Strategy: {SourceStrategy.ToString()}" + 
+            $"\nPlayout Strategy: {PlayoutStrategy}" +
+            $"\nSource Strategy: {SourceStrategy}" + 
             $"\nDevice - {Device?.ToString()}";
         }
 

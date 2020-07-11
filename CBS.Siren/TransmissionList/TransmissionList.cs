@@ -4,7 +4,7 @@ namespace CBS.Siren
 {
     public class TransmissionList
     {
-        public string Id { get; set; }
+        public int? Id { get; set; } = null;
         public IPlaylist SourceList { get; set; }
         public List<TransmissionListEvent> Events { get; set;  }
         
@@ -20,7 +20,7 @@ namespace CBS.Siren
             string result = $"Id: {Id}";
             for (int i = 0; i < Events.Count; ++i)
             {
-                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
+                result = $"{result}\nEvent #{i} - {Events[i]}\n";
             }
 
             return result;

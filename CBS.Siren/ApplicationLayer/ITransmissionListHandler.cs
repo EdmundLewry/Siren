@@ -7,13 +7,13 @@ namespace CBS.Siren.Application
     public interface ITransmissionListHandler
     {
         Task<IEnumerable<TransmissionList>> GetAllLists();
-        Task<IEnumerable<TransmissionListEvent>> GetListEvents(string id);
-        Task<TransmissionListEvent> AddEvent(string id, TransmissionListEventCreationDTO listEvent);
-        Task RemoveEvent(string listId, string eventId);
-        Task ClearList(string id);
+        Task<IEnumerable<TransmissionListEvent>> GetListEvents(int id);
+        Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventCreationDTO listEvent);
+        Task RemoveEvent(int listId, int eventId);
+        Task ClearList(int id);
 
-        Task PlayTransmissionList(string id);
-        Task PauseTransmissionList(string id);
-        Task NextTransmissionList(string id);
+        Task PlayTransmissionList(int id);
+        Task PauseTransmissionList(int id);
+        Task NextTransmissionList(int id);
     }
 }

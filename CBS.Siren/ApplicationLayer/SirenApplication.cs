@@ -60,8 +60,10 @@ namespace CBS.Siren.Application
 
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
 
-            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), _logFactory.CreateLogger<TransmissionListService>());
-            transmissionListService.TransmissionList = transmissionList;
+            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), _logFactory.CreateLogger<TransmissionListService>())
+            {
+                TransmissionList = transmissionList
+            };
 
             transmissionListService.PlayTransmissionList();
 
