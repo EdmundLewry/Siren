@@ -14,30 +14,6 @@ namespace CBS.Siren.Test
 {
     public class TransmissionListHandlerUnitTest
     {
-        private TransmissionListEventCreationDTO GetListEventCreationDTO()
-        {
-            TransmissionListEventCreationDTO creationDTO = new TransmissionListEventCreationDTO(){
-                TimingData = new TimingStrategyCreationDTO(){
-                    StrategyType = "fixed",
-                    TargetStartTime = DateTime.Parse("2020-03-22 12:30:10")
-                },
-                Features = new List<ListEventFeatureCreationDTO>(){
-                    new ListEventFeatureCreationDTO(){
-                        FeatureType = "video",
-                        PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
-                        SourceStrategy = new SourceStrategyCreationDTO() {
-                            StrategyType = "mediaSource",
-                            SOM = "00:00:00:00",
-                            EOM = "00:00:30:00",
-                            MediaName = "TestInstance"
-                        }
-                    }
-                }
-            };
-
-            return creationDTO;
-        }
-
         private readonly Mock<ILogger<TransmissionListHandler>> _logger;
         private readonly Mock<ITransmissionListService> _listService;
         private readonly Mock<IDeviceManager> _deviceManager;
@@ -58,6 +34,31 @@ namespace CBS.Siren.Test
             {
                 Id = 1
             };
+        }
+        private TransmissionListEventCreationDTO GetListEventCreationDTO()
+        {
+            TransmissionListEventCreationDTO creationDTO = new TransmissionListEventCreationDTO()
+            {
+                TimingData = new TimingStrategyCreationDTO()
+                {
+                    StrategyType = "fixed",
+                    TargetStartTime = DateTime.Parse("2020-03-22 12:30:10")
+                },
+                Features = new List<ListEventFeatureCreationDTO>(){
+                    new ListEventFeatureCreationDTO(){
+                        FeatureType = "video",
+                        PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
+                        SourceStrategy = new SourceStrategyCreationDTO() {
+                            StrategyType = "mediaSource",
+                            SOM = "00:00:00:00",
+                            EOM = "00:00:30:00",
+                            MediaName = "TestInstance"
+                        }
+                    }
+                }
+            };
+
+            return creationDTO;
         }
 
         private TransmissionListHandler CreateHandlerUnderTest()
