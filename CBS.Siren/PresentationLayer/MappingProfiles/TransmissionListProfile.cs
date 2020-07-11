@@ -1,5 +1,6 @@
 using System;
 using AutoMapper;
+using CBS.Siren.Time;
 
 namespace CBS.Siren.DTO
 {
@@ -14,6 +15,8 @@ namespace CBS.Siren.DTO
             CreateMap<TransmissionListEvent, TransmissionListEventDTO>()
                         .ForMember(dto => dto.EventState,
                                 config => config.MapFrom(listEvent => Enum.GetName(typeof(TransmissionListEventState.Status), listEvent.EventState.CurrentStatus)))
+                        .ForMember(dto => dto.ExpectedDuration,
+                                config => config.MapFrom(listEvent => listEvent.ExpectedDuration.ToTimecodeString()))
                         .ForMember(dto => dto.EventTimingStrategy,
                                 config => config.MapFrom(listEvent => listEvent.EventTimingStrategy.StrategyType))
                         .ForMember(dto => dto.EventFeatureCount,
