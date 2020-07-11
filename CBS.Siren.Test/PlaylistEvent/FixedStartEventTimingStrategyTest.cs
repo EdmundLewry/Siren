@@ -1,8 +1,6 @@
 using Xunit;
 using System;
 
-using CBS.Siren;
-
 namespace CBS.Siren.Test
 {
     public class FixedStartEventTimingStrategyTest

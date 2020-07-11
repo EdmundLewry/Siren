@@ -1,4 +1,5 @@
 using CBS.Siren.Time;
+using CBS.Siren.Utilities;
 using System;
 using System.Text.Json;
 
@@ -10,8 +11,7 @@ namespace CBS.Siren
     */
     public class DeviceListEvent
     {
-        //We may want more human readable identifiers
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int? RelatedTransmissionListEventId { get; set; }
 
         public DeviceListEventState EventState { get; set; } = new DeviceListEventState();
@@ -21,7 +21,7 @@ namespace CBS.Siren
 
         public DeviceListEvent(string eventData, int? relatedEventId = null)
         {
-            Id = Guid.NewGuid();
+            Id = IdFactory.NextDeviceListEventId();
             RelatedTransmissionListEventId = relatedEventId;
             EventData = eventData;
             ProcessEventData();

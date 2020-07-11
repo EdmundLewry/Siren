@@ -1,10 +1,8 @@
 using Xunit;
-using Moq;
 
 using System;
 using System.Collections.Generic;
 
-using CBS.Siren;
 using CBS.Siren.Time;
 
 namespace CBS.Siren.Test

@@ -7,7 +7,9 @@ namespace CBS.Siren.Utilities
     public static class IdFactory
     {
         private static int _nextTransmissionListEventId = 0;
+        private static int _nextDeviceListEventId = 0;
 
-        public static int NextTransmissionListEventId() { return _nextTransmissionListEventId++; } 
+        public static int NextTransmissionListEventId() { return _nextTransmissionListEventId++; }
+        public static int NextDeviceListEventId() { return _nextDeviceListEventId++; }
     }
 }
