@@ -1,4 +1,5 @@
 using CBS.Siren.Time;
+using CBS.Siren.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ namespace CBS.Siren
     {
         public TransmissionListEventState EventState { get; set; } = new TransmissionListEventState();
         //We may want more human readable identifiers
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public int Id { get; set; } = IdFactory.NextTransmissionListEventId();
 
         public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }

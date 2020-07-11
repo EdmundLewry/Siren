@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Text.Json;
 using CBS.Siren.DTO;
 using CBS.Siren.Time;
-using CBS.Siren.Utilities;
 using System;
 using Xunit;
 using Moq;

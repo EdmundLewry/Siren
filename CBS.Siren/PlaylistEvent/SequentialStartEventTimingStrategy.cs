@@ -18,9 +18,9 @@ namespace CBS.Siren
             throw new ArgumentException("Failed to construct timing strategy. Given strategy was not the same type", "other");
         }
 
-        public DateTime CalculateStartTime(Guid eventId, TransmissionList list)
+        public DateTime CalculateStartTime(int? eventId, TransmissionList list)
         {
-            if(eventId == Guid.Empty || list == null)
+            if(!eventId.HasValue || list == null)
             {
                 return DateTime.Now;
             }

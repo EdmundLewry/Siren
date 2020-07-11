@@ -20,7 +20,7 @@ namespace CBS.Siren.Test
             DateTime target = DateTime.Parse(targetTimeString);
             FixedStartEventTimingStrategy strategy = new FixedStartEventTimingStrategy(target);
 
-            DateTime startTime = strategy.CalculateStartTime(Guid.Empty, null);
+            DateTime startTime = strategy.CalculateStartTime(null, null);
             Assert.Equal(target, startTime);
         }
     }

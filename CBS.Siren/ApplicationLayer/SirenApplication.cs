@@ -14,8 +14,8 @@ namespace CBS.Siren.Application
      */
     public class SirenApplication
     {
-        private ILogger<SirenApplication> _logger;
-        private ILoggerFactory _logFactory;
+        private readonly ILogger<SirenApplication> _logger;
+        private readonly ILoggerFactory _logFactory;
 
         public SirenApplication(ILoggerFactory logFactory)
         {

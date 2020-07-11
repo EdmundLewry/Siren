@@ -18,7 +18,7 @@ namespace CBS.Siren.Test
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
 
             DateTime target = DateTime.Now;
-            DateTime startTime = strategy.CalculateStartTime(Guid.Empty, new TransmissionList(new List<TransmissionListEvent>(), null));
+            DateTime startTime = strategy.CalculateStartTime(null, new TransmissionList(new List<TransmissionListEvent>(), null));
 
             //Using difference in frames to account for potential millisecond difference in DateTime.Now
             //rather than writing a Time abstraction
@@ -32,7 +32,7 @@ namespace CBS.Siren.Test
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
 
             DateTime target = DateTime.Now;
-            DateTime startTime = strategy.CalculateStartTime(Guid.NewGuid(), null);
+            DateTime startTime = strategy.CalculateStartTime(0, null);
 
             //Using difference in frames to account for potential millisecond difference in DateTime.Now
             //rather than writing a Time abstraction

@@ -31,12 +31,11 @@ namespace CBS.Siren.Test
             TransmissionList initialList = new TransmissionList(new List<TransmissionListEvent>(), null);
             CollectionDataLayer codeUnderTest = new CollectionDataLayer();
             await codeUnderTest.AddUpdateTransmissionLists(initialList);
-            {
-                TransmissionList changedList = (await codeUnderTest.TransmissionLists()).First();
-                changedList.SourceList = new Playlist(new List<PlaylistEvent>());
+            
+            TransmissionList changedList = (await codeUnderTest.TransmissionLists()).First();
+            changedList.SourceList = new Playlist(new List<PlaylistEvent>());
 
-                await codeUnderTest.AddUpdateTransmissionLists(changedList);
-            }
+            await codeUnderTest.AddUpdateTransmissionLists(changedList);
 
             List<TransmissionList> lists = (await codeUnderTest.TransmissionLists()).ToList(); 
             Assert.Single(lists);
