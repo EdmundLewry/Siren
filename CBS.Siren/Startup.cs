@@ -51,7 +51,8 @@ namespace CBS.Siren
             deviceManager.AddDevice("DemoDevice");
 
             IDataLayer dataLayer = app.ApplicationServices.GetService<IDataLayer>();
-            dataLayer.AddUpdateMediaInstances();
+            dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0,0,30)));
+
             /* For this early stage we're just going to create a single transmission list to work on.
             This is because sat this stage of the application, it's not possible to add transmission lists
             to channels */
