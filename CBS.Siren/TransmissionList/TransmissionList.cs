@@ -4,7 +4,7 @@ namespace CBS.Siren
 {
     public class TransmissionList
     {
-        public int? Id { get; set; } = null;
+        public int Id { get; set; } = 0;
         public IPlaylist SourceList { get; set; }
         public List<TransmissionListEvent> Events { get; set;  }
         

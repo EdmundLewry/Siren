@@ -37,8 +37,7 @@ namespace CBS.Siren
             services.AddTransient<ITransmissionListService, TransmissionListService>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment 
-            env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
             

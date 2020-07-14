@@ -10,8 +10,8 @@ namespace CBS.Siren.Utilities
         private static int _nextDeviceListEventId = 0;
         private static int _nextPlaylistEventId = 0;
 
-        public static int NextTransmissionListEventId() { return _nextTransmissionListEventId++; }
-        public static int NextDeviceListEventId() { return _nextDeviceListEventId++; }
-        public static int NextPlaylistEventId() { return _nextPlaylistEventId++; }
+        public static int NextTransmissionListEventId() { return ++_nextTransmissionListEventId; }
+        public static int NextDeviceListEventId() { return ++_nextDeviceListEventId; }
+        public static int NextPlaylistEventId() { return ++_nextPlaylistEventId; }
     }
 }

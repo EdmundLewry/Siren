@@ -28,7 +28,7 @@ namespace CBS.Siren.Application
         private Channel GenerateChannel(IDeviceManager deviceManager)
         {
             List<DeviceModel> deviceModels = DataLayer.Devices().Result.ToList();
-            List<IDevice> devices = deviceModels.Select(model => deviceManager.GetDevice(model.Id.GetValueOrDefault())).ToList();
+            List<IDevice> devices = deviceModels.Select(model => deviceManager.GetDevice(model.Id)).ToList();
             VideoChain chainConfiguration = new VideoChain(devices);
 
             return new Channel(chainConfiguration);

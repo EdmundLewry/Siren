@@ -2,7 +2,7 @@
 {
     public class DeviceModel
     {
-        public int? Id { get; set; } = null;
+        public int Id { get; set; } = 0;
         public string Name { get; set; }
     }
 }

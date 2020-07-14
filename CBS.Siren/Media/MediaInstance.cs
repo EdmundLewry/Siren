@@ -15,7 +15,7 @@ namespace CBS.Siren
      */
     public class MediaInstance
     {
-        public int? Id { get; set; }
+        public int Id { get; set; } = 0;
         public string Name { get; set; } 
 
         public TimeSpan Duration { get; set; }
@@ -24,7 +24,7 @@ namespace CBS.Siren
 
         public MediaInstance(string instanceName, TimeSpan duration, string instanceFilePath = "", FileType type = FileType.TEXT)
         {
-            Id = null;
+            Id = 0;
             Name = instanceName;
             Duration = duration;
             FilePath = instanceFilePath;
