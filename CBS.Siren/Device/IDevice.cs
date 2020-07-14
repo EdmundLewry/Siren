@@ -19,7 +19,7 @@ namespace CBS.Siren.Device
             PLAYING
         }
 
-        string Name { get; }
+        DeviceModel Model { get; set;  }
         DeviceStatus CurrentStatus { get; }
         DeviceList ActiveList { get; set; }
 

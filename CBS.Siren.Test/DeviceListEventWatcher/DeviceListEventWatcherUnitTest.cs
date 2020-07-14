@@ -1,6 +1,5 @@
 ﻿using CBS.Siren.Device;
 using Moq;
-using System;
 using Xunit;
 
 namespace CBS.Siren.Test
@@ -21,11 +20,11 @@ namespace CBS.Siren.Test
             eventWatcherUnderTest.UnsubcsribeFromDevice(mockListener.Object, mockDevice.Object);
             eventWatcherUnderTest.UnsubcsribeFromDevice(mockListener2.Object, mockDevice.Object);
 
-            DeviceListEventStatusChangeArgs args = new DeviceListEventStatusChangeArgs(Guid.NewGuid());
+            DeviceListEventStatusChangeArgs args = new DeviceListEventStatusChangeArgs(0);
 
             eventWatcherUnderTest.OnDeviceListEventStatusChange(mockDevice.Object, args);
 
-            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(It.IsAny<Guid>(), It.IsAny<DeviceListEventState>()), Times.Never);
+            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(It.IsAny<int>(), It.IsAny<DeviceListEventState>()), Times.Never);
         }
         
         [Fact]

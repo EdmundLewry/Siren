@@ -1,3 +1,4 @@
+using CBS.Siren.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -16,25 +17,24 @@ namespace CBS.Siren
         public bool IsValid { get; set; }
         public String ValidationStatus { get; set; }
 
-        //We may want more human readable identifiers
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         
         public PlaylistEvent(IEnumerable<IEventFeature> features, IEventTimingStrategy timingStrategy)
         {
             EventFeatures = features;
             EventTimingStrategy = timingStrategy;
-            Id = Guid.NewGuid();
+            Id = IdFactory.NextPlaylistEventId();
         }
 
         public override string ToString()
         {
             string returnValue =  $"{base.ToString()}" + 
-                    $"\nId: {Id.ToString()}" +
-                    $"\nTimingStategy: {EventTimingStrategy.ToString()}";
+                    $"\nId: {Id}" +
+                    $"\nTimingStategy: {EventTimingStrategy}";
             
             foreach(IEventFeature feature in EventFeatures)
             {
-                returnValue += $"\nEvent Feature: {feature.ToString()}";
+                returnValue += $"\nEvent Feature: {feature}";
             }
 
             return returnValue;

@@ -43,7 +43,7 @@ namespace CBS.Siren
             DeviceListEventFactory = deviceListEventFactory;
         }
 
-        public void OnDeviceListEventStatusChanged(Guid eventId, DeviceListEventState state)
+        public void OnDeviceListEventStatusChanged(int eventId, DeviceListEventState state)
         {
             //Find the transmission list event that relates to this id
             TransmissionListEvent effectedEvent = FindTransmissionListEventByDeviceListEventId(eventId);
@@ -96,7 +96,7 @@ namespace CBS.Siren
             }
         }
 
-        private TransmissionListEvent FindTransmissionListEventByDeviceListEventId(Guid eventId)
+        private TransmissionListEvent FindTransmissionListEventByDeviceListEventId(int eventId)
         {
             return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.RelatedDeviceListEvents.Contains(eventId));
         }
@@ -123,6 +123,10 @@ namespace CBS.Siren
             HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
             foreach (IDevice device in devices)
             {
+                if(device is null)
+                {
+                    continue;
+                }
                 DeviceListEventWatcher.SubcsribeToDevice(this, device);
             }
         }
@@ -137,6 +141,10 @@ namespace CBS.Siren
             HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
             foreach(IDevice device in devices)
             {
+                if(device is null)
+                {
+                    continue;
+                }
                 DeviceListEventWatcher.UnsubcsribeFromDevice(this, device);
             }
         }

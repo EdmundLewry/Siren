@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CBS.Siren
 {
@@ -8,16 +7,16 @@ namespace CBS.Siren
     //we do that
     public class DeviceListEventFactory : IDeviceListEventFactory
     {
-        public Dictionary<Guid, DeviceListEvent> CreatedEvents { get; private set; } = new Dictionary<Guid, DeviceListEvent>();
+        public Dictionary<int, DeviceListEvent> CreatedEvents { get; private set; } = new Dictionary<int, DeviceListEvent>();
 
-        public DeviceListEvent CreateDeviceListEvent(string eventData, Guid associatedTransmissionListEvent)
+        public DeviceListEvent CreateDeviceListEvent(string eventData, int associatedTransmissionListEvent)
         {
             DeviceListEvent deviceListEvent = new DeviceListEvent(eventData, associatedTransmissionListEvent);
             CreatedEvents.Add(deviceListEvent.Id, deviceListEvent);
             return deviceListEvent;
         }
 
-        public DeviceListEvent GetEventById(Guid eventId)
+        public DeviceListEvent GetEventById(int eventId)
         {
             return CreatedEvents.ContainsKey(eventId) ? CreatedEvents[eventId] : null;
         }

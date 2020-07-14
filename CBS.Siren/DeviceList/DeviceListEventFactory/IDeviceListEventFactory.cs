@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace CBS.Siren
+﻿namespace CBS.Siren
 {
     public interface IDeviceListEventFactory
     {
-        DeviceListEvent CreateDeviceListEvent(string eventData, Guid associatedTransmissionListEvent);
-        DeviceListEvent GetEventById(Guid eventId);
+        DeviceListEvent CreateDeviceListEvent(string eventData, int associatedTransmissionListEvent);
+        DeviceListEvent GetEventById(int eventId);
     }
 }

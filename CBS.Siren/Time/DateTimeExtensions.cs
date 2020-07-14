@@ -10,6 +10,7 @@ namespace CBS.Siren.Time
         private const string DATE_REGEX = "\\b"+ DATE_MATCH + "\\b";
         private const string DATETIME_REGEX = "\\b" + DATE_MATCH + "T" + TIMECODE_MATCH + "\\b";
 
+        public static DateTime ConvertTimecodeStringToDateTime(this string timecode) => FromTimecodeString(timecode);
         public static DateTime FromTimecodeString(string timecode) => FromTimecodeString(timecode, TimeSource.SourceFrameRate);
         public static DateTime FromTimecodeString(string timecode, FrameRate frameRate)
         {

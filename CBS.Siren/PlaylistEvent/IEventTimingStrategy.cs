@@ -13,7 +13,7 @@ namespace CBS.Siren
     {
         string StrategyType { get; }
         /* Change this so that it receives id of the event being calculated on, and the list */
-        DateTime CalculateStartTime(Guid eventId, TransmissionList list);
+        DateTime CalculateStartTime(int? eventId, TransmissionList list);
         string ToString();
     }
 }

@@ -6,6 +6,8 @@ namespace CBS.Siren.Time
     public static class TimeSpanExtensions
     {
         private const string TIMECODE_REGEX = @"\b(?:(?<days>[0-9]{2,3}):)?(?<hours>[0-1][0-9]|2[0-3]):(?<minutes>[0-5][0-9]):(?<seconds>[0-5][0-9])(?<seperator>[:;])(?<frames>[0-1][0-9]|2[0-9])\b";
+
+        public static TimeSpan ConvertTimecodeStringToTimeSpan(this string timecode) => FromTimecodeString(timecode);
         public static TimeSpan FromTimecodeString(string timecode) => FromTimecodeString(timecode, TimeSource.SourceFrameRate);
         public static TimeSpan FromTimecodeString(string timecode, FrameRate frameRate)
         {

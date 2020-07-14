@@ -6,7 +6,7 @@ using CBS.Siren.Device;
 using CBS.Siren.Time;
 using Microsoft.Extensions.Logging;
 
-namespace CBS.Siren
+namespace CBS.Siren.Application
 {
     /* This is a temporary application layer that places the domain logic together so that we can see
     how the pieces might interact. It is triggered via the Demo API controller, but both will be removed
@@ -14,8 +14,8 @@ namespace CBS.Siren
      */
     public class SirenApplication
     {
-        private ILogger<SirenApplication> _logger;
-        private ILoggerFactory _logFactory;
+        private readonly ILogger<SirenApplication> _logger;
+        private readonly ILoggerFactory _logFactory;
 
         public SirenApplication(ILoggerFactory logFactory)
         {
@@ -37,7 +37,7 @@ namespace CBS.Siren
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            using IDevice device = deviceFactory.CreateDemoDevice("DemoDevice1", _logFactory);
+            using IDevice device = deviceFactory.CreateDemoDevice(new DeviceModel() { Name = "DemoDevice1" }, _logFactory);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
@@ -55,13 +55,15 @@ namespace CBS.Siren
 
             Channel channel = GenerateChannel(device);
 
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(list, channel.ChainConfiguration, null);
             PrintTransmissionListContent(transmissionList);
 
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
 
-            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), _logFactory.CreateLogger<TransmissionListService>());
-            transmissionListService.TransmissionList = transmissionList;
+            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), _logFactory.CreateLogger<TransmissionListService>())
+            {
+                TransmissionList = transmissionList
+            };
 
             transmissionListService.PlayTransmissionList();
 
@@ -132,7 +134,7 @@ namespace CBS.Siren
         {
             videoChain.ChainDevices.ForEach((device) =>
             {
-                _logger.LogInformation($"Device:{device.Name} will have a Device List containing the following events:");
+                _logger.LogInformation($"Device:{device.Model.Name} will have a Device List containing the following events:");
                 _logger.LogInformation(device.ActiveList.ToString());
             });
         }

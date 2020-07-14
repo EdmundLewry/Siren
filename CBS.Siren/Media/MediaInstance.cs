@@ -13,20 +13,22 @@ namespace CBS.Siren
     A Media Instance represents 1 or more files that relate to a single coherent
     piece of media that can be scheduled for playout in a list
      */
-    public struct MediaInstance
+    public class MediaInstance
     {
-        public string Name { get; } 
+        public int Id { get; set; } = 0;
+        public string Name { get; set; } 
 
-        public TimeSpan Duration { get; }
-        public string FilePath { get; }
-        public FileType InstanceFileType { get; }
+        public TimeSpan Duration { get; set; }
+        public string FilePath { get; set;  }
+        public FileType InstanceFileType { get; set;  }
 
         public MediaInstance(string instanceName, TimeSpan duration, string instanceFilePath = "", FileType type = FileType.TEXT)
         {
+            Id = 0;
             Name = instanceName;
             Duration = duration;
             FilePath = instanceFilePath;
             InstanceFileType = type;
-        }        
+        }
     }
 }

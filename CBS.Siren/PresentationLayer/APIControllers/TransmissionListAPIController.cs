@@ -1,0 +1,117 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using CBS.Siren.Application;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Linq;
+using AutoMapper;
+using CBS.Siren.DTO;
+using System;
+
+namespace CBS.Siren.Controllers
+{
+    [ApiController]
+    [Route("api/1/automation/transmissionlist")]
+    public class TransmissionListAPIController : ControllerBase
+    {
+        private readonly ITransmissionListHandler _handler;
+        private readonly IMapper _mapper;
+
+        public ILogger<TransmissionListAPIController> Logger { get; private set; }
+
+        public TransmissionListAPIController(ILogger<TransmissionListAPIController> logger, ITransmissionListHandler handler, IMapper mapper)
+        {
+            Logger = logger;
+            _handler = handler;
+            _mapper = mapper;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TransmissionListDTO>>> GetAllLists()
+        {
+            Logger.LogDebug("Received request to Get all lists");
+            var lists = await _handler.GetAllLists();
+            return _mapper.Map<List<TransmissionListDTO>>(lists.ToList());
+        }
+
+        [HttpPost("{id}/clear")]
+        public async Task<ActionResult> ClearListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to clear list with id {0}", id);
+                await _handler.ClearList(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to clear list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
+        
+        [HttpPost("{id}/play")]
+        public async Task<ActionResult> PlayTransmissionListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to play list with id {0}", id);
+                await _handler.PlayTransmissionList(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to Play list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
+
+        [HttpGet("{id}/events")]
+        public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to get events for list with id {0}", id);
+                var transmissionEvents = await _handler.GetListEvents(id);
+                return _mapper.Map<List<TransmissionListEventDTO>>(transmissionEvents.ToList());
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to get events for list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
+
+        [HttpPost("{id}/events")]
+        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to add event to list with id {0} and list event dto {1}", id, listEvent);
+                var createdListEvent = await _handler.AddEvent(id, listEvent);
+                return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDTO>(createdListEvent));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to create event for list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
+
+        [HttpDelete("{id}/events/{eventId}")]
+        public async Task<ActionResult> DeleteEvent(int id, int eventId)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to delete event {0} from list with id {1}", id, eventId);
+                await _handler.RemoveEvent(id, eventId);
+                return NoContent();
+            }
+            catch(Exception e)
+            {
+                Logger.LogError(e, "Unable to delete event with given event id {0} and list id {1}", eventId, id);
+                return NotFound(id);
+            }
+        }
+    }
+}

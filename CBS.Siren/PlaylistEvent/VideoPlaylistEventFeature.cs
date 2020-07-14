@@ -26,18 +26,18 @@ namespace CBS.Siren
         public override string ToString()
         {
             return "VideoPlaylistEventFeature:" +
-            $"\nPlayout Strategy: {PlayoutStrategy.ToString()}" +
-            $"\nSource Strategy: {SourceStrategy.ToString()}" + 
+            $"\nPlayout Strategy: {PlayoutStrategy}" +
+            $"\nSource Strategy: {SourceStrategy}" + 
             $"\nDevice - {Device?.ToString()}";
         }
 
         public virtual bool Equals([AllowNull] IEventFeature other)
         {
-            return other is VideoPlaylistEventFeature videoEvent &&
+            return other is VideoPlaylistEventFeature &&
                     FeatureType == other.FeatureType &&
                     PlayoutStrategy.Equals(other.PlayoutStrategy) &&
                     SourceStrategy.Equals(other.SourceStrategy) &&
-                    Device?.Name == other.Device?.Name;
+                    Device?.Model?.Name == other.Device?.Model?.Name;
         }
 
         public TimeSpan CalculateDuration()

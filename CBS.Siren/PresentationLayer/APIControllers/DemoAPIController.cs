@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using CBS.Siren.Application;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

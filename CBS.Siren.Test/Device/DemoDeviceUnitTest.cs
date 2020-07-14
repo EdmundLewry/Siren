@@ -14,7 +14,7 @@ namespace CBS.Siren.Test.Device
             var mockDriver = new Mock<IDeviceDriver>().Object;
             var mockController = new Mock<IDeviceController>().Object;
 
-            using IDevice device = new DemoDevice("test", mockController, mockDriver);
+            using IDevice device = new DemoDevice(new DeviceModel() { Name = "test" }, mockController, mockDriver);
             Assert.Equal(IDevice.DeviceStatus.STOPPED, device.CurrentStatus);
         }
 
@@ -28,7 +28,7 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent returnEvent = new DeviceListEvent("");
             mockController.Setup(mock => mock.CurrentEvent).Returns(returnEvent);
 
-            using IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
+            using IDevice device = new DemoDevice(new DeviceModel() { Name = "test" }, mockController.Object, mockDriver);
 
             int callCount = 0;
             EventHandler<DeviceStatusEventArgs> eventHandler = new EventHandler<DeviceStatusEventArgs>((sender, args) =>
@@ -57,7 +57,7 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent returnEvent = new DeviceListEvent("");
             mockController.Setup(mock => mock.CurrentEvent).Returns(returnEvent);
 
-            using IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
+            using IDevice device = new DemoDevice(new DeviceModel() { Name = "test" }, mockController.Object, mockDriver);
 
             int callCount = 0;
             EventHandler<DeviceStatusEventArgs> eventHandler = new EventHandler<DeviceStatusEventArgs>((sender, args) =>
@@ -93,7 +93,7 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent returnEvent = new DeviceListEvent("");
             mockController.Setup(mock => mock.CurrentEvent).Returns(returnEvent);
             
-            using IDevice device = new DemoDevice("test", mockController.Object, mockDriver);
+            using IDevice device = new DemoDevice(new DeviceModel() { Name = "test" }, mockController.Object, mockDriver);
 
             DeviceListEventStatusChangeArgs receivedArgs = null;
             object receivedSender = null;

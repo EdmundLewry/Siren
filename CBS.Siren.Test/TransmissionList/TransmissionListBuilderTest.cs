@@ -17,7 +17,7 @@ namespace CBS.Siren.Test
         private PlaylistEvent GenerateTestPlaylistEvent(TimingStrategyType strategyType = TimingStrategyType.Fixed)
         {
             List<IEventFeature> features = new List<IEventFeature>() {
-                new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), new MediaInstance())
+                new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), new MediaInstance("", new TimeSpan()))
             };
             IEventTimingStrategy timingStrategy = strategyType switch
             {
@@ -35,7 +35,7 @@ namespace CBS.Siren.Test
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             PlaylistEvent event2 = GenerateTestPlaylistEvent();
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>(){event1, event2});
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null, null);
 
             Assert.Equal(playlist.Events.Count, transmissionList.Events.Count);
         }
@@ -47,7 +47,7 @@ namespace CBS.Siren.Test
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             PlaylistEvent event2 = GenerateTestPlaylistEvent();
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>(){event1, event2});
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null, null);
 
             Assert.Equal(event1.Id, transmissionList.Events[0].RelatedPlaylistEvent.Id);
             Assert.Equal(event2.Id, transmissionList.Events[1].RelatedPlaylistEvent.Id);
@@ -59,7 +59,7 @@ namespace CBS.Siren.Test
         {
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>(){event1});
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null, null);
 
             Assert.True(event1.EventFeatures.SequenceEqual<IEventFeature>(transmissionList.Events[0].EventFeatures));
         }
@@ -70,7 +70,7 @@ namespace CBS.Siren.Test
         {
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>(){event1});
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null, null);
 
             Assert.Equal(event1.Id, transmissionList.Events[0].RelatedPlaylistEvent.Id);
         }
@@ -82,7 +82,7 @@ namespace CBS.Siren.Test
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             PlaylistEvent event2 = GenerateTestPlaylistEvent(TimingStrategyType.Sequential);
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1, event2 });
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, null, null);
 
             Assert.Equal(event1.EventTimingStrategy, transmissionList.Events[0].EventTimingStrategy);
             Assert.Equal(event2.EventTimingStrategy, transmissionList.Events[1].EventTimingStrategy);
@@ -98,7 +98,7 @@ namespace CBS.Siren.Test
 
             PlaylistEvent event1 = GenerateTestPlaylistEvent();
             IPlaylist playlist = new Playlist(new List<PlaylistEvent>() { event1 });
-            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, videoChain.Object);
+            TransmissionList transmissionList = TransmissionListBuilder.BuildFromPlaylist(playlist, videoChain.Object, null);
 
             Assert.Equal(device.Object, transmissionList.Events[0].EventFeatures[0].Device);
         }
