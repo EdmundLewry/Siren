@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.Siren", "CBS.Siren\CBS.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.Siren.Test", "CBS.Siren.Test\CBS.Siren.Test.csproj", "{98841694-D5D4-430A-9B88-1054F740AF99}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.SirenUI", "CBS.SirenUI\CBS.SirenUI.csproj", "{116C6564-CE37-406D-B58C-0D1AFA54DB41}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CBS.SirenUI.Test", "CBS.SirenUI.Test\CBS.SirenUI.Test.csproj", "{254BC1B5-4594-44AC-AF38-7B636B94C563}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{98841694-D5D4-430A-9B88-1054F740AF99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98841694-D5D4-430A-9B88-1054F740AF99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98841694-D5D4-430A-9B88-1054F740AF99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{116C6564-CE37-406D-B58C-0D1AFA54DB41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{116C6564-CE37-406D-B58C-0D1AFA54DB41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{116C6564-CE37-406D-B58C-0D1AFA54DB41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{116C6564-CE37-406D-B58C-0D1AFA54DB41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{254BC1B5-4594-44AC-AF38-7B636B94C563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{254BC1B5-4594-44AC-AF38-7B636B94C563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{254BC1B5-4594-44AC-AF38-7B636B94C563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{254BC1B5-4594-44AC-AF38-7B636B94C563}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
