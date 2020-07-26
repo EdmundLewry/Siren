@@ -31,10 +31,12 @@
     "oidc-client": "^1.9.1",
     "popper.js": "^1.16.0",
     "rxjs": "^6.5.3",
+    "tslib": "^1.10.0",
     "zone.js": "0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.29",
+    "@angular-devkit/build-ng-packagr": "~0.803.14",
     "@angular/cli": "8.3.14",
     "@angular/compiler-cli": "8.2.12",
     "@angular/language-service": "8.2.12",
@@ -49,6 +51,8 @@
     "karma-coverage-istanbul-reporter": "~2.1.0",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
+    "ng-packagr": "^5.4.0",
+    "tsickle": "^0.37.0",
     "typescript": "3.5.3"
   },
   "optionalDependencies": {

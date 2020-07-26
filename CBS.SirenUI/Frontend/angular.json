@@ -129,6 +129,41 @@
           }
         }
       }
+    },
+    "automation": {
+      "projectType": "library",
+      "root": "projects/automation",
+      "sourceRoot": "projects/automation/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/automation/tsconfig.lib.json",
+            "project": "projects/automation/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/automation/src/test.ts",
+            "tsConfig": "projects/automation/tsconfig.spec.json",
+            "karmaConfig": "projects/automation/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/automation/tsconfig.lib.json",
+              "projects/automation/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "CBS.SirenUI"
