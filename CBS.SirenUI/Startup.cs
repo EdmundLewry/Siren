@@ -24,7 +24,7 @@ namespace CBS.SirenUI
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
-                configuration.RootPath = "Frontend/dist";//"ClientApp/dist";
+                configuration.RootPath = "Frontend/dist";
             });
         }
 
