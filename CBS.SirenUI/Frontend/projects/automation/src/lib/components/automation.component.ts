@@ -2,11 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'lib-automation',
-  template: `
-    <p>
-      automation works!
-    </p>
-  `
+  templateUrl: "./automation.component.html"
 })
 export class AutomationComponent implements OnInit {
 
