@@ -6,8 +6,7 @@ import { Component, OnInit } from '@angular/core';
     <p>
       automation works!
     </p>
-  `,
-  styles: []
+  `
 })
 export class AutomationComponent implements OnInit {
 
