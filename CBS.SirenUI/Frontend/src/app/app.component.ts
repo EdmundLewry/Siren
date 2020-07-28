@@ -5,6 +5,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'root',
   templateUrl: './app.component.html'
 })
+
 export class AppComponent {
   title = 'Siren';
 }
