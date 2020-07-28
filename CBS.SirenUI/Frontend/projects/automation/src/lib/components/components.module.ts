@@ -1,13 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { AutomationComponent } from './automation.component';
+
+import { MatTableModule } from '@angular/material/table';
+
+import { TransmissionlistListComponent } from './transmissionlist-list/transmissionlist-list.component';
 
 @NgModule({
   declarations: [
-    AutomationComponent
+    TransmissionlistListComponent
   ],
   imports: [
-    RouterModule
+    RouterModule,
+    MatTableModule
   ]
 })
 export class ComponentsModule { }

@@ -20,3 +20,6 @@ html {
 /*.menu-spacer {
   flex: 1 1 auto;
 }*/
+.appTitle {
+  margin-right: 30px;
+}

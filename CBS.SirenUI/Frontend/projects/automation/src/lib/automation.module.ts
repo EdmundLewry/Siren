@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ComponentsModule } from './components/components.module';
-import { AutomationComponent } from './components/automation.component';
+import { TransmissionlistListComponent } from './components/transmissionlist-list/transmissionlist-list.component';
 
 const routes: Routes = [
-  { path: "txlist", component: AutomationComponent }
+  { path: "txlist", component: TransmissionlistListComponent }
 ]
 
 @NgModule({

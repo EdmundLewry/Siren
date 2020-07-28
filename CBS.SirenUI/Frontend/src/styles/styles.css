@@ -29,3 +29,11 @@ body{
 body{
     font-family: "Muli", "Roboto", Arial, Helvetica, sans-serif;
 }
+
+.container {
+    margin: 10px;
+}
+
+.mat-table {
+    width: 100%;
+}
