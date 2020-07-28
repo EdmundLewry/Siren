@@ -1,0 +1,36 @@
+<div class="header">
+  <h1>Transmission List Events</h1>
+</div>
+
+<table mat-table [dataSource]="dataSource" class="compact hoverable">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>Id</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.id}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="eventState">
+    <th mat-header-cell *matHeaderCellDef>Event State</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.eventState}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expectedDuration">
+    <th mat-header-cell *matHeaderCellDef>Expected Duration</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.expectedDuration}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expectedStartTime">
+    <th mat-header-cell *matHeaderCellDef>Expected Start Time</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.expectedStartTime}}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
