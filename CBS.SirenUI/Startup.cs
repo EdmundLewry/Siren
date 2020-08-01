@@ -1,6 +1,6 @@
+using CBS.SirenUI.Backend.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +26,8 @@ namespace CBS.SirenUI
             {
                 configuration.RootPath = "Frontend/dist";
             });
+
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +52,8 @@ namespace CBS.SirenUI
             }
 
             app.UseRouting();
+
+            app.UseMiddleware<ReverseProxyMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
