@@ -15,19 +15,20 @@ export class TranmissionlistEventsListComponent implements OnInit {
     "id",
     "eventState",
     "expectedDuration",
-    "expectedStartTime"
+    "expectedStartTime",
+    "options"
   ];
 
   private itemId?: string;
 
-  //private readonly fakeData: TransmissionListEvent[] = [
-  //  { id: 1, eventState: "Scheduled", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:10:05" },
-  //  { id: 2, eventState: "Running", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:40:05" },
-  //];
+  private readonly fakeData: TransmissionListEvent[] = [
+    { id: 1, eventState: "Scheduled", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:10:05" },
+    { id: 2, eventState: "Running", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:40:05" },
+  ];
 
   constructor(private http: HttpClient,
               private route: ActivatedRoute) {
-    //this.dataSource.data = this.fakeData;
+    this.dataSource.data = this.fakeData;
   }
 
   public ngOnInit() {
@@ -36,10 +37,15 @@ export class TranmissionlistEventsListComponent implements OnInit {
     }
 
     this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.itemId}/events`).subscribe(result => {
-      this.dataSource.data = result;
+      //this.dataSource.data = result;
     }, error => console.error(error));
   }
+
+  public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
+
+  }
 }
+
 
 interface TransmissionListEvent {
   id: number;
