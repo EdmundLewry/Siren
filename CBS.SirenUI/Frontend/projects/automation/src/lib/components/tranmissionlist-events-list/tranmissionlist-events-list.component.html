@@ -1,6 +1,28 @@
 <div class="header">
   <h1>Transmission List Events</h1>
+  <span class="menu-spacer"></span>
+  <div class="list-control-bar">
+    <button mat-mini-fab class="controller-button">
+      <mat-icon matTooltip="Play">play_arrow</mat-icon>
+    </button>
+    <button mat-mini-fab class="controller-button">
+      <mat-icon matTooltip="Stop">stop</mat-icon>
+    </button>
+  </div>
 </div>
+
+<mat-toolbar>
+  <h2>Events</h2>
+  <span class="menu-spacer"></span>
+  <div class="eventCommandBar">
+    <button mat-button>
+      <mat-icon matTooltip="Create New Event">add_box</mat-icon>
+    </button>
+    <button mat-button>
+      <mat-icon matTooltip="Clear List">clear</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>
 
 <table mat-table [dataSource]="dataSource" class="compact hoverable">
   <ng-container matColumnDef="id">
@@ -34,7 +56,9 @@
   <ng-container matColumnDef="options">
     <th mat-header-cell *matHeaderCellDef></th>
     <td mat-cell *matCellDef="let row" class="more-wrapper" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation();">
-      <mat-icon class="more-icon">more_horiz</mat-icon>
+      <button mat-icon-button>
+        <mat-icon class="more-icon">more_horiz</mat-icon>
+      </button>
       <mat-menu #menu="matMenu">
         <div class="button-wrapper">
           <button mat-menu-item class="more-option-delete" (click)="requestDeleteConfirmation(row)">Delete</button>
