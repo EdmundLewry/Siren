@@ -2,10 +2,10 @@
   <h1>Transmission List Events</h1>
   <span class="menu-spacer"></span>
   <div class="list-control-bar">
-    <button mat-mini-fab class="controller-button">
+    <button mat-mini-fab class="controller-button" (click)="requestListPlay()">
       <mat-icon matTooltip="Play">play_arrow</mat-icon>
     </button>
-    <button mat-mini-fab class="controller-button">
+    <button mat-mini-fab class="controller-button" (click)="requestListStop()">
       <mat-icon matTooltip="Stop">stop</mat-icon>
     </button>
   </div>
@@ -15,10 +15,10 @@
   <h2>Events</h2>
   <span class="menu-spacer"></span>
   <div class="eventCommandBar">
-    <button mat-button>
+    <button mat-button (click)="requestAddNewEvent()">
       <mat-icon matTooltip="Create New Event">add_box</mat-icon>
     </button>
-    <button mat-button>
+    <button mat-button (click)="requestClearList()">
       <mat-icon matTooltip="Clear List">clear</mat-icon>
     </button>
   </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 
@@ -10,7 +10,6 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class TranmissionlistEventsListComponent implements OnInit {
   public readonly dataSource: MatTableDataSource<TransmissionListEvent> = new MatTableDataSource();
-
   public readonly displayedColumns: string[] = [
     "id",
     "eventState",
@@ -19,12 +18,18 @@ export class TranmissionlistEventsListComponent implements OnInit {
     "options"
   ];
 
-  private itemId?: string;
+  private listId?: string;
 
   private readonly fakeData: TransmissionListEvent[] = [
     { id: 1, eventState: "Scheduled", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:10:05" },
     { id: 2, eventState: "Running", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:40:05" },
   ];
+
+  private readonly httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  };
+
+  private transmissionList: TransmissionList;
 
   constructor(private http: HttpClient,
               private route: ActivatedRoute) {
@@ -33,16 +38,43 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   public ngOnInit() {
     if (this.route.snapshot.paramMap.has("itemId")) {
-      this.itemId = this.route.snapshot.paramMap.get("itemId") as string;
+      this.listId = this.route.snapshot.paramMap.get("itemId") as string;
     }
 
-    this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.itemId}/events`).subscribe(result => {
-      //this.dataSource.data = result;
-    }, error => console.error(error));
+    this.retrieveEvents();
   }
 
   public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
+    this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
+      this.retrieveEvents();
+    }, error => console.error(error));
+  }
 
+  public requestListPlay(): void {
+    this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/play`, this.httpOptions).subscribe(result => {
+      this.retrieveEvents();
+    }, error => console.error(error));
+  }
+
+  public requestListStop(): void {
+    console.error("Stop not currently supported");
+  }
+
+  public requestAddNewEvent(): void {
+
+  }
+
+  public requestClearList(): void {
+    this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
+      this.retrieveEvents();
+    }, error => console.error(error));
+
+  }
+
+  private retrieveEvents(): void {
+    this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, this.httpOptions).subscribe(result => {
+      this.dataSource.data = result;
+    }, error => console.error(error));
   }
 }
 
@@ -52,4 +84,10 @@ interface TransmissionListEvent {
   eventState: string;
   expectedDuration: string;
   expectedStartTime: string;
+}
+
+interface TransmissionList {
+  id: number;
+  playlistId: number;
+  eventCount: number;
 }
