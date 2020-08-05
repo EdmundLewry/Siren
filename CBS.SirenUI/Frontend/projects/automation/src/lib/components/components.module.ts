@@ -7,14 +7,17 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { TransmissionlistListComponent } from './transmissionlist-list/transmissionlist-list.component';
 import { TranmissionlistEventsListComponent } from './tranmissionlist-events-list/tranmissionlist-events-list.component';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
 
 @NgModule({
   declarations: [
     TransmissionlistListComponent,
-    TranmissionlistEventsListComponent
+    TranmissionlistEventsListComponent,
+    ConfirmationDialogComponent
   ],
   imports: [
     RouterModule,
@@ -23,7 +26,8 @@ import { TranmissionlistEventsListComponent } from './tranmissionlist-events-lis
     MatMenuModule,
     MatTooltipModule,
     MatButtonModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatDialogModule
   ]
 })
 export class ComponentsModule { }

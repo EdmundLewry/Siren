@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -32,7 +34,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
   private transmissionList: TransmissionList;
 
   constructor(private http: HttpClient,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              public dialog: MatDialog) {
     this.dataSource.data = this.fakeData;
   }
 
@@ -45,9 +48,21 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
-    this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
-      this.retrieveEvents();
-    }, error => console.error(error));
+    this.openDialog("Delete event?").afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
+        this.retrieveEvents();
+      }, error => console.error(error));
+    });
+
+  }
+
+  private openDialog(dialogText: string) {
+    return this.dialog.open(ConfirmationDialogComponent, {
+      width: '250px',
+      data: { title: dialogText }
+    });
   }
 
   public requestListPlay(): void {
