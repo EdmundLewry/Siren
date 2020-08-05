@@ -80,10 +80,13 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestClearList(): void {
-    this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
-      this.retrieveEvents();
-    }, error => console.error(error));
+    this.openDialog("Clear all events from the list?").afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
 
+      this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
+        this.retrieveEvents();
+      }, error => console.error(error));
+    });
   }
 
   private retrieveEvents(): void {
