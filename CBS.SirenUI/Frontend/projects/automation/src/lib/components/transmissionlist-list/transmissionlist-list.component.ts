@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
+import { TransmissionList } from '../../interfaces/itransmission-list'
 
 @Component({
   selector: 'lib-transmissionlist-list',
@@ -35,10 +36,4 @@ export class TransmissionlistListComponent implements OnInit {
       this.dataSource.data = result;
     }, error => console.error(error));
   }
-}
-
-interface TransmissionList {
-  id: number;
-  playlistId: number;
-  eventCount: number;
 }
