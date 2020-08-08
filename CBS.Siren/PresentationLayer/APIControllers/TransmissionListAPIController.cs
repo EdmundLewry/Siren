@@ -7,6 +7,7 @@ using System.Linq;
 using AutoMapper;
 using CBS.Siren.DTO;
 using System;
+using System.Text.Json;
 
 namespace CBS.Siren.Controllers
 {
@@ -87,13 +88,13 @@ namespace CBS.Siren.Controllers
         {
             try
             {
-                Logger.LogDebug("Received request to add event to list with id {0} and list event dto {1}", id, listEvent);
+                Logger.LogDebug("Received request to add event to list with id {0} and list event dto {1}", id, JsonSerializer.Serialize(listEvent));
                 var createdListEvent = await _handler.AddEvent(id, listEvent);
                 return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDTO>(createdListEvent));
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Unable to create event for list with given id {0}", id);
+                Logger.LogError(e, "Unable to create event for list with given id {0}, {1}", id, e.Message);
                 return NotFound(id);
             }
         }

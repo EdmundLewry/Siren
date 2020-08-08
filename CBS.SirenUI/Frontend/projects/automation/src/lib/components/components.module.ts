@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,16 +9,22 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
+
 
 import { TransmissionlistListComponent } from './transmissionlist-list/transmissionlist-list.component';
 import { TranmissionlistEventsListComponent } from './tranmissionlist-events-list/tranmissionlist-events-list.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
+import { CreateEventDialogComponent } from './create-event-dialog/create-event-dialog.component';
 
 @NgModule({
   declarations: [
     TransmissionlistListComponent,
     TranmissionlistEventsListComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    CreateEventDialogComponent
   ],
   imports: [
     RouterModule,
@@ -27,7 +34,12 @@ import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-
     MatTooltipModule,
     MatButtonModule,
     MatToolbarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSelectModule,
+    MatDividerModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule
   ]
 })
 export class ComponentsModule { }

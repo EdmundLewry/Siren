@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 /*
@@ -50,16 +55,25 @@ namespace CBS.SirenUI.Backend.Middleware
         private async Task RouteMessageToTarget(HttpContext context, Uri targetUri)
         {
             HttpRequestMessage requestMessage = ConstructTargetRequest(context, targetUri);
-            //Skipping copying request headers
 
             HttpClient httpClient = HttpClientFactory.CreateClient();
             using HttpResponseMessage responseMessage = await httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
 
             context.Response.StatusCode = (int)responseMessage.StatusCode;
 
-            //Skipping copying response headers
+            CopyResponseHeaders(context, responseMessage.Headers);
+            CopyResponseHeaders(context, responseMessage.Content.Headers);
+            context.Response.Headers.Remove("transfer-encoding");
 
             await responseMessage.Content.CopyToAsync(context.Response.Body);
+        }
+
+        private void CopyResponseHeaders<T>(HttpContext context, T headers) where T : IEnumerable<KeyValuePair<string, IEnumerable<string>>>
+        {
+            foreach (var header in headers)
+            {
+                context.Response.Headers[header.Key] = header.Value.ToArray();
+            }
         }
 
         private HttpRequestMessage ConstructTargetRequest(HttpContext context, Uri targetUri)
@@ -75,6 +89,13 @@ namespace CBS.SirenUI.Backend.Middleware
             if(requestMessage.Method != HttpMethod.Get)
             {
                 requestMessage.Content = new StreamContent(context.Request.Body);
+
+                Console.WriteLine(requestMessage.Content.ReadAsStringAsync().Result);
+
+                foreach (var header in context.Request.Headers)
+                {
+                    requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                }
             }
 
             return requestMessage;

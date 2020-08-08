@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { CreateEventDialogComponent, TransmissionListEventCreationData } from '../create-event-dialog/create-event-dialog.component';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -48,7 +49,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
-    this.openDialog("Delete event?").afterClosed().subscribe(confirmed => {
+    this.openConfirmationDialog("Delete event?").afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
 
       this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
@@ -58,9 +59,9 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   }
 
-  private openDialog(dialogText: string) {
+  private openConfirmationDialog(dialogText: string) {
     return this.dialog.open(ConfirmationDialogComponent, {
-      width: '250px',
+      width: '300px',
       data: { title: dialogText }
     });
   }
@@ -76,11 +77,24 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestAddNewEvent(): void {
+    this.dialog.open(CreateEventDialogComponent, {
+      width: '800px',
+      data: {}
+    })
+    .afterClosed()
+      .subscribe((result: TransmissionListEventCreationData) => {
+      if (result == null) return;
 
+      console.log(result);
+
+        this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(result => {
+        this.retrieveEvents();
+      }, error => console.error(error));
+    });
   }
 
   public requestClearList(): void {
-    this.openDialog("Clear all events from the list?").afterClosed().subscribe(confirmed => {
+    this.openConfirmationDialog("Clear all events from the list?").afterClosed().subscribe(confirmed => {
       if (!confirmed) return;
 
       this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
