@@ -10,22 +10,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
-import { CounterComponent } from './components/counter/counter.component';
-import { FetchDataComponent } from './components/fetch-data/fetch-data.component';
 
 const routes: Routes = [
   { path: "automation", loadChildren: () => import('automation').then((library) => library.AutomationModule) },
-  { path: "", redirectTo: "automation/txlist", pathMatch: 'full' },
-  { path: 'counter', component: CounterComponent },
-  { path: 'fetch-data', component: FetchDataComponent }
+  { path: "", redirectTo: "automation/txlist", pathMatch: 'full' }
 ]
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavMenuComponent,
-    CounterComponent,
-    FetchDataComponent
+    NavMenuComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
