@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { CreateEventDialogComponent, TransmissionListEventCreationData } from '../create-event-dialog/create-event-dialog.component';
+import { CreateEventDialogComponent } from '../create-event-dialog/create-event-dialog.component';
+import { TransmissionList } from '../../interfaces/itransmission-list';
+import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
+import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -108,18 +111,4 @@ export class TranmissionlistEventsListComponent implements OnInit {
       this.dataSource.data = result;
     }, error => console.error(error));
   }
-}
-
-
-interface TransmissionListEvent {
-  id: number;
-  eventState: string;
-  expectedDuration: string;
-  expectedStartTime: string;
-}
-
-interface TransmissionList {
-  id: number;
-  playlistId: number;
-  eventCount: number;
 }

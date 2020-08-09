@@ -1,33 +1,11 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
-
-export interface PlayoutStrategy {
-  strategyType: string;
-}
-
-export interface MediaSourceStrategy {
-  strategyType: string;
-  som?: string;
-  eom?: string;
-  mediaName?: string;
-}
-
-export interface TransmissionListEventFeatureCreationData {
-  featureType: string;
-  playoutStrategy: PlayoutStrategy;
-  sourceStrategy: MediaSourceStrategy;
-}
-
-export interface TransmissionListEventTimingData {
-  timingStrategyType: string;
-  targetStartTime?: string;
-}
-
-export interface TransmissionListEventCreationData {
-  timingData: TransmissionListEventTimingData;
-  features: TransmissionListEventFeatureCreationData[];
-}
+import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
+import { TimingStrategyTypes } from '../../interfaces/timing-strategy-types.enum';
+import { PlayoutStrategyTypes } from '../../interfaces/playout-strategy-types.enum';
+import { SourceStrategyTypes } from '../../interfaces/source-strategy-types.enum';
+import { FeatureTypes } from '../../interfaces/feature-types.enum';
 
 @Component({
   selector: 'lib-create-event-dialog',
@@ -45,32 +23,16 @@ export class CreateEventDialogComponent {
   public readonly eomControl: FormControl;
   public readonly mediaNameControl: FormControl;
 
-
-  public readonly timingStrategyTypes: string[] = [
-    "Sequential",
-    "Fixed"
-  ];
-
-  public readonly playoutStrategyTypes: string[] = [
-    "Primary Video"
-  ];
-
-  public readonly sourceStrategyTypes: string[] = [
-    "Media Source"
-  ];
-
-  public readonly featureTypes: string[] = [
-    "Video"
-  ];
+  public featureTypes = FeatureTypes;
 
   constructor(
     public dialogRef: MatDialogRef<CreateEventDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventCreationData) {
-      this.timingStrategyTypeControl = new FormControl(this.timingStrategyTypes[0]);
+      this.timingStrategyTypeControl = new FormControl(TimingStrategyTypes.Sequential);
       this.targetStartTimeControl = new FormControl();
-      this.featureTypeControl = new FormControl(this.featureTypes[0]);
-      this.playoutStrategyTypeControl = new FormControl(this.playoutStrategyTypes[0]);
-      this.sourceStrategyTypeControl = new FormControl(this.sourceStrategyTypes[0]);
+      this.featureTypeControl = new FormControl(FeatureTypes.Video);
+      this.playoutStrategyTypeControl = new FormControl(PlayoutStrategyTypes.PrimaryVideo);
+      this.sourceStrategyTypeControl = new FormControl(SourceStrategyTypes.MediaSource);
       this.somControl = new FormControl("00:00:00:00");
       this.eomControl = new FormControl("00:00:30:00");
       this.mediaNameControl = new FormControl("TestInstance");
@@ -114,7 +76,6 @@ export class CreateEventDialogComponent {
   }
 
   public handleSubmit() {
-
     this.dialogRef.close();
   }
 }

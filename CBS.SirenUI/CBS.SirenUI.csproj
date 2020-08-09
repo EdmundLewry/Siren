@@ -20,6 +20,22 @@
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Frontend\projects\automation\src\lib\interfaces\interfaces.ts" />
+    <None Remove="Frontend\projects\automation\src\lib\interfaces\itransmission-list-event-creation-data.ts" />
+    <None Remove="Frontend\projects\automation\src\lib\interfaces\itransmission-list-event.ts" />
+    <None Remove="Frontend\projects\automation\src\lib\interfaces\itransmission-list.ts" />
+    <None Remove="Frontend\projects\automation\src\lib\pipes\pipes.module.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="Frontend\projects\automation\src\lib\interfaces\interfaces.ts" />
+    <TypeScriptCompile Include="Frontend\projects\automation\src\lib\interfaces\itransmission-list-event-creation-data.ts" />
+    <TypeScriptCompile Include="Frontend\projects\automation\src\lib\interfaces\itransmission-list-event.ts" />
+    <TypeScriptCompile Include="Frontend\projects\automation\src\lib\interfaces\itransmission-list.ts" />
+    <TypeScriptCompile Include="Frontend\projects\automation\src\lib\pipes\pipes.module.ts" />
+  </ItemGroup>
+
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">
