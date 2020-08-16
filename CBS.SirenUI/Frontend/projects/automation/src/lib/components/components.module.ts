@@ -16,14 +16,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 
 
-import { TransmissionlistListComponent } from './transmissionlist-list/transmissionlist-list.component';
 import { TranmissionlistEventsListComponent } from './tranmissionlist-events-list/tranmissionlist-events-list.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
 import { CreateEventDialogComponent } from './create-event-dialog/create-event-dialog.component';
 
 @NgModule({
   declarations: [
-    TransmissionlistListComponent,
     TranmissionlistEventsListComponent,
     ConfirmationDialogComponent,
     CreateEventDialogComponent

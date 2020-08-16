@@ -12,7 +12,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
 import { SidenavMenuComponent } from './components/sidenav-menu/sidenav-menu.component';
 
 const routes: Routes = [
@@ -23,7 +22,6 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    NavMenuComponent,
     SidenavMenuComponent
   ],
   imports: [

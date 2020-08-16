@@ -40,7 +40,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
   constructor(private http: HttpClient,
               private route: ActivatedRoute,
               public dialog: MatDialog) {
-    this.dataSource.data = this.fakeData;
+    
   }
 
   public ngOnInit() {

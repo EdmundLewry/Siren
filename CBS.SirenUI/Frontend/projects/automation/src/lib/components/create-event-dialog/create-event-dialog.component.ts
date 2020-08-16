@@ -82,4 +82,12 @@ export class CreateEventDialogComponent {
   public handleSubmit() {
     this.dialogRef.close();
   }
+
+  public isUsingFixedTiming(): boolean {
+    return TimingStrategyTypes[this.timingStrategyTypeControl.value] == TimingStrategyTypes.Fixed;
+  }
+
+  public isUsingMediaSource(): boolean {
+    return SourceStrategyTypes[this.sourceStrategyTypeControl.value] == SourceStrategyTypes.MediaSource;
+  }
 }
