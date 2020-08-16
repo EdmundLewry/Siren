@@ -1,0 +1,22 @@
+<div class="sideNavContent">
+  <div class="sideNavHeader">
+    <h1 class="appTitle">Siren</h1>
+  </div>
+  <span class="menu-spacer"></span>
+  <mat-nav-list>
+    <mat-accordion>
+      <mat-expansion-panel class="panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Channels</mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-expansion-panel class="panel">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Alpha</mat-panel-title>
+          </mat-expansion-panel-header>
+          <!--Hardcoded until we replace Channels with the full channel list and can pull the transmission lists from there-->
+          <a mat-list-item [routerLink]="['./automation/txlist/1']">Transmission List</a>
+        </mat-expansion-panel>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </mat-nav-list>
+</div>

@@ -1,6 +1,12 @@
 <body class="mat-app-background">
-  <app-nav-menu></app-nav-menu>
-  <div class="container">
-    <router-outlet></router-outlet>
-  </div>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav mode="side" opened class="appSidenav" [fixedInViewport]="true">
+      <app-sidenav-menu></app-sidenav-menu>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="container">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </body>
