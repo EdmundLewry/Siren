@@ -7,11 +7,9 @@ import { FeatureTypes } from '../interfaces/feature-types.enum';
 export class FeatureTypeDisplayPipe implements PipeTransform {
 
   transform(value: any): any {
-    console.log(value);
-    console.log(FeatureTypes[value]);
     switch (FeatureTypes[value]) {
       case FeatureTypes.Video:
-        return "Video"
+        return "Video";
     }
   }
 

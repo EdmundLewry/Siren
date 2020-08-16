@@ -6,7 +6,6 @@ import { TimingStrategyTypes } from '../../interfaces/timing-strategy-types.enum
 import { PlayoutStrategyTypes } from '../../interfaces/playout-strategy-types.enum';
 import { SourceStrategyTypes } from '../../interfaces/source-strategy-types.enum';
 import { FeatureTypes } from '../../interfaces/feature-types.enum';
-import { FeatureTypeDisplayPipe } from '../../pipes/feature-type-display.pipe';
 
 @Component({
   selector: 'lib-create-event-dialog',
@@ -25,16 +24,19 @@ export class CreateEventDialogComponent {
   public readonly mediaNameControl: FormControl;
 
   public featureTypes: string[] = Object.keys(FeatureTypes);
+  public playoutStrategyTypes: string[] = Object.keys(PlayoutStrategyTypes);
+  public sourceStrategyTypes: string[] = Object.keys(SourceStrategyTypes);
+  public timingStrategyTypes: string[] = Object.keys(TimingStrategyTypes);
 
   constructor(
     public dialogRef: MatDialogRef<CreateEventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventCreationData) {      
-      this.timingStrategyTypeControl = new FormControl(TimingStrategyTypes.Sequential);
+    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventCreationData) {
+      this.timingStrategyTypeControl = new FormControl(this.timingStrategyTypes[0]);
       this.targetStartTimeControl = new FormControl();
 
       this.featureTypeControl = new FormControl(this.featureTypes[0]);
-      this.playoutStrategyTypeControl = new FormControl(PlayoutStrategyTypes.PrimaryVideo);
-      this.sourceStrategyTypeControl = new FormControl(SourceStrategyTypes.MediaSource);
+      this.playoutStrategyTypeControl = new FormControl(this.playoutStrategyTypes[0]);
+      this.sourceStrategyTypeControl = new FormControl(this.sourceStrategyTypes[0]);
       this.somControl = new FormControl("00:00:00:00");
       this.eomControl = new FormControl("00:00:30:00");
       this.mediaNameControl = new FormControl("TestInstance");

@@ -6,8 +6,7 @@
     <mat-form-field color="accent">
       <mat-label>Timing Strategy</mat-label>
       <mat-select formControlName="timingStrategyType">
-        <mat-option value="sequential">Sequential</mat-option>
-        <mat-option value="fixed">Fixed</mat-option>
+        <mat-option *ngFor="let item of timingStrategyTypes" value="{{item}}">{{item | timingStrategyDisplay}}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -28,13 +27,13 @@
     <mat-form-field color="accent">
       <mat-label>Playout Strategy</mat-label>
       <mat-select formControlName="playoutStrategyType">
-        <mat-option value="primaryVideo">Primary Video</mat-option>
+        <mat-option *ngFor="let item of playoutStrategyTypes" value="{{item}}">{{item | playoutStrategyDisplay}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field color="accent">
       <mat-label>Source Strategy</mat-label>
       <mat-select formControlName="sourceStrategyType">
-        <mat-option value="mediaSource">Media</mat-option>
+        <mat-option *ngFor="let item of sourceStrategyTypes" value="{{item}}">{{item | sourceStrategyDisplay}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field color="accent">
