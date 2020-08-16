@@ -62,7 +62,7 @@ namespace CBS.Siren.Controllers
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Unable to Play list with given id {0}", id);
+                Logger.LogError(e, "Unable to Play list with given id {0}, {1}", id, e.Message);
                 return NotFound(id);
             }
         }

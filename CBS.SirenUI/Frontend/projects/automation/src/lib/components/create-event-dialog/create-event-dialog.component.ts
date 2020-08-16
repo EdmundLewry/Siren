@@ -61,16 +61,16 @@ export class CreateEventDialogComponent {
     let formValue = this.transmissionListEventForm.value;
     return {
       timingData: {
-        strategyType: formValue.timingStrategyType,
+        strategyType: TimingStrategyTypes[formValue.timingStrategyType],
         targetStartTime: formValue.targetStartTime
       },
       features: [{
         featureType: FeatureTypes[formValue.featureType],
         playoutStrategy: {
-          strategyType: formValue.playoutStrategyType
+          strategyType: PlayoutStrategyTypes[formValue.playoutStrategyType]
         },
         sourceStrategy: {
-          strategyType: formValue.sourceStrategyType,
+          strategyType: SourceStrategyTypes[formValue.sourceStrategyType],
           som: formValue.som,
           eom: formValue.eom,
           mediaName: formValue.mediaName

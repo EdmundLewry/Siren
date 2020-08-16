@@ -37,10 +37,12 @@ namespace CBS.Siren.Application
         private async Task<TransmissionList> GetListBydId(int id)
         {
             IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
+
             TransmissionList transmissionList = transmissionLists.FirstOrDefault(list => list.Id == id);
 
             if (transmissionList == null)
             {
+                Logger.LogError($"Unable to find list with Id {id}");
                 throw new ArgumentException($"Unable to find list with id: {id}", "id");
             }
 
