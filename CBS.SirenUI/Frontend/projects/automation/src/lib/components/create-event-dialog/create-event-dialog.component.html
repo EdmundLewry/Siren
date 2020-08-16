@@ -22,7 +22,7 @@
     <mat-form-field color="accent">
       <mat-label>Feature Type</mat-label>
       <mat-select formControlName="featureType">
-        <mat-option *ngFor="let item of featureTypes | enumToArray" value="item.value">{{item.name}}</mat-option>
+        <mat-option *ngFor="let item of featureTypes" value="{{item}}">{{item | featureTypeDisplay}}</mat-option>
       </mat-select>
     </mat-form-field>
     <mat-form-field color="accent">
