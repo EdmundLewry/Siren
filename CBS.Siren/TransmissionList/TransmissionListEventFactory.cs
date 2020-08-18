@@ -99,7 +99,7 @@ namespace CBS.Siren
         {
             return timingData.StrategyType switch
             {
-                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime),
+                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime.GetValueOrDefault()),
                 "sequential" => new SequentialStartEventTimingStrategy(),
                 _ => null
             };

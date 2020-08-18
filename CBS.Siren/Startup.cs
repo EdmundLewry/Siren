@@ -28,13 +28,13 @@ namespace CBS.Siren
             
             services.AddTransient<SirenApplication>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
-            services.AddTransient<IDeviceFactory, DeviceFactory>();
             services.AddSingleton<IDeviceManager, DeviceManager>();
+            services.AddSingleton<ITransmissionListService, TransmissionListService>();
             services.AddTransient<ITransmissionListHandler, TransmissionListHandler>();
             services.AddTransient<IScheduler, SimpleScheduler>();
+            services.AddTransient<IDeviceFactory, DeviceFactory>();
             services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
             services.AddTransient<IDeviceListEventFactory, DeviceListEventFactory>();
-            services.AddTransient<ITransmissionListService, TransmissionListService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

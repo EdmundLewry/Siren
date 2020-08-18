@@ -1,0 +1,47 @@
+/*@import "~@angular/material/theming";*/
+
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/purple-green.css";
+
+/* Provide sufficient contrast against white background 
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #e01a76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+*/
+
+html,
+body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body{
+    font-family: "Muli", "Roboto", Arial, Helvetica, sans-serif;
+}
+
+.container {
+    margin: 10px;
+}
+
+.mat-table {
+    width: 100%;
+}
+
+.appSidenav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+  background: rgb(117, 95, 195);
+}

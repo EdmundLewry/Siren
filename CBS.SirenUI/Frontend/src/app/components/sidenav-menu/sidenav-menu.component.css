@@ -1,0 +1,14 @@
+.appTitle {
+  margin-bottom: 20px;
+  font-family: 'Exo', sans-serif;
+}
+
+.sideNavHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  background: rgb(117, 95, 195);
+}

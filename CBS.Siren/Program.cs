@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Hosting;
 using NLog.Web;
 using System;
+using Microsoft.Extensions.Configuration;
 
 namespace CBS.Siren
 {
@@ -31,12 +32,15 @@ namespace CBS.Siren
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((hostingContext, config) =>{
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            })
             .ConfigureWebHostDefaults(webBuilder =>{
                     webBuilder.UseStartup<Startup>();
             })
             .ConfigureLogging(logging => {
                 logging.ClearProviders();
-                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                logging.SetMinimumLevel(LogLevel.Trace);
             })
             .UseNLog();
         }

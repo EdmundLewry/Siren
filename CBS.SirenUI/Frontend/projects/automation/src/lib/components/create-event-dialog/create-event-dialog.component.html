@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>Create Transmission List Event</h2>
+<form [formGroup]="transmissionListEventForm">
+  <div mat-dialog-content>
+
+    <h3 mat-dialog-title>Timing</h3>
+    <mat-form-field color="accent">
+      <mat-label>Timing Strategy</mat-label>
+      <mat-select formControlName="timingStrategyType">
+        <mat-option *ngFor="let item of timingStrategyTypes" value="{{item}}">{{item | timingStrategyDisplay}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br />
+    <mat-form-field *ngIf="isUsingFixedTiming()" color="accent">
+      <mat-label>Target Start Time</mat-label>
+      <input matInput type="datetime-local" formControlName="targetStartTime">
+    </mat-form-field>
+
+    <mat-divider></mat-divider>
+
+    <h3 mat-dialog-title>Features</h3>
+    <mat-form-field color="accent">
+      <mat-label>Feature Type</mat-label>
+      <mat-select formControlName="featureType">
+        <mat-option *ngFor="let item of featureTypes" value="{{item}}">{{item | featureTypeDisplay}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br />
+    <mat-form-field color="accent">
+      <mat-label>Playout Strategy</mat-label>
+      <mat-select formControlName="playoutStrategyType">
+        <mat-option *ngFor="let item of playoutStrategyTypes" value="{{item}}">{{item | playoutStrategyDisplay}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br />
+    <mat-form-field color="accent">
+      <mat-label>Source Strategy</mat-label>
+      <mat-select formControlName="sourceStrategyType">
+        <mat-option *ngFor="let item of sourceStrategyTypes" value="{{item}}">{{item | sourceStrategyDisplay}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br />
+    <mat-form-field class="formInput" *ngIf="isUsingMediaSource()" color="accent">
+      <mat-label>SOM</mat-label>
+      <input matInput type="text" formControlName="som">
+    </mat-form-field>
+    <mat-form-field class="formInput" *ngIf="isUsingMediaSource()" color="accent">
+      <mat-label>EOM</mat-label>
+      <input matInput formControlName="eom">
+    </mat-form-field>
+    <mat-form-field class="formInput" *ngIf="isUsingMediaSource()" color="accent">
+      <mat-label>Media Name</mat-label>
+      <input matInput formControlName="mediaName">
+    </mat-form-field>
+  </div>
+
+  <div mat-dialog-actions>
+    <button mat-raised-button (click)="onNoClick()">Cancel</button>
+    <button mat-raised-button type="submit" [mat-dialog-close]="getResult()" cdkFocusInitial>Ok</button>
+  </div>
+</form>

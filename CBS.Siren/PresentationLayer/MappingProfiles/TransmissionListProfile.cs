@@ -17,6 +17,8 @@ namespace CBS.Siren.DTO
                                 config => config.MapFrom(listEvent => Enum.GetName(typeof(TransmissionListEventState.Status), listEvent.EventState.CurrentStatus)))
                         .ForMember(dto => dto.ExpectedDuration,
                                 config => config.MapFrom(listEvent => listEvent.ExpectedDuration.ToTimecodeString()))
+                        .ForMember(dto => dto.ExpectedStartTime,
+                                config => config.MapFrom(listEvent => listEvent.ExpectedStartTime.ToTimecodeString()))
                         .ForMember(dto => dto.EventTimingStrategy,
                                 config => config.MapFrom(listEvent => listEvent.EventTimingStrategy.StrategyType))
                         .ForMember(dto => dto.EventFeatureCount,
