@@ -34,7 +34,7 @@ namespace CBS.Siren
             services.AddTransient<IScheduler, SimpleScheduler>();
             services.AddTransient<IDeviceFactory, DeviceFactory>();
             services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
-            services.AddTransient<IDeviceListEventFactory, DeviceListEventFactory>();
+            services.AddTransient<IDeviceListEventStore, DeviceListEventStore>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

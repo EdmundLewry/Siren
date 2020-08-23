@@ -22,7 +22,7 @@ namespace CBS.Siren
         public ILogger<TransmissionListService> Logger { get; }
         public IScheduler Scheduler { get; private set; }
         public IDeviceListEventWatcher DeviceListEventWatcher { get; }
-        public IDeviceListEventFactory DeviceListEventFactory { get; }
+        public IDeviceListEventStore DeviceListEventStore { get; }
 
         private TransmissionList _transmissionList;
         public TransmissionList TransmissionList 
@@ -35,12 +35,12 @@ namespace CBS.Siren
             } 
         }
 
-        public TransmissionListService(IScheduler scheduler, IDeviceListEventWatcher deviceListEventWatcher, IDeviceListEventFactory deviceListEventFactory, ILogger<TransmissionListService> logger)
+        public TransmissionListService(IScheduler scheduler, IDeviceListEventWatcher deviceListEventWatcher, IDeviceListEventStore deviceListEventStore, ILogger<TransmissionListService> logger)
         {
             Logger = logger;
             Scheduler = scheduler;
             DeviceListEventWatcher = deviceListEventWatcher;
-            DeviceListEventFactory = deviceListEventFactory;
+            DeviceListEventStore = deviceListEventStore;
         }
 
         public void OnDeviceListEventStatusChanged(int eventId, int? transmissionListEventId, DeviceListEventState state)
@@ -52,7 +52,7 @@ namespace CBS.Siren
             {
                 case DeviceListEventState.Status.CUED:
                     {
-                        if (IsTransmissionListEventCued(effectedEvent, DeviceListEventFactory))
+                        if (IsTransmissionListEventCued(effectedEvent, DeviceListEventStore))
                         {
                             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.CUED);
                             break;
@@ -68,7 +68,7 @@ namespace CBS.Siren
                     }
                 case DeviceListEventState.Status.PLAYED:
                     {
-                        if(IsTransmissionListEventPlayed(effectedEvent, DeviceListEventFactory))
+                        if(IsTransmissionListEventPlayed(effectedEvent, DeviceListEventStore))
                         {
                             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
                         }
@@ -78,17 +78,17 @@ namespace CBS.Siren
             }
         }
 
-        private bool AreAllFeatureDeviceEventsInState(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory, DeviceListEventState.Status targetState)
+        private bool AreAllFeatureDeviceEventsInState(TransmissionListEvent effectedEvent, IDeviceListEventStore deviceListEventStore, DeviceListEventState.Status targetState)
         {
             IEnumerable<int> deviceListEvents = effectedEvent.EventFeatures.Where(feature => feature.DeviceListEventId.HasValue).Select(feature => feature.DeviceListEventId.Value);
-            return deviceListEvents.All(deviceListEventId => deviceListEventFactory.GetEventById(deviceListEventId)?.EventState.CurrentStatus == targetState);
+            return deviceListEvents.All(deviceListEventId => deviceListEventStore.GetEventById(deviceListEventId)?.EventState.CurrentStatus == targetState);
         }
 
-        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory) => 
-            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventFactory, DeviceListEventState.Status.CUED);
+        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventStore deviceListEventStore) => 
+            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventStore, DeviceListEventState.Status.CUED);
 
-        private bool IsTransmissionListEventPlayed(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory) =>
-            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventFactory, DeviceListEventState.Status.PLAYED);
+        private bool IsTransmissionListEventPlayed(TransmissionListEvent effectedEvent, IDeviceListEventStore deviceListEventStore) =>
+            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventStore, DeviceListEventState.Status.PLAYED);
 
 
         private void UpdateTransmissionListEventStatus(TransmissionListEvent effectedEvent, TransmissionListEventState.Status status)
@@ -111,7 +111,7 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventFactory);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore);
 
             DeliverDeviceLists(deviceLists);
         }
