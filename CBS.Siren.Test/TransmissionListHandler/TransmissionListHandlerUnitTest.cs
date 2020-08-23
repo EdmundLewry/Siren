@@ -113,7 +113,7 @@ namespace CBS.Siren.Test
 
             Assert.Equal(TransmissionListEventState.Status.UNSCHEDULED, createdEvent.EventState.CurrentStatus);
             Assert.Single(createdEvent.EventFeatures);
-            Assert.Empty(createdEvent.RelatedDeviceListEvents);
+            Assert.Null(createdEvent.EventFeatures[0].DeviceListEventId);
             Assert.Equal("fixed", createdEvent.EventTimingStrategy.StrategyType);
         }
         

@@ -103,7 +103,7 @@ namespace CBS.Siren.Test.Device
 
             device.OnDeviceEventStatusChanged += eventHandler;
 
-            DeviceListEventStatusChangeArgs expectedArgs = new DeviceListEventStatusChangeArgs(returnEvent.Id,  new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
+            DeviceListEventStatusChangeArgs expectedArgs = new DeviceListEventStatusChangeArgs(returnEvent.Id, null,  new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
             returnEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
             mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
 

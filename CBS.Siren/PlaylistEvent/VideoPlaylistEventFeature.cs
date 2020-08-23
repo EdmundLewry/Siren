@@ -10,6 +10,7 @@ namespace CBS.Siren
         public IPlayoutStrategy PlayoutStrategy { get; set; }
         public ISourceStrategy SourceStrategy { get; set; }
         public IDevice Device { get; set; }
+        public int? DeviceListEventId { get; set; }
 
         public VideoPlaylistEventFeature(IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy, IDevice device = null)
         {
@@ -28,7 +29,8 @@ namespace CBS.Siren
             return "VideoPlaylistEventFeature:" +
             $"\nPlayout Strategy: {PlayoutStrategy}" +
             $"\nSource Strategy: {SourceStrategy}" + 
-            $"\nDevice - {Device?.ToString()}";
+            $"\nDevice - {Device?.ToString()}" +
+            $"\nDeviceListEvent - {DeviceListEventId}";
         }
 
         public virtual bool Equals([AllowNull] IEventFeature other)

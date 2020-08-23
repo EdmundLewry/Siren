@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AutoMapper;
 using CBS.Siren.Time;
 
@@ -26,7 +27,7 @@ namespace CBS.Siren.DTO
                         .ForMember(dto => dto.RelatedPlaylistEvent,
                             config => config.MapFrom(listEvent => listEvent.RelatedPlaylistEvent.Id))
                         .ForMember(dto => dto.RelatedDeviceListEventCount,
-                            config => config.MapFrom(listEvent => listEvent.RelatedDeviceListEvents.Count));
+                            config => config.MapFrom(listEvent => listEvent.EventFeatures.Where(feature => feature.DeviceListEventId.HasValue).Count()));
         }
     }
 }

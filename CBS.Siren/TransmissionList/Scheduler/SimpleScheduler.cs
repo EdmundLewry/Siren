@@ -68,7 +68,7 @@ namespace CBS.Siren
         {
             string eventData = GenerateEventData(transmissionEvent, feature);
             DeviceListEvent createdEvent = deviceListEventFactory.CreateDeviceListEvent(eventData, transmissionEvent.Id);
-            transmissionEvent.RelatedDeviceListEvents.Add(createdEvent.Id);
+            feature.DeviceListEventId = createdEvent.Id;
             return createdEvent;
         }
 

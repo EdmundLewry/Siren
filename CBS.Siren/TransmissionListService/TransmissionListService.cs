@@ -43,10 +43,10 @@ namespace CBS.Siren
             DeviceListEventFactory = deviceListEventFactory;
         }
 
-        public void OnDeviceListEventStatusChanged(int eventId, DeviceListEventState state)
+        public void OnDeviceListEventStatusChanged(int eventId, int? transmissionListEventId, DeviceListEventState state)
         {
             //Find the transmission list event that relates to this id
-            TransmissionListEvent effectedEvent = FindTransmissionListEventByDeviceListEventId(eventId);
+            TransmissionListEvent effectedEvent = transmissionListEventId.HasValue ? GetTransmissionListEventById(transmissionListEventId.Value) : FindTransmissionListEventByDeviceListEventId(eventId);
 
             switch (state.CurrentStatus)
             {
@@ -78,15 +78,18 @@ namespace CBS.Siren
             }
         }
 
-        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory)
+        private bool AreAllFeatureDeviceEventsInState(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory, DeviceListEventState.Status targetState)
         {
-            return effectedEvent.RelatedDeviceListEvents.All(eventId => deviceListEventFactory.GetEventById(eventId)?.EventState.CurrentStatus == DeviceListEventState.Status.CUED);
+            IEnumerable<int> deviceListEvents = effectedEvent.EventFeatures.Where(feature => feature.DeviceListEventId.HasValue).Select(feature => feature.DeviceListEventId.Value);
+            return deviceListEvents.All(deviceListEventId => deviceListEventFactory.GetEventById(deviceListEventId)?.EventState.CurrentStatus == targetState);
         }
 
-        private bool IsTransmissionListEventPlayed(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory)
-        {
-            return effectedEvent.RelatedDeviceListEvents.All(eventId => deviceListEventFactory.GetEventById(eventId)?.EventState.CurrentStatus == DeviceListEventState.Status.PLAYED);
-        }
+        private bool IsTransmissionListEventCued(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory) => 
+            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventFactory, DeviceListEventState.Status.CUED);
+
+        private bool IsTransmissionListEventPlayed(TransmissionListEvent effectedEvent, IDeviceListEventFactory deviceListEventFactory) =>
+            AreAllFeatureDeviceEventsInState(effectedEvent, deviceListEventFactory, DeviceListEventState.Status.PLAYED);
+
 
         private void UpdateTransmissionListEventStatus(TransmissionListEvent effectedEvent, TransmissionListEventState.Status status)
         {
@@ -96,9 +99,14 @@ namespace CBS.Siren
             }
         }
 
-        private TransmissionListEvent FindTransmissionListEventByDeviceListEventId(int eventId)
+        public TransmissionListEvent GetTransmissionListEventById(int transmissionListEventId)
         {
-            return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.RelatedDeviceListEvents.Contains(eventId));
+            return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.Id == transmissionListEventId);
+        }
+
+        private TransmissionListEvent FindTransmissionListEventByDeviceListEventId(int deviceListEventId)
+        {
+            return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.EventFeatures.Select(feature => feature.DeviceListEventId).Contains(deviceListEventId));
         }
 
         public void PlayTransmissionList()

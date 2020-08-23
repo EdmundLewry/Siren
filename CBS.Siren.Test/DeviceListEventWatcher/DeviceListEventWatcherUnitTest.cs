@@ -24,7 +24,7 @@ namespace CBS.Siren.Test
 
             eventWatcherUnderTest.OnDeviceListEventStatusChange(mockDevice.Object, args);
 
-            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(It.IsAny<int>(), It.IsAny<DeviceListEventState>()), Times.Never);
+            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(It.IsAny<int>(), It.IsAny<int?>(), It.IsAny<DeviceListEventState>()), Times.Never);
         }
         
         [Fact]
@@ -37,13 +37,15 @@ namespace CBS.Siren.Test
 
             eventWatcherUnderTest.SubcsribeToDevice(mockListener.Object, mockDevice.Object);
 
-            DeviceListEvent returnEvent = new DeviceListEvent("");
+            DeviceListEvent returnEvent = new DeviceListEvent("") { 
+                RelatedTransmissionListEventId = 0
+            };
             DeviceListEventState returnState = new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED };
-            DeviceListEventStatusChangeArgs args = new DeviceListEventStatusChangeArgs(returnEvent.Id, returnState);
+            DeviceListEventStatusChangeArgs args = new DeviceListEventStatusChangeArgs(returnEvent.Id, returnEvent.RelatedTransmissionListEventId, returnState);
 
             eventWatcherUnderTest.OnDeviceListEventStatusChange(mockDevice.Object, args);
 
-            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(returnEvent.Id, returnState), Times.Once);
+            mockListener.Verify(mock => mock.OnDeviceListEventStatusChanged(returnEvent.Id, 0, returnState), Times.Once);
         }
     }
 }

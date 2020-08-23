@@ -62,7 +62,7 @@ namespace CBS.Siren.Device
 
         private void HandleDeviceEventChange(DeviceEventChangedEventArgs args)
         {
-            OnDeviceEventStatusChanged?.Invoke(this, new DeviceListEventStatusChangeArgs(args.AffectedEvent.Id, args.AffectedEvent.EventState));
+            OnDeviceEventStatusChanged?.Invoke(this, new DeviceListEventStatusChangeArgs(args.AffectedEvent.Id, args.AffectedEvent.RelatedTransmissionListEventId, args.AffectedEvent.EventState));
             AssessDeviceStatus();
         }
 

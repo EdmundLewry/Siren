@@ -44,7 +44,7 @@ namespace CBS.Siren
                 return;
             }
 
-            Subscriptions[device].ForEach((listerner) => listerner.OnDeviceListEventStatusChanged(args.EventId, args.NewState));
+            Subscriptions[device].ForEach((listerner) => listerner.OnDeviceListEventStatusChanged(args.EventId, args.RelatedTransmissionListEventId, args.NewState));
         }
 
         #region IDisposable Support

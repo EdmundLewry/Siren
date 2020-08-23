@@ -1,5 +1,3 @@
-using System;
-
 namespace CBS.Siren.DTO
 {
     public class TransmissionListEventDTO
