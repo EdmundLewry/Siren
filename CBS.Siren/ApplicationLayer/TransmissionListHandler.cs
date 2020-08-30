@@ -65,9 +65,25 @@ namespace CBS.Siren.Application
             TransmissionList transmissionList = await GetListBydId(id);
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
-            transmissionList.Events.Add(createdEvent);
+            InsertEventIntoList(createdEvent, listEvent.ListPosition, transmissionList);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
             return createdEvent;
+        }
+
+        private void InsertEventIntoList(TransmissionListEvent createdEvent, ListPositionDTO listPosition, TransmissionList transmissionList)
+        {
+            if(listPosition != null)
+            {
+                int foundEventIndex = transmissionList.Events.FindIndex((listEvent) => listEvent.Id == listPosition.AssociatedEventId);
+                if(foundEventIndex != -1)
+                {
+                    foundEventIndex = listPosition.RelativePosition == RelativePosition.Above ? foundEventIndex : foundEventIndex + 1;
+                    transmissionList.Events.Insert(foundEventIndex, createdEvent);
+                    return;
+                }
+            }
+
+            transmissionList.Events.Add(createdEvent);
         }
 
         public async Task RemoveEvent(int listId, int eventId)

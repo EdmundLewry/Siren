@@ -141,6 +141,28 @@ namespace CBS.Siren.Test
 
             await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.AddEvent(1, new TransmissionListEventCreationDTO()));
         }
+        
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData(RelativePosition.Above, 0)]
+        [InlineData(RelativePosition.Below, 1)]
+        public async Task AddEvent_WithPositionData_InsertsEventInTheCorrectPosition(RelativePosition position, int expectedIndex)
+        {
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            creationDTO.ListPosition = new ListPositionDTO() {
+                RelativePosition = position,
+                AssociatedEventId = _transmissionList.Events[0].Id
+            };
+
+            TransmissionListEvent createdEvent = await codeUnderTest.AddEvent(1, creationDTO);
+
+            Assert.Equal(3, savedList.Events.Count);
+            Assert.Equal(createdEvent.Id, savedList.Events[expectedIndex].Id);
+        }
 
         #endregion
 

@@ -15,7 +15,16 @@ namespace CBS.Siren
         public int? RelatedTransmissionListEventId { get; set; }
 
         public DeviceListEventState EventState { get; set; } = new DeviceListEventState();
-        public string EventData {get;}
+
+        private string _eventData;
+        public string EventData {
+            get { return _eventData; }
+            set {
+                _eventData = value;
+                ProcessEventData();
+            } 
+        
+        }
         public DateTime StartTime { get; private set; }
         public DateTime EndTime { get; private set; }
 

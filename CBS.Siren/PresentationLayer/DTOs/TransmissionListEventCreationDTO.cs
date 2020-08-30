@@ -4,7 +4,8 @@ namespace CBS.Siren.DTO
 {
     public class TransmissionListEventCreationDTO
     {
-        public TimingStrategyCreationDTO TimingData {get; set;}
-        public List<ListEventFeatureCreationDTO> Features {get; set;}
+        public TimingStrategyCreationDTO TimingData { get; set; }
+        public List<ListEventFeatureCreationDTO> Features { get; set; }
+        public ListPositionDTO ListPosition { get; set; }
     }
 }

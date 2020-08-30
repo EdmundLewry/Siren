@@ -45,7 +45,7 @@ namespace CBS.Siren.Test
                 [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
             };
             var mockScheduler = new Mock<IScheduler>();
-            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>())).Returns(deviceLists);
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
 
             TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object, 

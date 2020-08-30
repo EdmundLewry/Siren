@@ -9,18 +9,20 @@ namespace CBS.Siren
 {
     public class SimpleScheduler : IScheduler
     {
-        public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore)
+        public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex = 0)
         {
-            TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList);
-            return GenerateDeviceLists(calculatedTransmsmissionList, deviceListEventStore);
+            TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList, startIndex);
+            return GenerateDeviceLists(calculatedTransmsmissionList, deviceListEventStore, startIndex);
         }
 
-        private TransmissionList CalculateListTimings(TransmissionList transmissionList)
+        private TransmissionList CalculateListTimings(TransmissionList transmissionList, int startIndex)
         {
-            transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
+            for(int i = startIndex; i<transmissionList.Events.Count; ++i)
+            {
+                TransmissionListEvent transmissionEvent = transmissionList.Events[i];
                 transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
                 transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
-            });
+            }
 
             return transmissionList;
         }
@@ -30,14 +32,16 @@ namespace CBS.Siren
             return eventFeatures.Select(feature => feature.CalculateDuration()).Max();
         }
 
-        private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore)
+        private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex)
         {
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
-            
-            transmissionList.Events.ForEach((transmissionEvent) => {
+
+            for (int i = startIndex; i < transmissionList.Events.Count; ++i)
+            {
+                TransmissionListEvent transmissionEvent = transmissionList.Events[i];
                 TranslateListEventToDeviceEvents(transmissionEvent, deviceLists, deviceListEventStore); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
                 transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
-            });
+            }
 
             return deviceLists;
         }
@@ -67,9 +71,20 @@ namespace CBS.Siren
         private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature, IDeviceListEventStore deviceListEventStore)
         {
             string eventData = GenerateEventData(transmissionEvent, feature);
-            DeviceListEvent createdEvent = deviceListEventStore.CreateDeviceListEvent(eventData, transmissionEvent.Id);
-            feature.DeviceListEventId = createdEvent.Id;
-            return createdEvent;
+            DeviceListEvent deviceEvent;
+            if (feature.DeviceListEventId.HasValue)
+            {
+                deviceEvent =  deviceListEventStore.GetEventById(feature.DeviceListEventId.Value);
+                deviceEvent.EventData = eventData;
+                deviceEvent.RelatedTransmissionListEventId = transmissionEvent.Id;
+            }
+            else
+            {
+                deviceEvent = deviceListEventStore.CreateDeviceListEvent(eventData, transmissionEvent.Id);
+            }
+
+            feature.DeviceListEventId = deviceEvent.Id;
+            return deviceEvent;
         }
 
         private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)

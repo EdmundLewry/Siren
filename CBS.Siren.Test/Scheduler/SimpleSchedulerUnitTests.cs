@@ -127,6 +127,26 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenStartIndexIsGiven_ShouldCreateDeviceListWithCorrectOrder()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object, 2);
+
+            DeviceList deviceOneList = lists[mockDevice1.Object];
+
+            Assert.Equal(event4.Id, deviceOneList.Events[0].RelatedTransmissionListEventId);
+
+            DeviceList deviceTwoList = lists[mockDevice2.Object];
+
+            Assert.Equal(event3.Id, deviceTwoList.Events[0].RelatedTransmissionListEventId);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void ScheduleTransmissionList_ShouldCreateOneDeviceListEventsWithCorrectData()
         {
             var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
@@ -205,5 +225,7 @@ namespace CBS.Siren.Test
 
             Assert.All(transmissionList.Events, (listEvent) => Assert.Equal(TransmissionListEventState.Status.SCHEDULED, listEvent.EventState.CurrentStatus));
         }
+
+
     }
 }
