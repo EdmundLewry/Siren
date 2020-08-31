@@ -28,6 +28,11 @@ namespace CBS.Siren
 
         public void UnsubcsribeFromDevice(IDeviceListEventStatusChangeListener listener, IDevice device)
         {
+            if(!Subscriptions.ContainsKey(device))
+            {
+                return;
+            }
+
             Subscriptions[device].Remove(listener);
 
             if(!Subscriptions[device].Any())

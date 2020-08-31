@@ -114,9 +114,9 @@ namespace CBS.Siren.Test
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
             TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
-            Assert.Equal("UNSCHEDULED", returnedEvent.EventState);
+            Assert.Equal("SCHEDULED", returnedEvent.EventState);
             Assert.Equal(1, returnedEvent.EventFeatureCount);
-            Assert.Equal(0, returnedEvent.RelatedDeviceListEventCount);
+            Assert.Equal(1, returnedEvent.RelatedDeviceListEventCount);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy);
         }
 

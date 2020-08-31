@@ -23,15 +23,16 @@ namespace CBS.Siren
         public IScheduler Scheduler { get; private set; }
         public IDeviceListEventWatcher DeviceListEventWatcher { get; }
         public IDeviceListEventStore DeviceListEventStore { get; }
+        private HashSet<IDevice> SubscribedDevices { get; set; } = new HashSet<IDevice>();
 
         private TransmissionList _transmissionList;
         public TransmissionList TransmissionList 
         { 
             get => _transmissionList; 
             set {
-                UnsubscribeFromDeviceEventChanges(_transmissionList);
+                UnsubscribeFromAllDeviceEventChanges(_transmissionList);
                 _transmissionList = value;
-                SubscribeToDeviceEvents(_transmissionList);
+                UpdateDeviceSubscriptions();
             } 
         }
 
@@ -74,7 +75,6 @@ namespace CBS.Siren
                         }
                         break;
                     }
-
             }
         }
 
@@ -114,32 +114,54 @@ namespace CBS.Siren
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore);
 
             DeliverDeviceLists(deviceLists);
+            if(deviceLists.Any())
+            {
+                TransmissionList.State = TransmissionListState.Playing;
+            }
+        }
+
+        public void OnTransmissionListChanged(int changeIndex = 0)
+        {
+            //I wonder if we want to do some sort of dry run scheduling implementation?
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
+
+            if(TransmissionList?.State == TransmissionListState.Playing)
+            {
+                DeliverDeviceLists(deviceLists);
+            }
+
         }
 
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
         {
             deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
+            UpdateDeviceSubscriptions();
         }
 
-        private void SubscribeToDeviceEvents(TransmissionList transmissionList)
+        private void UpdateDeviceSubscriptions()
         {
-            if (transmissionList is null)
+            if (TransmissionList is null)
             {
                 return;
             }
 
-            HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
-            foreach (IDevice device in devices)
+            HashSet<IDevice> devices = TransmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
+            IEnumerable<IDevice> devicesToSubscribeTo = devices.Except(SubscribedDevices);
+            foreach (IDevice device in devicesToSubscribeTo)
             {
                 if(device is null)
                 {
                     continue;
                 }
                 DeviceListEventWatcher.SubcsribeToDevice(this, device);
+                SubscribedDevices.Add(device);
             }
+
+            IEnumerable<IDevice> devicesToUnsubscribeFrom = SubscribedDevices.Except(devices);
+            UnsubscribeFromDevices(devicesToUnsubscribeFrom);
         }
 
-        private void UnsubscribeFromDeviceEventChanges(TransmissionList transmissionList)
+        private void UnsubscribeFromAllDeviceEventChanges(TransmissionList transmissionList)
         {
             if(transmissionList is null)
             {
@@ -147,13 +169,19 @@ namespace CBS.Siren
             }
 
             HashSet<IDevice> devices = transmissionList.Events.SelectMany(listEvent => listEvent.EventFeatures.Select(feature => feature.Device)).ToHashSet();
-            foreach(IDevice device in devices)
+            UnsubscribeFromDevices(devices);
+        }
+
+        private void UnsubscribeFromDevices(IEnumerable<IDevice> devices)
+        {
+            foreach (IDevice device in devices)
             {
-                if(device is null)
+                if (device is null)
                 {
                     continue;
                 }
                 DeviceListEventWatcher.UnsubcsribeFromDevice(this, device);
+                SubscribedDevices.Remove(device);
             }
         }
 
@@ -164,7 +192,7 @@ namespace CBS.Siren
         {
             if (!disposedValue && disposing)
             {
-                UnsubscribeFromDeviceEventChanges(_transmissionList);
+                UnsubscribeFromAllDeviceEventChanges(_transmissionList);
                 disposedValue = true;
             }
         }

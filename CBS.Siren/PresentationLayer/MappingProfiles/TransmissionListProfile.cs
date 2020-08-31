@@ -27,7 +27,7 @@ namespace CBS.Siren.DTO
                         .ForMember(dto => dto.RelatedPlaylistEvent,
                             config => config.MapFrom(listEvent => listEvent.RelatedPlaylistEvent.Id))
                         .ForMember(dto => dto.RelatedDeviceListEventCount,
-                            config => config.MapFrom(listEvent => listEvent.EventFeatures.Where(feature => feature.DeviceListEventId.HasValue).Count()));
+                            config => config.MapFrom(listEvent => listEvent.EventFeatures.Count(feature => feature.DeviceListEventId.HasValue)));
         }
     }
 }

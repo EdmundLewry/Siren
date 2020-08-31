@@ -65,11 +65,14 @@ namespace CBS.Siren.Test
         {
             _dataLayer.Setup(mock => mock.TransmissionLists()).ReturnsAsync(new List<TransmissionList>() { _transmissionList });
             _dataLayer.Setup(mock => mock.MediaInstances()).ReturnsAsync(new List<MediaInstance>(){new MediaInstance("TestInstance", new TimeSpan(0,0,30))});
-            
-            return new TransmissionListHandler(_logger.Object, _dataLayer.Object, _listService.Object, _deviceManager.Object);
+
+            Mock<ITransmissionListServiceStore> mockStore = new Mock<ITransmissionListServiceStore>();
+            mockStore.Setup(mock => mock.GetTransmissionListServiceByListId(It.IsAny<int>())).Returns(_listService.Object);
+
+            return new TransmissionListHandler(_logger.Object, _dataLayer.Object, mockStore.Object, _deviceManager.Object);
         }
 
-        #region GET        
+        #region Get      
         [Fact]
         [Trait("TestType", "UnitTest")]
         public async Task GetListEvents_WithInvalidId_ThrowsException()
@@ -164,6 +167,28 @@ namespace CBS.Siren.Test
             Assert.Equal(createdEvent.Id, savedList.Events[expectedIndex].Id);
         }
 
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData(RelativePosition.Above, 1)]
+        [InlineData(RelativePosition.Below, 2)]
+        public async Task AddEvent_WithPositionData_ShouldCallIntoListService(RelativePosition position, int expectedIndex)
+        {
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            creationDTO.ListPosition = new ListPositionDTO()
+            {
+                RelativePosition = position,
+                AssociatedEventId = _transmissionList.Events[1].Id
+            };
+
+            await codeUnderTest.AddEvent(1, creationDTO);
+
+            _listService.Verify((service) => service.OnTransmissionListChanged(expectedIndex));
+        }
+
         #endregion
 
         #region Remove
@@ -208,6 +233,18 @@ namespace CBS.Siren.Test
             await codeUnderTest.RemoveEvent(1, eventId);
 
             _dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task RemoveEvent_WithValidInput_ShouldCallIntoListService()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            int eventId = _transmissionList.Events[1].Id;
+            await codeUnderTest.RemoveEvent(1, eventId);
+
+            _listService.Verify((service) => service.OnTransmissionListChanged(1));
         }
 
         #endregion
