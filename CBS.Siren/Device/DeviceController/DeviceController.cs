@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,15 +23,33 @@ namespace CBS.Siren.Device
         private DeviceList _activeDeviceList;
         public DeviceList ActiveDeviceList { 
             get => _activeDeviceList; 
-            set {
-                lock (_deviceListLock)
+            set { UpdateActiveDeviceList(value); } 
+        }
+
+        private void UpdateActiveDeviceList(DeviceList value)
+        {
+            lock (_deviceListLock)
+            {
+                if(_activeDeviceList == null)
                 {
                     _activeDeviceList = value;
                     _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
                     EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
                 }
-                _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
-            } 
+                else
+                {
+                    int replacePosition = _activeDeviceList.Events.FindIndex((listEvent) => listEvent.Id == value.Events[0].Id);
+                    if(replacePosition != -1)
+                    {
+                        _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
+                    }
+
+                    value.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    _activeDeviceList.Events.AddRange(value.Events);
+                }
+
+            }
+            _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
         }
 
         private int EventIndex { get; set; } = INVALID_INDEX;

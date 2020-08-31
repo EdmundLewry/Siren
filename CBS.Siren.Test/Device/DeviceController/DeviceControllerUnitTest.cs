@@ -42,6 +42,45 @@ namespace CBS.Siren.Test.Device
 
             Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
         }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndEventIsNotFound_AddsCurrentEvents()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = generatedList;
+            
+            DeviceList updateList = GenerateTestDeviceList();
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
+            Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[1].Id);
+            Assert.Equal(DeviceListEventState.Status.CUED, deviceController.ActiveDeviceList.Events[1].EventState.CurrentStatus);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndEventIsFound_ReplacesFromThatEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList();
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3));
+            generatedList.Events.Add(deviceListEvent);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent });
+            updateList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
+            Assert.Equal(3, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[1].Id);
+            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[2].Id);
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
