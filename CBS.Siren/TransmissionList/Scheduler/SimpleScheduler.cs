@@ -20,8 +20,14 @@ namespace CBS.Siren
             for(int i = startIndex; i<transmissionList.Events.Count; ++i)
             {
                 TransmissionListEvent transmissionEvent = transmissionList.Events[i];
-                transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
-                transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
+                if(!transmissionEvent.HasStartedPlayingOut())
+                {
+                    transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
+                }
+                if(!transmissionEvent.HasCompleted())
+                {
+                    transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
+                }
             }
 
             return transmissionList;

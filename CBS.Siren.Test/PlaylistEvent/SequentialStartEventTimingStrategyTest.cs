@@ -49,7 +49,7 @@ namespace CBS.Siren.Test
             DateTime target = DateTime.Now;
             DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
-            Assert.True(target.DifferenceInFrames(startTime)==0);
+            Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
         
         [Fact]
@@ -62,6 +62,7 @@ namespace CBS.Siren.Test
             DateTime target = DateTime.Parse("01/01/2020 14:30:00");
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>())
             {
+                Id = 1,
                 ExpectedDuration = new TimeSpan(0, 30, 0),
                 ExpectedStartTime = target,
                 ActualStartTime = target
@@ -70,7 +71,7 @@ namespace CBS.Siren.Test
 
             DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
-            Assert.True(target.DifferenceInFrames(startTime)==0);
+            Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
         
         [Fact]

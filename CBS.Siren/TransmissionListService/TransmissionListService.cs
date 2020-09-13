@@ -64,23 +64,36 @@ namespace CBS.Siren
                     }
                 case DeviceListEventState.Status.PLAYING:
                     {
-                        UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
+                        if(effectedEvent.EventState.CurrentStatus != TransmissionListEventState.Status.PLAYING)
+                        {
+                            OnTransmissionListEventStartedPlaying(effectedEvent);
+                        }
                         break;
                     }
                 case DeviceListEventState.Status.PLAYED:
                     {
                         if(IsTransmissionListEventPlayed(effectedEvent, DeviceListEventStore))
                         {
-                            OnTransmissionListPlayedOutSuccessfully(effectedEvent);
+                            OnTransmissionListEventPlayedOutSuccessfully(effectedEvent);
                         }
                         break;
                     }
             }
         }
 
-        private void OnTransmissionListPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
+        private void OnTransmissionListEventStartedPlaying(TransmissionListEvent effectedEvent)
+        {
+            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
+            if (!effectedEvent.ActualStartTime.HasValue)
+            {
+                effectedEvent.ActualStartTime = DateTime.Now;
+            }
+        }
+
+        private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
         {
             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
+            effectedEvent.ActualEndTime = DateTime.Now;
             if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
             {
                 TransmissionList.State = TransmissionListState.Stopped;

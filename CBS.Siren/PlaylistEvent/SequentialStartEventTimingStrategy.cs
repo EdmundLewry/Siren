@@ -27,10 +27,12 @@ namespace CBS.Siren
 
             //This is not very efficient...
             TransmissionListEvent precedingEvent = null;
+            TransmissionListEvent relatedEvent = null;
             foreach(TransmissionListEvent listEvent in list.Events)
             {
                 if(listEvent.Id == eventId)
                 {
+                    relatedEvent = listEvent;
                     break;
                 }
 
@@ -39,7 +41,7 @@ namespace CBS.Siren
 
             if(precedingEvent == null)
             {
-                return DateTime.Now;
+                return relatedEvent?.ActualStartTime ?? DateTime.Now;
             }
 
             return precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
