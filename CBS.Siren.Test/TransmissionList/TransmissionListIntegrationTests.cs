@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Collections.Generic;
 using CBS.Siren.DTO;
-using System.Linq;
 using System;
 using System.Text;
 using Xunit.Abstractions;

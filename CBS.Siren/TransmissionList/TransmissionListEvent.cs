@@ -23,9 +23,10 @@ namespace CBS.Siren
         public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }
 
-        //Probably need an actual start time here
         public TimeSpan ExpectedDuration { get; set; }
         public DateTime ExpectedStartTime { get; set; }
+        public DateTime? ActualStartTime { get; set; } = null;
+        public DateTime? ActualEndTime { get; set; } = null;
 
         //I think this should just be a way to reference the related playlist event
         //There may not be a related event, so this could be null. We may choose to do
@@ -39,12 +40,14 @@ namespace CBS.Siren
             EventTimingStrategy = eventTiming;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             string returnValue = base.ToString() +
                     $":\nId: {Id}" +
                     $"\nExpectedStartTime: {ExpectedStartTime.ToTimecodeString()}" +
                     $"\nExpectedDuration: {ExpectedDuration.ToTimecodeString()}" +
+                    $"\nActualStartTime: {(ActualStartTime != null ? ActualStartTime?.ToTimecodeString() : "null")}" +
+                    $"\nActualEndTime: {(ActualEndTime != null ? ActualEndTime?.ToTimecodeString() : "null")}" +
                     $"\nTimingStategy - {EventTimingStrategy?.ToString()}" +
                     $"\nRelated Playlist Event Id: {RelatedPlaylistEvent?.Id}";
 

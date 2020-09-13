@@ -21,6 +21,8 @@ namespace CBS.Siren.Test
         private TransmissionListEvent event4;
         private readonly TransmissionList transmissionList;
 
+        private readonly DateTime calculatedStartTime = DateTime.Parse("01/01/2020 14:30:00");
+
         public SimpleSchedulerUnitTests()
         {
             transmissionList = GenerateTransmissionList();
@@ -29,7 +31,7 @@ namespace CBS.Siren.Test
         private TransmissionList GenerateTransmissionList()
         {
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
-            mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime(It.IsAny<int>(), It.IsAny<TransmissionList>())).Returns(DateTime.Parse("01/01/2020 14:30:00"));
+            mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime(It.IsAny<int>(), It.IsAny<TransmissionList>())).Returns(calculatedStartTime);
 
             event1 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object));
             event2 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object));
@@ -176,6 +178,79 @@ namespace CBS.Siren.Test
             Assert.Equal(750, TimeSpanExtensions.FromTimecodeString(sourceDataElement.GetProperty("eom").GetString()).TotalFrames());
             
             Assert.Equal(event1.Id, deviceListEvent.RelatedTransmissionListEventId);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenActualStartTimeNotSet_ShouldSetExpectedStartTimeFromTimingStrategy()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            Assert.Equal(event1.ExpectedStartTime, calculatedStartTime);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenActualStartTimeSet_ShouldNotSetEitherStartTime()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+            DateTime targetActualStart = DateTime.Parse("01/01/2020 20:30:00");
+            event1.ActualStartTime = targetActualStart;
+            DateTime targetExpectedStart = DateTime.Parse("01/01/2020 19:30:00");
+            event1.ExpectedStartTime = targetExpectedStart;
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            Assert.Equal(event1.ActualStartTime, targetActualStart);
+            Assert.Equal(event1.ExpectedStartTime, targetExpectedStart);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenActualEndTimeNotSet_ShouldSetExpectedDurationFromLongestFeatureDuration()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+            
+            TimeSpan longestDuration = new TimeSpan(0, 0, 40);
+            Mock<IEventFeature> extraFeature = GenerateMockFeature(mockDevice1.Object);
+            extraFeature.Setup(mock => mock.CalculateDuration()).Returns(longestDuration);
+            event1.EventFeatures.Add(extraFeature.Object);
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            Assert.Equal(event1.ExpectedDuration, longestDuration);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenActualEndTimeSet_ShouldNotUpdateExpectedDuration()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+            
+            Mock<IEventFeature> extraFeature = GenerateMockFeature(mockDevice1.Object);
+            extraFeature.Setup(mock => mock.CalculateDuration()).Returns(new TimeSpan(0, 0, 40));
+            event1.EventFeatures.Add(extraFeature.Object);
+            TimeSpan setDuration = new TimeSpan(0, 0, 20);
+            event1.ExpectedDuration = setDuration;
+            event1.ActualEndTime = calculatedStartTime;
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            Assert.Equal(event1.ExpectedDuration, setDuration);
         }
 
         [Fact]

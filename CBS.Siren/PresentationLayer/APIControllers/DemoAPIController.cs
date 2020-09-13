@@ -10,7 +10,7 @@ namespace CBS.Siren.Controllers
     public class DemoAPIController : ControllerBase
     {
         private readonly ILogger<DemoAPIController> _logger;
-        private SirenApplication _application;
+        private readonly SirenApplication _application;
 
         public DemoAPIController(ILogger<DemoAPIController> logger, SirenApplication application)
         {

@@ -54,6 +54,27 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void CalculateStartTime_WhenEventContainsActualStartTime_ReportsActualStartTime()
+        {
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
+
+            DateTime target = DateTime.Parse("01/01/2020 14:30:00");
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>())
+            {
+                ExpectedDuration = new TimeSpan(0, 30, 0),
+                ExpectedStartTime = target,
+                ActualStartTime = target
+            };
+            list.Events.Add(listEvent);
+
+            DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
+
+            Assert.True(target.DifferenceInFrames(startTime)==0);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventIsValid_ReportsStartAfterPreviousEvent()
         {
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);

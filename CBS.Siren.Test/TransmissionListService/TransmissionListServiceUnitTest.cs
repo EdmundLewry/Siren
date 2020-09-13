@@ -1,6 +1,7 @@
 ﻿using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -250,7 +251,32 @@ namespace CBS.Siren.Test
 
             Assert.Equal(TransmissionListEventState.Status.PLAYING, event1.EventState.CurrentStatus);
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldSetTransmissionListEventActualStartTime()
+        {
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
 
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object);
+            event1.EventFeatures[0].DeviceListEventId = deviceEvent1.Id;
+            event1.EventFeatures[1].DeviceListEventId = deviceEvent2.Id;
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<IDeviceListEventStore>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            DateTime earliestStartTime = DateTime.Now;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
+            DateTime latestStartTime = DateTime.Now;
+
+            Assert.NotNull(event1.ActualStartTime);
+            Assert.True(event1.ActualStartTime.Value >= earliestStartTime && event1.ActualStartTime.Value <= latestStartTime);
+        }
+        
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenAllDeviceListEventsPlayed_ShouldChangeTransmissionListEventToPlayed()
@@ -277,7 +303,37 @@ namespace CBS.Siren.Test
 
             Assert.Equal(TransmissionListEventState.Status.PLAYED, event1.EventState.CurrentStatus);
         }
-        
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenAllDeviceListEventsPlayed_ShouldSetTransmissionListEventActualEndTime()
+        {
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            var mockDeviceEventStore = CreateMockDeviceListEventStore(deviceEvent1, deviceEvent2);
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object);
+            event1.EventFeatures[0].DeviceListEventId = deviceEvent1.Id;
+            event1.EventFeatures[1].DeviceListEventId = deviceEvent2.Id;
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, mockDeviceEventStore.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            DateTime earliestEndTime = DateTime.Now;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            DateTime latestEndTime = DateTime.Now;
+
+            Assert.NotNull(event1.ActualEndTime);
+            Assert.True(event1.ActualEndTime.Value >= earliestEndTime && event1.ActualEndTime.Value <= latestEndTime);
+        }
+
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenWhenLastEventSetToPlayed_ShouldChangeTransmissionListStateToStopped()
