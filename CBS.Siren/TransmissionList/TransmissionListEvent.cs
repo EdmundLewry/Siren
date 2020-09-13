@@ -23,6 +23,7 @@ namespace CBS.Siren
         public IEventTimingStrategy EventTimingStrategy { get; set; }
         public List<IEventFeature> EventFeatures { get; set; }
 
+        //Probably need an actual start time here
         public TimeSpan ExpectedDuration { get; set; }
         public DateTime ExpectedStartTime { get; set; }
 

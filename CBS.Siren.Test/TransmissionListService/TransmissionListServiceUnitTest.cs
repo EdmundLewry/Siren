@@ -277,6 +277,33 @@ namespace CBS.Siren.Test
 
             Assert.Equal(TransmissionListEventState.Status.PLAYED, event1.EventState.CurrentStatus);
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenWhenLastEventSetToPlayed_ShouldChangeTransmissionListStateToStopped()
+        {
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            var mockDeviceEventStore = CreateMockDeviceListEventStore(deviceEvent1, deviceEvent2);
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object);
+            event1.EventFeatures[0].DeviceListEventId = deviceEvent1.Id;
+            event1.EventFeatures[1].DeviceListEventId = deviceEvent2.Id;
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, mockDeviceEventStore.Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+
+            Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -318,8 +345,11 @@ namespace CBS.Siren.Test
             var mockScheduler = new Mock<IScheduler>();
             mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
 
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
-            transmissionList.State = TransmissionListState.Playing;
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null)
+            {
+                State = TransmissionListState.Playing,
+                Events = new List<TransmissionListEvent>() { GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object) }
+            };
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
                                                                                          new Mock<IDeviceListEventWatcher>().Object,
                                                                                          new Mock<IDeviceListEventStore>().Object,
@@ -331,6 +361,36 @@ namespace CBS.Siren.Test
             serviceUnderTest.OnTransmissionListChanged();
 
             mockDevice.VerifySet(mock => mock.ActiveList = It.IsAny<DeviceList>());
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void OnTransmissionListChanged_WhenListIsEmpty_SetsStateToStopped()
+        {
+            var mockDevice = new Mock<IDevice>();
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>()
+            {
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
+            };
+            var mockScheduler = new Mock<IScheduler>();
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null)
+            {
+                State = TransmissionListState.Playing
+            };
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
+                                                                                         new Mock<IDeviceListEventWatcher>().Object,
+                                                                                         new Mock<IDeviceListEventStore>().Object,
+                                                                                         new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.OnTransmissionListChanged();
+
+            Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
         }
 
         [Fact]

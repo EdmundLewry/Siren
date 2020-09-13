@@ -207,7 +207,7 @@ namespace CBS.Siren.Test
         {
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
-            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent(1, 30));
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.RemoveEvent(1, 3000));
         }
         
         [Fact]

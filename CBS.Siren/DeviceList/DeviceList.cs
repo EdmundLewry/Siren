@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -17,6 +18,11 @@ namespace CBS.Siren
         public DeviceList(List<DeviceListEvent> events)
         {
             Events = events;
+        }
+
+        public DeviceList(DeviceList deviceList)
+        {
+            Events = deviceList.Events.Select((listEvent) => new DeviceListEvent(listEvent)).ToList();
         }
 
         public override string ToString()

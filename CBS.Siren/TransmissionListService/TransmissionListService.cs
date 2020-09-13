@@ -71,10 +71,19 @@ namespace CBS.Siren
                     {
                         if(IsTransmissionListEventPlayed(effectedEvent, DeviceListEventStore))
                         {
-                            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
+                            OnTransmissionListPlayedOutSuccessfully(effectedEvent);
                         }
                         break;
                     }
+            }
+        }
+
+        private void OnTransmissionListPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
+        {
+            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
+            if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
+            {
+                TransmissionList.State = TransmissionListState.Stopped;
             }
         }
 
@@ -122,8 +131,14 @@ namespace CBS.Siren
 
         public void OnTransmissionListChanged(int changeIndex = 0)
         {
+            if(!TransmissionList.Events.Any())
+            {
+                TransmissionList.State = TransmissionListState.Stopped;
+                return;
+            }
+
             //I wonder if we want to do some sort of dry run scheduling implementation?
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore/*, changeIndex*/);
 
             if(TransmissionList?.State == TransmissionListState.Playing)
             {

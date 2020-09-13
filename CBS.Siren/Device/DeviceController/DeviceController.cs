@@ -26,38 +26,64 @@ namespace CBS.Siren.Device
             set { UpdateActiveDeviceList(value); } 
         }
 
-        private void UpdateActiveDeviceList(DeviceList value)
-        {
-            lock (_deviceListLock)
-            {
-                if(_activeDeviceList == null)
-                {
-                    _activeDeviceList = value;
-                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
-                    EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
-                }
-                else
-                {
-                    int replacePosition = _activeDeviceList.Events.FindIndex((listEvent) => listEvent.Id == value.Events[0].Id);
-                    if(replacePosition != -1)
-                    {
-                        _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
-                    }
-
-                    value.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
-                    _activeDeviceList.Events.AddRange(value.Events);
-                }
-
-            }
-            _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
-        }
-
         private int EventIndex { get; set; } = INVALID_INDEX;
         public DeviceListEvent CurrentEvent { get => EventIndex==INVALID_INDEX ? null : ActiveDeviceList.Events[EventIndex]; }
 
         public DeviceController(ILogger logger)
         {
             _logger = logger;
+        }
+
+        private void UpdateActiveDeviceList(DeviceList value)
+        {
+            lock (_deviceListLock)
+            {
+                if (_activeDeviceList == null)
+                {
+                    _activeDeviceList = new DeviceList(value);
+                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
+                }
+                else
+                {
+                    DeviceList incomingList = new DeviceList(value);
+                    int replacePosition = FindReplacePosition(incomingList);
+                    PrepareListsForReplace(incomingList, replacePosition);
+
+                    incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    _activeDeviceList.Events.AddRange(incomingList.Events);
+                }
+
+            }
+            _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
+        }
+
+        private void PrepareListsForReplace(DeviceList value, int replacePosition)
+        {
+            if (replacePosition == -1)
+            {
+                value.Events.RemoveRange(0, _activeDeviceList.Events.Count);
+                return;
+            }
+
+            _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
+            if (replacePosition <= value.Events.Count)
+            {
+                value.Events.RemoveRange(0, replacePosition);
+            }
+        }
+
+        private int FindReplacePosition(DeviceList incomingList)
+        {
+            for (int i = 0; i < _activeDeviceList.Events.Count; ++i)
+            {
+                if (i >= incomingList.Events.Count || _activeDeviceList.Events[i].Id != incomingList.Events[i].Id)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         public async Task Run(CancellationToken token)

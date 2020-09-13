@@ -40,7 +40,10 @@ namespace CBS.Siren
             {
                 TransmissionListEvent transmissionEvent = transmissionList.Events[i];
                 TranslateListEventToDeviceEvents(transmissionEvent, deviceLists, deviceListEventStore); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
-                transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
+                if(transmissionEvent.EventState.CurrentStatus == TransmissionListEventState.Status.UNSCHEDULED)
+                {
+                    transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
+                }
             }
 
             return deviceLists;

@@ -14,23 +14,25 @@ namespace CBS.Siren.Test.Device
     {
         private const int TIMEOUT = 2000;
 
-        private DeviceList GenerateTestDeviceList()
+        private DeviceList GenerateTestDeviceList(int count = 1)
         {
-            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTime.Now.AddMilliseconds(50), DateTime.Now.AddSeconds(1));
-            DeviceList deviceList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent });
+            List<DeviceListEvent> events = new List<DeviceListEvent>();
+            for(int i=0; i<count; ++i)
+            {
+                events.Add(GenerateDeviceListEvent(DateTime.Now.AddMilliseconds(50), DateTime.Now.AddSeconds(1)));
+            }
 
-            return deviceList;
+            return new DeviceList(events);
         }
 
         private DeviceListEvent GenerateDeviceListEvent(DateTime startTime, DateTime endTime)
         {
             string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToTimecodeString()}\",\"duration\":\"00:00:25:00\",\"endTime\":\"{endTime.ToTimecodeString()}\"}}}}";
 
-            DeviceListEvent deviceListEvent = new DeviceListEvent(eventData);
-
-            return deviceListEvent;
+            return new DeviceListEvent(eventData);
         }
 
+        #region Device List Set
         [Fact]
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_DeviceController_SetsCurrentEvent()
@@ -40,78 +42,135 @@ namespace CBS.Siren.Test.Device
 
             deviceController.ActiveDeviceList = generatedList;
 
-            Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
         }
         
         [Fact]
         [Trait("TestType","UnitTest")]
-        public void WhenDeviceListSet_WithExistingActiveListAndEventIsNotFound_AddsCurrentEvents()
+        public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenAdded_AddsNewEvent()
         {
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
             
-            DeviceList updateList = GenerateTestDeviceList();
+            DeviceList updateList = GenerateTestDeviceList(2);
+            updateList.Events[0].Id = generatedList.Events[0].Id;
             deviceController.ActiveDeviceList = updateList;
 
-            Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
             Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
-            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[1].Id);
-            Assert.Equal(DeviceListEventState.Status.CUED, deviceController.ActiveDeviceList.Events[1].EventState.CurrentStatus);
+            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventState.Status.CUED, listEvent.EventState.CurrentStatus));
         }
         
         [Fact]
         [Trait("TestType","UnitTest")]
-        public void WhenDeviceListSet_WithExistingActiveListAndEventIsFound_ReplacesFromThatEvent()
+        public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenAdded_SetsNewEventToCued()
         {
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             DeviceList generatedList = GenerateTestDeviceList();
-            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3));
-            generatedList.Events.Add(deviceListEvent);
+
+            deviceController.ActiveDeviceList = generatedList;
+            
+            DeviceList updateList = GenerateTestDeviceList(2);
+            updateList.Events[0].Id = generatedList.Events[0].Id;
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventState.Status.CUED, listEvent.EventState.CurrentStatus));
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenReplaced_ReplacesEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList(2);
 
             deviceController.ActiveDeviceList = generatedList;
 
-            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent });
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
             updateList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
             deviceController.ActiveDeviceList = updateList;
 
-            Assert.Equal(generatedList.Events[0], deviceController.CurrentEvent);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
+            Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[1].Id);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndEventAddedAboveKnownEvent_ReplacesFromThatEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList(2);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
+            updateList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+            updateList.Events.Add(generatedList.Events[1]);
+
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
             Assert.Equal(3, deviceController.ActiveDeviceList.Events.Count);
-            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[1].Id);
-            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[2].Id);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[1].Id);
+            Assert.Equal(generatedList.Events[1].Id, deviceController.ActiveDeviceList.Events[2].Id);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndFinalEventDeleted_RemovesFinalEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList(2);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
+            Assert.Single(deviceController.ActiveDeviceList.Events);
+            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndMiddleEventDeleted_RemovesMiddleEventFromActiveList()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList(3);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0], generatedList.Events[2] });
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
+            Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.Equal(generatedList.Events[2].Id, deviceController.ActiveDeviceList.Events[1].Id);
         }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public async Task WhenCurrentEventEnds_DeviceController_ChangesCurrentEvent()
+        public void WhenDeviceListSet_DeviceController_SetsEventsStateToCued()
         {
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
             DeviceList generatedList = GenerateTestDeviceList();
-            generatedList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
 
             deviceController.ActiveDeviceList = generatedList;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
-            Task deviceControllerTask = Task.Run(() => deviceController.Run(cancellationTokenSource.Token));
-
-            deviceController.OnEventEnded += (sender, args) => {
-                if(args.AffectedEvent.Id == generatedList.Events[0].Id)
-                { 
-                    cancellationTokenSource.Cancel();
-                }
-            };
-
-            await deviceControllerTask;
-
-            Assert.Equal(generatedList.Events[1], deviceController.CurrentEvent);
-
-            if(cancellationTokenSource.Token.CanBeCanceled)
-            { 
-                cancellationTokenSource.Cancel();
-            }
+            Assert.Equal(DeviceListEventState.Status.CUED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
         }
 
+        #endregion
+
+        #region Event Start
         [Fact]
         [Trait("TestType", "UnitTest")]
         public async Task WhenEventStartTimeIsMet_DeviceController_EmitsEventStartEvent()
@@ -169,6 +228,65 @@ namespace CBS.Siren.Test.Device
             deviceController.OnEventStarted -= eventHandler;
         }
 
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task WhenEventStarts_DeviceController_SetsEventsStateToPlaying()
+        {
+            TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            deviceController.OnEventStarted += eventHandler;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+
+            deviceController.ActiveDeviceList = deviceList;
+            _ = deviceController.Run(cancellationTokenSource.Token);
+
+            await taskCompletionSource.Task;
+
+            Assert.Equal(DeviceListEventState.Status.PLAYING, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            deviceController.OnEventStarted -= eventHandler;
+        }
+        #endregion
+
+        #region Event End
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task WhenCurrentEventEnds_DeviceController_ChangesCurrentEvent()
+        {
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            DeviceList generatedList = GenerateTestDeviceList();
+            generatedList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+            Task deviceControllerTask = Task.Run(() => deviceController.Run(cancellationTokenSource.Token));
+
+            deviceController.OnEventEnded += (sender, args) => {
+                if (args.AffectedEvent.Id == generatedList.Events[0].Id)
+                {
+                    cancellationTokenSource.Cancel();
+                }
+            };
+
+            await deviceControllerTask;
+
+            Assert.Equal(generatedList.Events[1].Id, deviceController.CurrentEvent.Id);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -256,50 +374,8 @@ namespace CBS.Siren.Test.Device
             }
         }
 
-        //Could expose and test the internal functions and make the above integration tests - But choosing not to as this is a demo implementation
-
         [Fact]
-        [Trait("TestType","UnitTest")]
-        public void WhenDeviceListSet_DeviceController_SetsEventsStateToUnscheduled()
-        {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            DeviceList generatedList = GenerateTestDeviceList();
-
-            deviceController.ActiveDeviceList = generatedList;
-
-            Assert.Equal(DeviceListEventState.Status.CUED, generatedList.Events[0].EventState.CurrentStatus);
-        }
-        
-        [Fact]
-        [Trait("TestType","UnitTest")]
-        public async Task WhenEventStarts_DeviceController_SetsEventsStateToPlaying()
-        {
-            TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
-            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            deviceController.OnEventStarted += eventHandler;
-
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
-
-            DeviceList deviceList = GenerateTestDeviceList();
-
-            deviceController.ActiveDeviceList = deviceList;
-            _ = deviceController.Run(cancellationTokenSource.Token);
-
-            await taskCompletionSource.Task;
-
-            Assert.Equal(DeviceListEventState.Status.PLAYING, deviceList.Events[0].EventState.CurrentStatus);
-
-            if (cancellationTokenSource.Token.CanBeCanceled)
-            {
-                cancellationTokenSource.Cancel();
-            }
-
-            deviceController.OnEventStarted -= eventHandler;
-        }
-        
-        [Fact]
-        [Trait("TestType","UnitTest")]
+        [Trait("TestType", "UnitTest")]
         public async Task WhenEventEnds_DeviceController_SetsEventsStateToPlayed()
         {
             TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
@@ -316,7 +392,7 @@ namespace CBS.Siren.Test.Device
 
             await taskCompletionSource.Task;
 
-            Assert.Equal(DeviceListEventState.Status.PLAYED, deviceList.Events[0].EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventState.Status.PLAYED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
 
             if (cancellationTokenSource.Token.CanBeCanceled)
             {
@@ -325,5 +401,6 @@ namespace CBS.Siren.Test.Device
 
             deviceController.OnEventEnded -= eventHandler;
         }
+        #endregion
     }
 }

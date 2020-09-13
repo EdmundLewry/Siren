@@ -214,7 +214,7 @@ namespace CBS.Siren.Test
 
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void ScheduleTranmissionList_ShouldSetTransmissionListEventStatus_ToScheduled()
+        public void ScheduleTranmissionList_WhenEventStateIsUnscheduled_ShouldSetTransmissionListEventStatusToScheduled()
         {
             var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
             mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
@@ -224,6 +224,25 @@ namespace CBS.Siren.Test
             _ = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
 
             Assert.All(transmissionList.Events, (listEvent) => Assert.Equal(TransmissionListEventState.Status.SCHEDULED, listEvent.EventState.CurrentStatus));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTranmissionList_WhenEventStateIsNotUnscheduled_ShouldNotUpdateEventState()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+
+            event1.EventState.CurrentStatus = TransmissionListEventState.Status.CUED;
+            event2.EventState.CurrentStatus = TransmissionListEventState.Status.CUEING;
+            event3.EventState.CurrentStatus = TransmissionListEventState.Status.PLAYED;
+            event4.EventState.CurrentStatus = TransmissionListEventState.Status.PLAYING;
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            _ = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            Assert.All(transmissionList.Events, (listEvent) => Assert.NotEqual(TransmissionListEventState.Status.SCHEDULED, listEvent.EventState.CurrentStatus));
         }
 
 

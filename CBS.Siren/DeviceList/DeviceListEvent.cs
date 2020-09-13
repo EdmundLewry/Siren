@@ -36,6 +36,14 @@ namespace CBS.Siren
             ProcessEventData();
         }
 
+        public DeviceListEvent(DeviceListEvent listEvent)
+        {
+            Id = listEvent.Id;
+            RelatedTransmissionListEventId = listEvent.RelatedTransmissionListEventId;
+            EventData = listEvent.EventData;
+            ProcessEventData();
+        }
+
         private void ProcessEventData()
         {
             //Should do better error handling here

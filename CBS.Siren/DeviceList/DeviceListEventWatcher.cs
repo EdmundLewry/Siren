@@ -49,7 +49,7 @@ namespace CBS.Siren
                 return;
             }
 
-            Subscriptions[device].ForEach((listerner) => listerner.OnDeviceListEventStatusChanged(args.EventId, args.RelatedTransmissionListEventId, args.NewState));
+            Subscriptions[device].ForEach((listener) => listener.OnDeviceListEventStatusChanged(args.EventId, args.RelatedTransmissionListEventId, args.NewState));
         }
 
         #region IDisposable Support
