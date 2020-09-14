@@ -15,8 +15,9 @@ namespace CBS.Siren.Device
         private bool _eventHasStarted = false;
         private readonly object _deviceListLock = new object();
 
-        public event EventHandler<DeviceEventChangedEventArgs> OnEventStarted = delegate { };
-        public event EventHandler<DeviceEventChangedEventArgs> OnEventEnded = delegate { };
+        public event EventHandler<DeviceEventChangedEventArgs> OnEventCue = delegate { };
+        public event EventHandler<DeviceEventChangedEventArgs> OnEventStart = delegate { };
+        public event EventHandler<DeviceEventChangedEventArgs> OnEventEnd = delegate { };
         public event EventHandler<EventArgs> OnDeviceListEnded = delegate { };
 
         private DeviceList _activeDeviceList;
@@ -26,7 +27,7 @@ namespace CBS.Siren.Device
                 lock (_deviceListLock)
                 {
                     _activeDeviceList = value;
-                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    _activeDeviceList.Events.ForEach(listEvent => OnEventCue?.Invoke(this, new DeviceEventChangedEventArgs(listEvent)) );
                     EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
                 }
                 _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
@@ -100,7 +101,7 @@ namespace CBS.Siren.Device
 
             _eventHasStarted = false;
             endedEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            OnEventEnded?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
+            OnEventEnd?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
         }
 
         private bool CheckForEventStart()
@@ -113,7 +114,7 @@ namespace CBS.Siren.Device
         {
             _eventHasStarted = true;
             CurrentEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
-            OnEventStarted?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
+            OnEventStart?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
         }
     }
 }

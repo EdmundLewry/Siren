@@ -6,8 +6,9 @@ namespace CBS.Siren.Device
 {
     public interface IDeviceController
     {
-        event EventHandler<DeviceEventChangedEventArgs> OnEventStarted;
-        event EventHandler<DeviceEventChangedEventArgs> OnEventEnded;
+        event EventHandler<DeviceEventChangedEventArgs> OnEventCue;
+        event EventHandler<DeviceEventChangedEventArgs> OnEventStart;
+        event EventHandler<DeviceEventChangedEventArgs> OnEventEnd;
         event EventHandler<EventArgs> OnDeviceListEnded;
 
         DeviceList ActiveDeviceList { get; set; }

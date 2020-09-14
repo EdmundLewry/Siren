@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace CBS.Siren.Device
 {
@@ -15,14 +16,15 @@ namespace CBS.Siren.Device
         public ILoggerFactory LoggerFactory { get; }
         public IDeviceFactory DeviceFactory { get; }
         public Dictionary<int, DeviceProcess> Devices { get; } = new Dictionary<int, DeviceProcess>();
+        private IHttpClientFactory _httpClientFactory;
 
-        public DeviceManager(IDataLayer dataLayer, ILogger<DeviceManager> logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory)
+        public DeviceManager(IDataLayer dataLayer, ILogger<DeviceManager> logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory, IHttpClientFactory httpClientFactory)
         {
             DataLayer = dataLayer;
             Logger = logger;
             LoggerFactory = loggerFactory;
             DeviceFactory = deviceFactory;
-
+            _httpClientFactory = httpClientFactory;
             ConstructExistingDevices();
         }
 
@@ -63,7 +65,7 @@ namespace CBS.Siren.Device
 
         private void CreateDevice(DeviceModel deviceModel)
         {
-            IDevice device = DeviceFactory.CreateDemoDevice(deviceModel, LoggerFactory);
+            IDevice device = DeviceFactory.CreatePoseidonDevice(deviceModel, LoggerFactory, _httpClientFactory);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async (deviceProcess) => await StartDeviceThread(deviceProcess));
 

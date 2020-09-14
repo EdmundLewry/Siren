@@ -31,23 +31,36 @@ namespace CBS.Siren.Device
             Model = model;
             Controller = controller;
             Driver = driver;
+
             DeviceEventChangeEventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => HandleDeviceEventChange(args));
             DeviceListEndEventHandler = new EventHandler<EventArgs>((sender, args) => AssessDeviceStatus());
             SubscribeToControllerEvents();
+            SubscribeToDriverEvents();
         }
 
         private void SubscribeToControllerEvents()
         {
-            Controller.OnEventStarted += DeviceEventChangeEventHandler;
-            Controller.OnEventEnded += DeviceEventChangeEventHandler;
-            Controller.OnDeviceListEnded += DeviceListEndEventHandler;
+            Controller.OnEventCue += (s, e) => Driver.CueEvent(e.AffectedEvent);
+            Controller.OnEventStart += (s, e) => Driver.StartEvent(e.AffectedEvent);
+            Controller.OnEventEnd += (s, e) => Driver.EndEvent(e.AffectedEvent);
+            //Controller.OnDeviceListEnded += DeviceListEndEventHandler;
         }
 
         private void UnsubscribeFromControllerEvents()
         {
-            Controller.OnEventStarted -= DeviceEventChangeEventHandler;
-            Controller.OnEventEnded -= DeviceEventChangeEventHandler;
+            Controller.OnEventStart -= DeviceEventChangeEventHandler;
+            Controller.OnEventEnd -= DeviceEventChangeEventHandler;
             Controller.OnDeviceListEnded -= DeviceListEndEventHandler;
+        }
+
+        private void SubscribeToDriverEvents()
+        {
+            //Driver.OnEventCued += (s, e) => 
+        }
+
+        private void UnsubscribeFromDriverEvents()
+        {
+
         }
 
         public override String ToString()
@@ -97,6 +110,7 @@ namespace CBS.Siren.Device
                 if (disposing)
                 {
                     UnsubscribeFromControllerEvents();
+                    UnsubscribeFromDriverEvents();
                     Driver.Dispose();
                 }
 

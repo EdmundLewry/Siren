@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using System.Net.Http;
 
 namespace CBS.Siren.Test
 {
@@ -16,6 +17,7 @@ namespace CBS.Siren.Test
         private readonly Mock<IDeviceFactory> _deviceFactory;
         private readonly Mock<IDevice> _mockDevice;
         private readonly Mock<IDataLayer> _dataLayer;
+        private readonly Mock<IHttpClientFactory> _httpClient;
 
         public DeviceManagerUnitTest()
         {
@@ -24,6 +26,7 @@ namespace CBS.Siren.Test
             _deviceFactory = new Mock<IDeviceFactory>();
             _mockDevice = new Mock<IDevice>();
             _dataLayer = new Mock<IDataLayer>();
+            _httpClient = new Mock<IHttpClientFactory>();
         }
 
         private DeviceManager CreateCodeUnderTest()
@@ -31,7 +34,7 @@ namespace CBS.Siren.Test
             _deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(_mockDevice.Object);
             _dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>())).ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } });
 
-            return new DeviceManager(_dataLayer.Object, _logger.Object, _loggerFactory.Object, _deviceFactory.Object);
+            return new DeviceManager(_dataLayer.Object, _logger.Object, _loggerFactory.Object, _deviceFactory.Object, _httpClient.Object);
         }
 
         [Fact]

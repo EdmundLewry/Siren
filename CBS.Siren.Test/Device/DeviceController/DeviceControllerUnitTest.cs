@@ -56,7 +56,7 @@ namespace CBS.Siren.Test.Device
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
             Task deviceControllerTask = Task.Run(() => deviceController.Run(cancellationTokenSource.Token));
 
-            deviceController.OnEventEnded += (sender, args) => {
+            deviceController.OnEventEnd += (sender, args) => {
                 if(args.AffectedEvent.Id == generatedList.Events[0].Id)
                 { 
                     cancellationTokenSource.Cancel();
@@ -83,8 +83,8 @@ namespace CBS.Siren.Test.Device
 
             DeviceList deviceList = GenerateTestDeviceList();
             var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
-                h => deviceController.OnEventStarted += h,
-                h => deviceController.OnEventStarted -= h,
+                h => deviceController.OnEventStart += h,
+                h => deviceController.OnEventStart -= h,
                 () => Task.Run(async () => {
                             deviceController.ActiveDeviceList = deviceList;
                             await deviceController.Run(cancellationTokenSource.Token);
@@ -110,7 +110,7 @@ namespace CBS.Siren.Test.Device
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            deviceController.OnEventStarted += eventHandler;
+            deviceController.OnEventStart += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -127,7 +127,7 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
 
-            deviceController.OnEventStarted -= eventHandler;
+            deviceController.OnEventStart -= eventHandler;
         }
 
 
@@ -141,8 +141,8 @@ namespace CBS.Siren.Test.Device
 
             DeviceList deviceList = GenerateTestDeviceList();
             var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
-                h => deviceController.OnEventEnded += h,
-                h => deviceController.OnEventEnded -= h,
+                h => deviceController.OnEventEnd += h,
+                h => deviceController.OnEventEnd -= h,
                 () => Task.Run(async () => {
                     deviceController.ActiveDeviceList = deviceList;
                     await deviceController.Run(cancellationTokenSource.Token);
@@ -168,7 +168,7 @@ namespace CBS.Siren.Test.Device
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            deviceController.OnEventEnded += eventHandler;
+            deviceController.OnEventEnd += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -185,7 +185,7 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
 
-            deviceController.OnEventEnded -= eventHandler;
+            deviceController.OnEventEnd -= eventHandler;
         }
         
         [Fact]
@@ -238,7 +238,7 @@ namespace CBS.Siren.Test.Device
             TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            deviceController.OnEventStarted += eventHandler;
+            deviceController.OnEventStart += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -256,7 +256,7 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
 
-            deviceController.OnEventStarted -= eventHandler;
+            deviceController.OnEventStart -= eventHandler;
         }
         
         [Fact]
@@ -266,7 +266,7 @@ namespace CBS.Siren.Test.Device
             TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
             IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
-            deviceController.OnEventEnded += eventHandler;
+            deviceController.OnEventEnd += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -284,7 +284,7 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
 
-            deviceController.OnEventEnded -= eventHandler;
+            deviceController.OnEventEnd -= eventHandler;
         }
     }
 }

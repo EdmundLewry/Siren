@@ -40,7 +40,7 @@ namespace CBS.Siren.Test.Device
             });
             device.OnDeviceStatusChanged += eventHandler;
 
-            mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
+            mockController.Raise(mock => mock.OnEventStart += null, new DeviceEventChangedEventArgs(returnEvent));
 
             Assert.Equal(1, callCount);
 
@@ -75,7 +75,7 @@ namespace CBS.Siren.Test.Device
             });
             device.OnDeviceStatusChanged += eventHandler;
 
-            mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
+            mockController.Raise(mock => mock.OnEventStart += null, new DeviceEventChangedEventArgs(returnEvent));
             mockController.Raise(mock => mock.OnDeviceListEnded += null, EventArgs.Empty);
 
             Assert.Equal(1, callCount);
@@ -105,7 +105,7 @@ namespace CBS.Siren.Test.Device
 
             DeviceListEventStatusChangeArgs expectedArgs = new DeviceListEventStatusChangeArgs(returnEvent.Id,  new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
             returnEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
-            mockController.Raise(mock => mock.OnEventStarted += null, new DeviceEventChangedEventArgs(returnEvent));
+            mockController.Raise(mock => mock.OnEventStart += null, new DeviceEventChangedEventArgs(returnEvent));
 
             Assert.Equal(device, receivedSender);
             Assert.Equal(expectedArgs.EventId, receivedArgs.EventId);

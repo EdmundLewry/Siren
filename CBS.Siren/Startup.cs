@@ -26,6 +26,7 @@ namespace CBS.Siren
 
             services.AddAutoMapper(typeof(Startup));
             
+            services.AddHttpClient();
             services.AddTransient<SirenApplication>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
             services.AddTransient<IDeviceFactory, DeviceFactory>();
@@ -35,6 +36,7 @@ namespace CBS.Siren
             services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
             services.AddTransient<IDeviceListEventFactory, DeviceListEventFactory>();
             services.AddTransient<ITransmissionListService, TransmissionListService>();
+            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -50,7 +52,7 @@ namespace CBS.Siren
             deviceManager.AddDevice("DemoDevice");
 
             IDataLayer dataLayer = app.ApplicationServices.GetService<IDataLayer>();
-            dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0,0,30)));
+            dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0,0,30), "C:/ProxyImage/TestClip1.mxf"));
 
             /* For this early stage we're just going to create a single transmission list to work on.
             This is because sat this stage of the application, it's not possible to add transmission lists
