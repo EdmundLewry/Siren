@@ -52,6 +52,21 @@
       {{row.expectedStartTime | timeStringDisplay}}
     </td>
   </ng-container>
+  
+  
+  <ng-container matColumnDef="actualStartTime">
+    <th mat-header-cell *matHeaderCellDef>Actual Start Time</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.actualStartTime | timeStringDisplay}}
+    </td>
+  </ng-container>
+  
+  <ng-container matColumnDef="actualEndTime">
+    <th mat-header-cell *matHeaderCellDef>Actual End Time</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.actualEndTime | timeStringDisplay}}
+    </td>
+  </ng-container>
 
   <ng-container matColumnDef="options">
     <th mat-header-cell *matHeaderCellDef></th>

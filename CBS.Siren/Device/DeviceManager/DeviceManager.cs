@@ -13,15 +13,17 @@ namespace CBS.Siren.Device
         public IDataLayer DataLayer { get; }
         public ILogger<DeviceManager> Logger { get; }
         public ILoggerFactory LoggerFactory { get; }
-        public IDeviceFactory DeviceFactory { get; }
+        public IDeviceFactory DeviceFactory { get; } 
+        public IDeviceListEventStore DeviceListEventStore { get; }
         public Dictionary<int, DeviceProcess> Devices { get; } = new Dictionary<int, DeviceProcess>();
 
-        public DeviceManager(IDataLayer dataLayer, ILogger<DeviceManager> logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory)
+        public DeviceManager(IDataLayer dataLayer, ILogger<DeviceManager> logger, ILoggerFactory loggerFactory, IDeviceFactory deviceFactory, IDeviceListEventStore deviceListEventStore)
         {
             DataLayer = dataLayer;
             Logger = logger;
             LoggerFactory = loggerFactory;
             DeviceFactory = deviceFactory;
+            DeviceListEventStore = deviceListEventStore;
 
             ConstructExistingDevices();
         }
@@ -63,7 +65,7 @@ namespace CBS.Siren.Device
 
         private void CreateDevice(DeviceModel deviceModel)
         {
-            IDevice device = DeviceFactory.CreateDemoDevice(deviceModel, LoggerFactory);
+            IDevice device = DeviceFactory.CreateDemoDevice(deviceModel, LoggerFactory, DeviceListEventStore);
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async (deviceProcess) => await StartDeviceThread(deviceProcess));
 

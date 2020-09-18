@@ -27,10 +27,12 @@ namespace CBS.Siren.Device
 
         private int EventIndex { get; set; } = INVALID_INDEX;
         public DeviceListEvent CurrentEvent { get => EventIndex==INVALID_INDEX ? null : ActiveDeviceList.Events[EventIndex]; }
+        public IDeviceListEventStore DeviceListEventStore { get; }
 
-        public DeviceController(ILogger logger)
+        public DeviceController(ILogger logger, IDeviceListEventStore deviceListEventStore)
         {
             _logger = logger;
+            DeviceListEventStore = deviceListEventStore;
         }
 
         private void UpdateActiveDeviceList(DeviceList value)
@@ -140,10 +142,12 @@ namespace CBS.Siren.Device
             {
                 EventIndex = INVALID_INDEX;
                 OnDeviceListEnded?.Invoke(this, EventArgs.Empty);
+                _activeDeviceList = null;
             }
 
             _eventHasStarted = false;
             endedEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            DeviceListEventStore.UpdateDeviceListEvent(endedEvent);
             OnEventEnded?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
         }
 
@@ -157,6 +161,7 @@ namespace CBS.Siren.Device
         {
             _eventHasStarted = true;
             CurrentEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
+            DeviceListEventStore.UpdateDeviceListEvent(CurrentEvent);
             OnEventStarted?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
         }
     }

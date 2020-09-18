@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace CBS.Siren
 {
@@ -7,18 +9,42 @@ namespace CBS.Siren
     //we do that
     public class DeviceListEventStore : IDeviceListEventStore
     {
-        public Dictionary<int, DeviceListEvent> CreatedEvents { get; private set; } = new Dictionary<int, DeviceListEvent>();
+        private readonly ILogger<DeviceListEventStore> _logger;
+        public ConcurrentDictionary<int, DeviceListEvent> CreatedEvents { get; private set; } = new ConcurrentDictionary<int, DeviceListEvent>();
 
+        public DeviceListEventStore(ILogger<DeviceListEventStore> logger)
+        {
+            _logger = logger;
+        }
+        
         public DeviceListEvent CreateDeviceListEvent(string eventData, int associatedTransmissionListEvent)
         {
             DeviceListEvent deviceListEvent = new DeviceListEvent(eventData, associatedTransmissionListEvent);
-            CreatedEvents.Add(deviceListEvent.Id, deviceListEvent);
-            return deviceListEvent;
+            DeviceListEvent foundListEvent = CreatedEvents.GetOrAdd(deviceListEvent.Id, deviceListEvent);
+            _logger.LogTrace($"Created DeviceListEvent with Id {foundListEvent.Id}");
+            return foundListEvent;
         }
 
         public DeviceListEvent GetEventById(int eventId)
         {
             return CreatedEvents.ContainsKey(eventId) ? CreatedEvents[eventId] : null;
+        }
+
+        public DeviceListEvent UpdateDeviceListEvent(DeviceListEvent deviceListEvent)
+        {
+            DeviceListEvent foundEvent = GetEventById(deviceListEvent.Id);
+            if(foundEvent == null)
+            {
+                throw new ArgumentException($"Unable to update device list event with id {deviceListEvent.Id}");
+            }
+
+            _logger.LogTrace($"Updating DeviceListEvents {deviceListEvent.Id}");
+            bool success = CreatedEvents.TryUpdate(foundEvent.Id, deviceListEvent, foundEvent);
+            if(!success)
+            {
+                throw new InvalidOperationException($"Failed to update DeviceListEvent store with latest data for event '{deviceListEvent.Id}'");
+            }
+            return GetEventById(foundEvent.Id);
         }
     }
 }

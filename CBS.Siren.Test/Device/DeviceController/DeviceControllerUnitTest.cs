@@ -32,12 +32,17 @@ namespace CBS.Siren.Test.Device
             return new DeviceListEvent(eventData);
         }
 
+        private IDeviceController CreateDeviceController()
+        {
+            return new DeviceController(new Mock<ILogger>().Object, new Mock<IDeviceListEventStore>().Object);
+        }
+
         #region Device List Set
         [Fact]
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_DeviceController_SetsCurrentEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
@@ -49,7 +54,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenAdded_AddsNewEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
@@ -68,7 +73,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenAdded_SetsNewEventToCued()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
@@ -84,7 +89,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndEventhasBeenReplaced_ReplacesEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList(2);
 
             deviceController.ActiveDeviceList = generatedList;
@@ -103,7 +108,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndEventAddedAboveKnownEvent_ReplacesFromThatEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList(2);
 
             deviceController.ActiveDeviceList = generatedList;
@@ -125,7 +130,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndFinalEventDeleted_RemovesFinalEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList(2);
 
             deviceController.ActiveDeviceList = generatedList;
@@ -142,7 +147,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType","UnitTest")]
         public void WhenDeviceListSet_WithExistingActiveListAndMiddleEventDeleted_RemovesMiddleEventFromActiveList()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList(3);
 
             deviceController.ActiveDeviceList = generatedList;
@@ -160,7 +165,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public void WhenDeviceListSet_DeviceController_SetsEventsStateToCued()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
 
             deviceController.ActiveDeviceList = generatedList;
@@ -175,7 +180,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenEventStartTimeIsMet_DeviceController_EmitsEventStartEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -200,6 +205,33 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task WhenEventStartTimeIsMet_DeviceController_CallsIntoDataStore()
+        {
+            var deviceListEventStore = new Mock<IDeviceListEventStore>();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object, deviceListEventStore.Object);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+            await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
+                h => deviceController.OnEventStarted += h,
+                h => deviceController.OnEventStarted -= h,
+                () => Task.Run(async () => {
+                            deviceController.ActiveDeviceList = deviceList;
+                            await deviceController.Run(cancellationTokenSource.Token);
+                        })
+            );
+
+            deviceListEventStore.Verify(mock => mock.UpdateDeviceListEvent(It.IsAny<DeviceListEvent>()), Times.AtLeastOnce);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -207,7 +239,7 @@ namespace CBS.Siren.Test.Device
         {
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventStarted += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
@@ -234,7 +266,7 @@ namespace CBS.Siren.Test.Device
         {
             TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventStarted += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
@@ -262,7 +294,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenCurrentEventEnds_DeviceController_ChangesCurrentEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
             generatedList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
 
@@ -292,7 +324,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task WhenEventEndTimeIsMet_DeviceController_EmitsEventEndEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -317,6 +349,33 @@ namespace CBS.Siren.Test.Device
                 cancellationTokenSource.Cancel();
             }
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task WhenEventEndTimeIsMet_DeviceController_CallsIntoDataStore()
+        {
+            var deviceListEventStore = new Mock<IDeviceListEventStore>();
+            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object, deviceListEventStore.Object);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+            var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
+                h => deviceController.OnEventEnded += h,
+                h => deviceController.OnEventEnded -= h,
+                () => Task.Run(async () => {
+                    deviceController.ActiveDeviceList = deviceList;
+                    await deviceController.Run(cancellationTokenSource.Token);
+                })
+            );
+
+            deviceListEventStore.Verify(mock => mock.UpdateDeviceListEvent(It.IsAny<DeviceListEvent>()), Times.AtLeastOnce);
+
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
@@ -324,7 +383,7 @@ namespace CBS.Siren.Test.Device
         {
             DateTime eventTime = DateTime.Now;
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventEnded += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
@@ -349,7 +408,7 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task DeviceController_EmitsDeviceListEvent_AtEndOfFinalEvent()
         {
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
@@ -380,7 +439,7 @@ namespace CBS.Siren.Test.Device
         {
             TaskCompletionSource<DeviceListEvent> taskCompletionSource = new TaskCompletionSource<DeviceListEvent>();
             EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => taskCompletionSource.SetResult(args.AffectedEvent));
-            IDeviceController deviceController = new DeviceController(new Mock<ILogger>().Object);
+            IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventEnded += eventHandler;
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
@@ -392,7 +451,7 @@ namespace CBS.Siren.Test.Device
 
             await taskCompletionSource.Task;
 
-            Assert.Equal(DeviceListEventState.Status.PLAYED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventState.Status.PLAYED, taskCompletionSource.Task.Result.EventState.CurrentStatus);
 
             if (cancellationTokenSource.Token.CanBeCanceled)
             {

@@ -37,7 +37,8 @@ namespace CBS.Siren.Application
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            using IDevice device = deviceFactory.CreateDemoDevice(new DeviceModel() { Name = "DemoDevice1" }, _logFactory);
+            IDeviceListEventStore deviceListEventStore = new DeviceListEventStore(_logFactory.CreateLogger<DeviceListEventStore>());
+            using IDevice device = deviceFactory.CreateDemoDevice(new DeviceModel() { Name = "DemoDevice1" }, _logFactory, deviceListEventStore);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
@@ -60,7 +61,7 @@ namespace CBS.Siren.Application
 
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
 
-            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventStore(), _logFactory.CreateLogger<TransmissionListService>())
+            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), deviceListEventStore, _logFactory.CreateLogger<TransmissionListService>())
             {
                 TransmissionList = transmissionList
             };

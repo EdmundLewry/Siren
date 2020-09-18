@@ -21,6 +21,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
     "eventState",
     "expectedDuration",
     "expectedStartTime",
+    "actualStartTime",
+    "actualEndTime",
     "options"
   ];
 
