@@ -76,6 +76,12 @@
       </button>
       <mat-menu #menu="matMenu">
         <div class="button-wrapper">
+          <button mat-menu-item class="more-option-insert-above" (click)="requestAddNewEvent(row, RelativePosition.Above)">Insert Event Above</button>
+        </div>
+        <div class="button-wrapper">
+          <button mat-menu-item class="more-option-insert-below" (click)="requestAddNewEvent(row, RelativePosition.Below)">Insert Above Below</button>
+        </div>
+        <div class="button-wrapper">
           <button mat-menu-item class="more-option-delete" (click)="requestDeleteConfirmation(row)">Delete</button>
         </div>
       </mat-menu>

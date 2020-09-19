@@ -1,3 +1,5 @@
+import { RelativePosition } from "./relative-position.enum";
+
 export interface PlayoutStrategy {
   strategyType: string;
 }
@@ -20,7 +22,13 @@ export interface TransmissionListEventTimingData {
   targetStartTime?: string;
 }
 
+export interface ListPositionData{
+  associatedEventId: number;
+  relativePosition: RelativePosition;
+}
+
 export interface TransmissionListEventCreationData {
   timingData: TransmissionListEventTimingData;
   features: TransmissionListEventFeatureCreationData[];
+  listPosition: ListPositionData;
 }

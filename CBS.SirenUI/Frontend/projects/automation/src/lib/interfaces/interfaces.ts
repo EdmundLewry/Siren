@@ -5,3 +5,4 @@ export * from "./feature-types.enum";
 export * from "./playout-strategy-types.enum";
 export * from "./source-strategy-types.enum";
 export * from "./timing-strategy-types.enum";
+export * from "./relative-position.enum";

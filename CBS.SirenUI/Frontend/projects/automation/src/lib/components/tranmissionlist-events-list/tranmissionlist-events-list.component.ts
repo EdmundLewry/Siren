@@ -7,7 +7,8 @@ import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation
 import { CreateEventDialogComponent } from '../create-event-dialog/create-event-dialog.component';
 import { TransmissionList } from '../../interfaces/itransmission-list';
 import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
-import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
+import { TransmissionListEventCreationData, ListPositionData } from '../../interfaces/itransmission-list-event-creation-data';
+import { RelativePosition } from '../../interfaces/interfaces';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -36,7 +37,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
   private readonly httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
-
+  
+  public RelativePosition = RelativePosition;
   private transmissionList: TransmissionList;
 
   constructor(private http: HttpClient,
@@ -81,7 +83,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
     console.error("Stop not currently supported");
   }
 
-  public requestAddNewEvent(): void {
+  public requestAddNewEvent(relativeEvent: TransmissionListEvent = null, relativePosition: RelativePosition = null): void {
     this.dialog.open(CreateEventDialogComponent, {
       width: '800px',
       data: {}
@@ -89,6 +91,14 @@ export class TranmissionlistEventsListComponent implements OnInit {
     .afterClosed()
       .subscribe((result: TransmissionListEventCreationData) => {
       if (result == null) return;
+      
+      if(relativeEvent != null && relativePosition != null)
+      {
+        result.listPosition = {
+          associatedEventId: relativeEvent.id,
+          relativePosition: relativePosition
+        };
+      }
 
       console.log(result);
 
