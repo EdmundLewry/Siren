@@ -281,6 +281,17 @@ namespace CBS.Siren.Test
             _dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
         }
 
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithValidInput_ShouldCallIntoListService()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.ClearList(1);
+
+            _listService.Verify((service) => service.OnTransmissionListChanged(0));
+        }
+
         #endregion
 
         #region Play
