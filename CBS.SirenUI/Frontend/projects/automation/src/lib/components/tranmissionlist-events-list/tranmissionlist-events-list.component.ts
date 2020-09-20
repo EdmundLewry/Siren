@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -8,6 +8,7 @@ import { CreateEventDialogComponent } from '../create-event-dialog/create-event-
 import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
 import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
 import { RelativePosition, TransmissionListDetails } from '../../interfaces/interfaces';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -36,6 +37,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
   public RelativePosition = RelativePosition;
 
   public transmissionList: TransmissionListDetails;
+  @ViewChild('table') table: MatTable<TransmissionListEvent>
 
   constructor(private http: HttpClient,
               private route: ActivatedRoute,
@@ -129,5 +131,10 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   public getListState(): string {
     return this.transmissionList?.listState ?? "";
+  }
+
+  dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
+    moveItemInArray(this.dataSource.data, event.previousIndex, event.currentIndex);
+    this.table.renderRows();
   }
 }

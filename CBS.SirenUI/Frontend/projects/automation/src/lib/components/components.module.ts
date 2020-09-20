@@ -3,6 +3,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PipesModule } from '../pipes/pipes.module';
 import { CommonModule } from '@angular/common';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +17,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
-
 
 import { TranmissionlistEventsListComponent } from './tranmissionlist-events-list/tranmissionlist-events-list.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
@@ -40,6 +41,7 @@ import { CreateEventDialogComponent } from './create-event-dialog/create-event-d
     MatDividerModule,
     MatChipsModule,
     FormsModule,
+    DragDropModule,
     ReactiveFormsModule,
     MatInputModule,
     PipesModule,
