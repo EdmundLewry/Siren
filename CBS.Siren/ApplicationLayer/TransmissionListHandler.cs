@@ -34,7 +34,7 @@ namespace CBS.Siren.Application
             return new Channel(chainConfiguration);
         }
 
-        private async Task<TransmissionList> GetListBydId(int id)
+        public async Task<TransmissionList> GetListById(int id)
         {
             IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
 
@@ -56,13 +56,13 @@ namespace CBS.Siren.Application
 
         public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             return transmissionList.Events;
         }
 
         public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             if (transmissionList == null)
             {
                 Logger.LogError($"Unable to find list with Id {id}");
@@ -105,7 +105,7 @@ namespace CBS.Siren.Application
 
         public async Task RemoveEvent(int listId, int eventId)
         {
-            TransmissionList transmissionList = await GetListBydId(listId);
+            TransmissionList transmissionList = await GetListById(listId);
             if (transmissionList == null)
             {
                 Logger.LogError($"Unable to find list with Id {listId}");
@@ -129,7 +129,7 @@ namespace CBS.Siren.Application
 
         public async Task ClearList(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             transmissionList.Events.Clear();
 
             ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
@@ -140,7 +140,7 @@ namespace CBS.Siren.Application
 
         public async Task PlayTransmissionList(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             if (transmissionList == null)
             {
                 string message = $"Unable to find list with Id {id}";

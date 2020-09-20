@@ -59,6 +59,42 @@ namespace CBS.Siren.Test
             List<TransmissionListDTO> returnedLists = JsonSerializer.Deserialize<List<TransmissionListDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
 
             Assert.Single(returnedLists);
+            Assert.Equal("Stopped", returnedLists[0].ListState);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task GetListById_WhenListIdInvalid_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1000");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenTransmissionListRequestedById_ReturnsTransmissionLists()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1");
+
+            string content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
+            TransmissionListDetailDTO returnedList = JsonSerializer.Deserialize<TransmissionListDetailDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            Assert.NotNull(returnedList);
+            Assert.Equal("Stopped", returnedList.ListState);
+            Assert.Single(returnedList.Events);
         }
         #endregion
 

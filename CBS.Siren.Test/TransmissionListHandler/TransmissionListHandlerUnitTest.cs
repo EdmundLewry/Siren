@@ -92,6 +92,27 @@ namespace CBS.Siren.Test
 
             Assert.Equal(2, events.ToList().Count);
         }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListById_WithInvalidId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListById(30));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListById_WithValidId_ReturnsList()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            TransmissionList transmissionList = await codeUnderTest.GetListById(1);
+
+            Assert.Equal(2, transmissionList.Events.ToList().Count);
+            Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
+        }
         #endregion
 
         #region Add

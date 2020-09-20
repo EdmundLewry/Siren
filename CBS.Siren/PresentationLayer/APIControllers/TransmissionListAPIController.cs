@@ -34,6 +34,22 @@ namespace CBS.Siren.Controllers
             var lists = await _handler.GetAllLists();
             return _mapper.Map<List<TransmissionListDTO>>(lists.ToList());
         }
+        
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TransmissionListDetailDTO>> GetListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to Get list with id {0}", id);
+                var list = await _handler.GetListById(id);
+                return _mapper.Map<TransmissionListDetailDTO>(list);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to get list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
 
         [HttpPost("{id}/clear")]
         public async Task<ActionResult> ClearListById(int id)

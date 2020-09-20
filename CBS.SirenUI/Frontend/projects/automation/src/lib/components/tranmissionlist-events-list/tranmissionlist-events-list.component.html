@@ -1,5 +1,17 @@
 <div class="header">
   <h1>Transmission List Events</h1>
+  <div class="list-state-indicator-bar" [ngSwitch]="getListState()">
+    <mat-chip-list>
+      <mat-chip color="primary" *ngSwitchCase="'Playing'" selected>
+        <mat-icon class="list-state-icon">play_arrow</mat-icon>
+        Playing
+      </mat-chip>
+      <mat-chip color="warn" *ngSwitchCase="'Stopped'" selected>
+        <mat-icon class="list-state-icon">stop</mat-icon>
+        Stopped
+      </mat-chip>
+    </mat-chip-list>
+  </div>
   <span class="menu-spacer"></span>
   <div class="list-control-bar">
     <button mat-mini-fab class="controller-button" (click)="requestListPlay()">

@@ -1,10 +1,12 @@
+﻿using System.Collections.Generic;
+
 namespace CBS.Siren.DTO
 {
-    public class TransmissionListDTO
+    public class TransmissionListDetailDTO
     {
         public int Id { get; set; }
         public PlaylistDTO SourceList { get; set; }
-        public int EventCount { get; set; }
+        public List<TransmissionListEventDTO> Events { get; set; }
         public string ListState { get; set; }
     }
 }

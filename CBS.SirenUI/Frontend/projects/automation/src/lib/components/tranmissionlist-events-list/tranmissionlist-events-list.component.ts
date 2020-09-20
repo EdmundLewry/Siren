@@ -5,10 +5,9 @@ import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { CreateEventDialogComponent } from '../create-event-dialog/create-event-dialog.component';
-import { TransmissionList } from '../../interfaces/itransmission-list';
 import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
-import { TransmissionListEventCreationData, ListPositionData } from '../../interfaces/itransmission-list-event-creation-data';
-import { RelativePosition } from '../../interfaces/interfaces';
+import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
+import { RelativePosition, TransmissionListDetails } from '../../interfaces/interfaces';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -29,17 +28,14 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   private listId?: string;
 
-  private readonly fakeData: TransmissionListEvent[] = [
-    { id: 1, eventState: "Scheduled", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:10:05" },
-    { id: 2, eventState: "Running", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:40:05" },
-  ];
-
   private readonly httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
   
+  //Store this enum as a public member so that we can reference it in the html
   public RelativePosition = RelativePosition;
-  private transmissionList: TransmissionList;
+
+  public transmissionList: TransmissionListDetails;
 
   constructor(private http: HttpClient,
               private route: ActivatedRoute,
@@ -52,7 +48,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       this.listId = this.route.snapshot.paramMap.get("itemId") as string;
     }
 
-    this.retrieveEvents();
+    this.retrieveListInformation();
   }
 
   public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
@@ -60,7 +56,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       if (!confirmed) return;
 
       this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
 
@@ -75,7 +71,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   public requestListPlay(): void {
     this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/play`, this.httpOptions).subscribe(result => {
-      this.retrieveEvents();
+      this.retrieveListInformation();
     }, error => console.error(error));
   }
 
@@ -103,7 +99,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       console.log(result);
 
         this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
   }
@@ -113,7 +109,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       if (!confirmed) return;
 
       this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
   }
@@ -122,5 +118,16 @@ export class TranmissionlistEventsListComponent implements OnInit {
     this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, this.httpOptions).subscribe(result => {
       this.dataSource.data = result;
     }, error => console.error(error));
+  }
+  
+  private retrieveListInformation(): void {
+    this.http.get<TransmissionListDetails>(`/proxy/api/1/automation/transmissionlist/${this.listId}`, this.httpOptions).subscribe(result => {
+      this.transmissionList = result;
+      this.dataSource.data = this.transmissionList.events;
+    }, error => console.error(error));
+  }
+
+  public getListState(): string {
+    return this.transmissionList?.listState ?? "";
   }
 }
