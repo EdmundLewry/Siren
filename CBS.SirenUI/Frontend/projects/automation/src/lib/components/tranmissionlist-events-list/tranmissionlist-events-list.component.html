@@ -30,8 +30,8 @@
     <button mat-button (click)="requestAddNewEvent()">
       <mat-icon matTooltip="Create New Event">add_box</mat-icon>
     </button>
-    <button mat-button (click)="requestClearList()">
-      <mat-icon matTooltip="Clear List">clear</mat-icon>
+    <button mat-button (click)="requestClearList()" [disabled]="getListState()=='Playing'">
+      <mat-icon [matTooltip]="getClearListTooltip()">clear</mat-icon>
     </button>
   </div>
 </mat-toolbar>

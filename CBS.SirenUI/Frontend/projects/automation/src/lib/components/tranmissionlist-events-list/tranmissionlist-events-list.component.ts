@@ -133,6 +133,10 @@ export class TranmissionlistEventsListComponent implements OnInit {
     return this.transmissionList?.listState ?? "";
   }
 
+  public getClearListTooltip(): string {
+    return this.getListState() == "Playing" ? "Can't clear Playing list" : "Clear List";
+  }
+
   dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
     
     let listEventId = this.dataSource.data[event.previousIndex].id;
