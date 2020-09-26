@@ -134,7 +134,18 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
-    moveItemInArray(this.dataSource.data, event.previousIndex, event.currentIndex);
-    this.table.renderRows();
+    
+    let listEventId = this.dataSource.data[event.previousIndex].id;
+
+    let request = {
+      previousPosition: event.previousIndex,
+      targetPosition: event.currentIndex
+    };
+
+    this.http.patch(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEventId}/move`, request).subscribe(result => {
+      moveItemInArray(this.dataSource.data, event.previousIndex, event.currentIndex);
+      this.table.renderRows();
+      this.retrieveListInformation();
+    }, error => console.error(error));
   }
 }
