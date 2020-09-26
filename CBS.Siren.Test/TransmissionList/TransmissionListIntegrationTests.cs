@@ -307,5 +307,168 @@ namespace CBS.Siren.Test
             Assert.True(returnedList[1].RelatedDeviceListEventCount > 0);
         }
         #endregion
+
+        #region Update Event
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalled_ReturnsMovedEvent()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1};
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+
+            response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
+            content = await response.Content.ReadAsStringAsync();
+            returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            Assert.Equal(returnedId, returnedEvent.Id);
+            Assert.Equal("SCHEDULED", returnedEvent.EventState);
+            Assert.Equal(1, returnedEvent.EventFeatureCount);
+            Assert.Equal(1, returnedEvent.RelatedDeviceListEventCount);
+            Assert.Equal("fixed", returnedEvent.EventTimingStrategy);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalled_SuccessfullyMovesEvent()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+
+            response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
+            content = await response.Content.ReadAsStringAsync();
+            returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
+
+            content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
+            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+
+            Assert.Equal(returnedList[1].Id, returnedEvent.Id);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/100/events/{returnedId}/move", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalledWithBadEventId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/100/move", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalledWithIncorrectPreviousPosition_ReturnsBadRequest()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 1, TargetPosition = 0 };
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenMoveEventIsCalledWithIncorrectTargetPosition_ReturnsBadRequest()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventCreationDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 10 };
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        #endregion
     }
 }

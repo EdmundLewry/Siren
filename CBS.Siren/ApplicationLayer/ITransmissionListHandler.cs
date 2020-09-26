@@ -13,6 +13,8 @@ namespace CBS.Siren.Application
         Task RemoveEvent(int listId, int eventId);
         Task ClearList(int id);
 
+        Task<TransmissionListEvent> ChangeEventPosition(int listId, int eventId, int previousPosition, int targetPosition);
+
         Task PlayTransmissionList(int id);
         Task PauseTransmissionList(int id);
         Task NextTransmissionList(int id);

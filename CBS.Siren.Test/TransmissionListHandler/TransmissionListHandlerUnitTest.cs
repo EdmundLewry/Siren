@@ -347,5 +347,93 @@ namespace CBS.Siren.Test
             _listService.Verify(mock => mock.PlayTransmissionList(), Times.Once);
         }
         #endregion
+
+        #region Update
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_WithInvalidListId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ChangeEventPosition(30, 0, 0, 1));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_WithInvalidEventId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ChangeEventPosition(1, 30, 0, 1));
+        }
+        
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData(100, 0)]
+        [InlineData(0, 100)]
+        public async Task ChangeEventPosition_WithInvalidPositions_ThrowsException(int previousIndex, int targetIndex)
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.ChangeEventPosition(1, 0, previousIndex, targetIndex));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_WithValidPositions_UpdatesPositionInList()
+        {
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            TransmissionListEvent createdEvent = await codeUnderTest.ChangeEventPosition(1, _transmissionList.Events[0].Id, 0, 1);
+
+            Assert.Equal(2, savedList.Events.Count);
+            Assert.Equal(createdEvent.Id, savedList.Events[1].Id);
+        }
+        
+        [Theory]
+        [Trait("TestType", "UnitTest")]
+        [InlineData(0, 1, 0)]
+        [InlineData(1, 0, 0)]
+        public async Task ChangeEventPosition_WithValidPositions_CallsIntoListService(int from, int to, int expected)
+        {
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.ChangeEventPosition(1, _transmissionList.Events[from].Id, from, to);
+
+            _listService.Verify((service) => service.OnTransmissionListChanged(expected));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_WithValidPositions_ReturnsEvent()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            int eventId = _transmissionList.Events[0].Id;
+            TransmissionListEvent returnedEvent = await codeUnderTest.ChangeEventPosition(1, eventId, 0, 1);
+
+            Assert.Equal(eventId, returnedEvent.Id);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_WithValidPositions_SavesTheList()
+        {
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.ChangeEventPosition(1, _transmissionList.Events[0].Id, 0, 1);
+
+            _dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.Once);
+        }
+        #endregion
     }
 }

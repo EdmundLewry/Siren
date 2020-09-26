@@ -9,7 +9,7 @@ using System;
 
 namespace CBS.Siren.Application
 {
-    public class TransmissionListHandler : ITransmissionListHandler
+    public partial class TransmissionListHandler : ITransmissionListHandler
     {
         public ILogger<TransmissionListHandler> Logger { get; }
         public IDataLayer DataLayer { get; }
@@ -160,6 +160,49 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
+        public async Task<TransmissionListEvent> ChangeEventPosition(int listId, int eventId, int previousPosition, int targetPosition)
+        {
+            TransmissionList transmissionList = await GetListById(listId);
+            if (transmissionList == null)
+            {
+                string message = $"Unable to find list with Id {listId}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(listId));
+            }
+
+            int foundEventIndex = GetEventPositionById(transmissionList, eventId);
+            if (foundEventIndex == -1)
+            {
+                string message = $"Unable to find list event with id {eventId} at position {previousPosition}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(previousPosition));
+            }
+
+            if (foundEventIndex != previousPosition)
+            {
+                string message = $"Unable to find list event with id {eventId} at position {previousPosition}";
+                Logger.LogError(message);
+                throw new InvalidPositionException(message, nameof(previousPosition));
+            }
+
+            if (targetPosition >= transmissionList.Events.Count)
+            {
+                string message = $"Unable to move list event with id {eventId} to target position {targetPosition}. Position is past the end of the list.";
+                Logger.LogError(message);
+                throw new InvalidPositionException(message, nameof(targetPosition));
+            }
+
+            TransmissionListEvent transmissionListEvent = transmissionList.Events[previousPosition];
+            transmissionList.Events.RemoveAt(previousPosition);
+            transmissionList.Events.Insert(targetPosition, transmissionListEvent);
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+
+            int changePosition = Math.Min(previousPosition, targetPosition);
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            transmissionListService?.OnTransmissionListChanged(changePosition);
+            return transmissionListEvent;
+        }
+
         public Task PauseTransmissionList(int id)
         {
             throw new NotImplementedException();
@@ -169,5 +212,6 @@ namespace CBS.Siren.Application
         {
             throw new NotImplementedException();
         }
+
     }
 }

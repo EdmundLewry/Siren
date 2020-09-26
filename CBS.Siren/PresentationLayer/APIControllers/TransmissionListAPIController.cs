@@ -114,6 +114,27 @@ namespace CBS.Siren.Controllers
                 return NotFound(id);
             }
         }
+        
+        [HttpPatch("{id}/events/{eventId}/move")]
+        public async Task<ActionResult<TransmissionListEventDTO>> MoveEvent(int id, int eventId, TransmissionListEventMoveDTO listEventMove)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to move event {0} on list with id {1} from {2} to {3}", id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
+                var updatedListEvent = await _handler.ChangeEventPosition(id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
+                return _mapper.Map<TransmissionListEventDTO>(updatedListEvent);
+            }
+            catch(InvalidPositionException e)
+            {
+                Logger.LogError(e, "Unable to change position of event for list with given id {0}, {1}", id, e.Message);
+                return BadRequest(id);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to change position of event for list with given id {0}, {1}", id, e.Message);
+                return NotFound(id);
+            }
+        }
 
         [HttpDelete("{id}/events/{eventId}")]
         public async Task<ActionResult> DeleteEvent(int id, int eventId)
