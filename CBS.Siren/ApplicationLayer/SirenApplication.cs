@@ -46,7 +46,7 @@ namespace CBS.Siren.Application
 
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
-            DateTime startTime = DateTime.Now.AddSeconds(3);
+            DateTimeOffset startTime = DateTimeOffset.UtcNow.AddSeconds(3);
             List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime, 3);
 
             Playlist list = new Playlist(events);
@@ -106,7 +106,7 @@ namespace CBS.Siren.Application
             return new MediaInstance(mediaName, duration, mediaPath, FileType.TEXT);
         }
 
-        private List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
+        private List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTimeOffset startTime, int eventCount)
         {
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             FixedStartEventTimingStrategy fixedStart = new FixedStartEventTimingStrategy(startTime);

@@ -18,11 +18,11 @@ namespace CBS.Siren
             throw new ArgumentException("Failed to construct timing strategy. Given strategy was not the same type", "other");
         }
 
-        public DateTime CalculateStartTime(int? eventId, TransmissionList list)
+        public DateTimeOffset CalculateStartTime(int? eventId, TransmissionList list)
         {
             if(!eventId.HasValue || list == null)
             {
-                return DateTime.Now;
+                return DateTimeOffset.UtcNow;
             }
 
             //This is not very efficient...
@@ -41,7 +41,7 @@ namespace CBS.Siren
 
             if(precedingEvent == null)
             {
-                return relatedEvent?.ActualStartTime ?? DateTime.Now;
+                return relatedEvent?.ActualStartTime ?? DateTimeOffset.UtcNow;
             }
 
             return precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;

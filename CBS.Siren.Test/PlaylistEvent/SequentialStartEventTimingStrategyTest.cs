@@ -15,12 +15,12 @@ namespace CBS.Siren.Test
         {
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
 
-            DateTime target = DateTime.Now;
-            DateTime startTime = strategy.CalculateStartTime(null, new TransmissionList(new List<TransmissionListEvent>(), null));
+            DateTimeOffset target = DateTimeOffset.UtcNow;
+            DateTimeOffset startTime = strategy.CalculateStartTime(null, new TransmissionList(new List<TransmissionListEvent>(), null));
 
-            //Using difference in frames to account for potential millisecond difference in DateTime.Now
+            //Using difference in frames to account for potential millisecond difference in DateTimeOffset.UtcNow
             //rather than writing a Time abstraction
-            Assert.True(target.DifferenceInFrames(startTime)==0);
+            Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
         
         [Fact]
@@ -29,10 +29,10 @@ namespace CBS.Siren.Test
         {
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
 
-            DateTime target = DateTime.Now;
-            DateTime startTime = strategy.CalculateStartTime(0, null);
+            DateTimeOffset target = DateTimeOffset.UtcNow;
+            DateTimeOffset startTime = strategy.CalculateStartTime(0, null);
 
-            //Using difference in frames to account for potential millisecond difference in DateTime.Now
+            //Using difference in frames to account for potential millisecond difference in DateTimeOffset.UtcNow
             //rather than writing a Time abstraction
             Assert.True(target.DifferenceInFrames(startTime)==0);
         }
@@ -46,8 +46,8 @@ namespace CBS.Siren.Test
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>());
             list.Events.Add(listEvent);
 
-            DateTime target = DateTime.Now;
-            DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
+            DateTimeOffset target = DateTimeOffset.UtcNow;
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
             Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
@@ -59,7 +59,7 @@ namespace CBS.Siren.Test
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
 
-            DateTime target = DateTime.Parse("01/01/2020 14:30:00");
+            DateTimeOffset target = DateTimeOffset.Parse("01/01/2020 14:30:00");
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>())
             {
                 Id = 1,
@@ -69,7 +69,7 @@ namespace CBS.Siren.Test
             };
             list.Events.Add(listEvent);
 
-            DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
             Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
@@ -82,7 +82,7 @@ namespace CBS.Siren.Test
             TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
             {
                 ExpectedDuration = new TimeSpan(0, 30, 0),
-                ExpectedStartTime = DateTime.Parse("01/01/2020 14:30:00")
+                ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00")
             };
 
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
@@ -90,8 +90,8 @@ namespace CBS.Siren.Test
             list.Events.Add(precedingEvent);
             list.Events.Add(listEvent);
 
-            DateTime target = DateTime.Parse("01/01/2020 15:00:00");
-            DateTime startTime = strategy.CalculateStartTime(listEvent.Id, list);
+            DateTimeOffset target = DateTimeOffset.Parse("01/01/2020 15:00:00");
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
             Assert.Equal(target, startTime);
         }

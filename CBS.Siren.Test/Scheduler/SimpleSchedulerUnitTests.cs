@@ -21,7 +21,7 @@ namespace CBS.Siren.Test
         private TransmissionListEvent event4;
         private readonly TransmissionList transmissionList;
 
-        private readonly DateTime calculatedStartTime = DateTime.Parse("01/01/2020 14:30:00");
+        private readonly DateTimeOffset calculatedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00");
 
         public SimpleSchedulerUnitTests()
         {
@@ -167,7 +167,7 @@ namespace CBS.Siren.Test
             Assert.Equal(event1.ExpectedStartTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("startTime").GetString()));
             Assert.Equal(event1.ExpectedDuration, TimeSpanExtensions.FromTimecodeString(timingElement.GetProperty("duration").GetString()));
 
-            DateTime expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.TotalSeconds);
+            DateTimeOffset expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.TotalSeconds);
             Assert.Equal(expectedEndTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("endTime").GetString()));
 
             JsonElement sourceElement = eventDataJson.GetProperty("source");
@@ -201,9 +201,9 @@ namespace CBS.Siren.Test
             var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
             mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
                                   .Returns((string s, int id) => new DeviceListEvent(s, id));
-            DateTime targetActualStart = DateTime.Parse("01/01/2020 20:30:00");
+            DateTimeOffset targetActualStart = DateTimeOffset.Parse("01/01/2020 20:30:00");
             event1.ActualStartTime = targetActualStart;
-            DateTime targetExpectedStart = DateTime.Parse("01/01/2020 19:30:00");
+            DateTimeOffset targetExpectedStart = DateTimeOffset.Parse("01/01/2020 19:30:00");
             event1.ExpectedStartTime = targetExpectedStart;
 
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();

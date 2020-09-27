@@ -16,8 +16,8 @@ namespace CBS.Siren.Test.Time
         [InlineData("2020-03-22", FrameRate.FPS25, "22/03/2020 00:00:00.000")]
         public void FromTimecodeString_GivenStringAndFramerate_ShouldReturnDateTime(string input, FrameRate frameRate, string expectedOutput)
         {
-            DateTime valueUnderTest = DateTimeExtensions.FromTimecodeString(input, frameRate);
-            DateTime expectedValue = DateTime.Parse(expectedOutput);
+            DateTimeOffset valueUnderTest = DateTimeExtensions.FromTimecodeString(input, frameRate);
+            DateTimeOffset expectedValue = DateTime.Parse(expectedOutput);
             Assert.Equal(expectedValue, valueUnderTest);
         }
 
@@ -50,7 +50,7 @@ namespace CBS.Siren.Test.Time
         [InlineData("22/03/2020 11:22:41.867", "2020-03-22T11:22:41;25", FrameRate.DF30)]
         public void ToTimecodeString_GivenTimeSpan_ReturnsExpectedString(string input, string expected, FrameRate frameRate)
         {
-            string output = DateTime.Parse(input).ToTimecodeString(frameRate);
+            string output = DateTimeOffset.Parse(input).ToTimecodeString(frameRate);
             Assert.Equal(expected, output);
         }
     }

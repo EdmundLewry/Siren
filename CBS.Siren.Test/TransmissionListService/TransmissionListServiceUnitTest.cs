@@ -269,9 +269,9 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            DateTime earliestStartTime = DateTime.Now;
+            DateTimeOffset earliestStartTime = DateTimeOffset.Now;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
-            DateTime latestStartTime = DateTime.Now;
+            DateTimeOffset latestStartTime = DateTimeOffset.Now;
 
             Assert.NotNull(event1.ActualStartTime);
             Assert.True(event1.ActualStartTime.Value >= earliestStartTime && event1.ActualStartTime.Value <= latestStartTime);
@@ -326,9 +326,9 @@ namespace CBS.Siren.Test
             deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
             deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            DateTime earliestEndTime = DateTime.Now;
+            DateTimeOffset earliestEndTime = DateTimeOffset.Now;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
-            DateTime latestEndTime = DateTime.Now;
+            DateTimeOffset latestEndTime = DateTimeOffset.Now;
 
             Assert.NotNull(event1.ActualEndTime);
             Assert.True(event1.ActualEndTime.Value >= earliestEndTime && event1.ActualEndTime.Value <= latestEndTime);

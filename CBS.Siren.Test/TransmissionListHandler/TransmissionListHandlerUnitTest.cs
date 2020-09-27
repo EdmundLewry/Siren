@@ -42,7 +42,7 @@ namespace CBS.Siren.Test
                 TimingData = new TimingStrategyCreationDTO()
                 {
                     StrategyType = "fixed",
-                    TargetStartTime = DateTime.Parse("2020-03-22 12:30:10")
+                    TargetStartTime = DateTimeOffset.Parse("2020-03-22 12:30:10")
                 },
                 Features = new List<ListEventFeatureCreationDTO>(){
                     new ListEventFeatureCreationDTO(){

@@ -24,9 +24,9 @@ namespace CBS.Siren
         public List<IEventFeature> EventFeatures { get; set; }
 
         public TimeSpan ExpectedDuration { get; set; }
-        public DateTime ExpectedStartTime { get; set; }
-        public DateTime? ActualStartTime { get; set; } = null;
-        public DateTime? ActualEndTime { get; set; } = null;
+        public DateTimeOffset ExpectedStartTime { get; set; }
+        public DateTimeOffset? ActualStartTime { get; set; } = null;
+        public DateTimeOffset? ActualEndTime { get; set; } = null;
 
         //I think this should just be a way to reference the related playlist event
         //There may not be a related event, so this could be null. We may choose to do

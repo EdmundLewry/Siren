@@ -47,7 +47,7 @@ namespace CBS.Siren.Time
             return (long)Math.Round(milliseconds);
         }
 
-        public static long DifferenceInFrames(this DateTime lhs, DateTime rhs)
+        public static long DifferenceInFrames(this DateTimeOffset lhs, DateTimeOffset rhs)
         {
             long ticksDifference = rhs.Ticks - lhs.Ticks;
             TimeSpan timeSpanDifference = new TimeSpan(ticksDifference);

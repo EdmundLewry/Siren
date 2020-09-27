@@ -115,9 +115,9 @@ namespace CBS.Siren.Device
 
         private bool TimeHasPassed(string timeToCheck)
         {
-            DateTime expectedTime = DateTimeExtensions.FromTimecodeString(timeToCheck);
+            DateTimeOffset expectedTime = DateTimeExtensions.FromTimecodeString(timeToCheck);
 
-            if (expectedTime.DifferenceInFrames(DateTime.Now) >= 0)
+            if (expectedTime.DifferenceInFrames(DateTimeOffset.UtcNow) >= 0)
             {
                 return true;
             }

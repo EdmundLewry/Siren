@@ -19,13 +19,13 @@ namespace CBS.Siren.Test.Device
             List<DeviceListEvent> events = new List<DeviceListEvent>();
             for(int i=0; i<count; ++i)
             {
-                events.Add(GenerateDeviceListEvent(DateTime.Now.AddMilliseconds(50), DateTime.Now.AddSeconds(1)));
+                events.Add(GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddMilliseconds(50), DateTimeOffset.UtcNow.AddSeconds(1)));
             }
 
             return new DeviceList(events);
         }
 
-        private DeviceListEvent GenerateDeviceListEvent(DateTime startTime, DateTime endTime)
+        private DeviceListEvent GenerateDeviceListEvent(DateTimeOffset startTime, DateTimeOffset endTime)
         {
             string eventData = $"{{\"timing\":{{\"startTime\":\"{startTime.ToTimecodeString()}\",\"duration\":\"00:00:25:00\",\"endTime\":\"{endTime.ToTimecodeString()}\"}}}}";
 
@@ -95,7 +95,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = generatedList;
 
             DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
-            updateList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+            updateList.Events.Add(GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), DateTimeOffset.UtcNow.AddSeconds(3)));
             deviceController.ActiveDeviceList = updateList;
 
             Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
@@ -114,7 +114,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = generatedList;
 
             DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
-            updateList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+            updateList.Events.Add(GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), DateTimeOffset.UtcNow.AddSeconds(3)));
             updateList.Events.Add(generatedList.Events[1]);
 
             deviceController.ActiveDeviceList = updateList;
@@ -237,8 +237,8 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task DeviceController_EmitsEventStartEvent_AtStartFrameOfEvent()
         {
-            DateTime eventTime = DateTime.Now;
-            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
+            DateTimeOffset eventTime = DateTimeOffset.UtcNow;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTimeOffset.UtcNow);
             IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventStarted += eventHandler;
 
@@ -249,7 +249,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = deviceList;
             await deviceController.Run(cancellationTokenSource.Token);
 
-            DateTime expectedTime = deviceList.Events[0].StartTime;
+            DateTimeOffset expectedTime = deviceList.Events[0].StartTime;
             Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
 
             if (cancellationTokenSource.Token.CanBeCanceled)
@@ -296,7 +296,7 @@ namespace CBS.Siren.Test.Device
         {
             IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList();
-            generatedList.Events.Add(GenerateDeviceListEvent(DateTime.Now.AddSeconds(2), DateTime.Now.AddSeconds(3)));
+            generatedList.Events.Add(GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), DateTimeOffset.UtcNow.AddSeconds(3)));
 
             deviceController.ActiveDeviceList = generatedList;
 
@@ -381,8 +381,8 @@ namespace CBS.Siren.Test.Device
         [Trait("TestType", "UnitTest")]
         public async Task DeviceController_EmitsEventEndEvent_AtEndFrameOfEvent()
         {
-            DateTime eventTime = DateTime.Now;
-            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTime.Now);
+            DateTimeOffset eventTime = DateTimeOffset.UtcNow;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>((sender, args) => eventTime = DateTimeOffset.UtcNow);
             IDeviceController deviceController = CreateDeviceController();
             deviceController.OnEventEnded += eventHandler;
 
@@ -393,7 +393,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = deviceList;
             await deviceController.Run(cancellationTokenSource.Token);
 
-            DateTime expectedTime = deviceList.Events[0].EndTime;
+            DateTimeOffset expectedTime = deviceList.Events[0].EndTime;
             Assert.Equal(0, expectedTime.DifferenceInFrames(eventTime));
 
             if (cancellationTokenSource.Token.CanBeCanceled)

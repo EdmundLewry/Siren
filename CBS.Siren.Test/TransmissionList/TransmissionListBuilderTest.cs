@@ -21,7 +21,7 @@ namespace CBS.Siren.Test
             };
             IEventTimingStrategy timingStrategy = strategyType switch
             {
-                TimingStrategyType.Fixed => new FixedStartEventTimingStrategy(DateTime.Now),
+                TimingStrategyType.Fixed => new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow),
                 TimingStrategyType.Sequential => new SequentialStartEventTimingStrategy(),
                 _ => null
             };

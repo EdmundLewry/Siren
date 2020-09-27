@@ -10,8 +10,8 @@ namespace CBS.Siren.Test.Time
         [Trait("TestType","UnitTest")]
         public void DifferenceInFrames_ReportsPositive_WhenDateTimeIsBeforeArgument()
         {
-            DateTime before = DateTime.Parse("01/01/2015 00:00:05");
-            DateTime after = DateTime.Parse("01/01/2015 00:00:10");
+            DateTimeOffset before = DateTimeOffset.Parse("01/01/2015 00:00:05");
+            DateTimeOffset after = DateTimeOffset.Parse("01/01/2015 00:00:10");
 
             long numFramesDifference = before.DifferenceInFrames(after);
             Assert.True(numFramesDifference > 0);
@@ -21,8 +21,8 @@ namespace CBS.Siren.Test.Time
         [Trait("TestType", "UnitTest")]
         public void DifferenceInFrames_ReportsNegative_WhenDateTimeIsAfterArgument()
         {
-            DateTime before = DateTime.Parse("01/01/2015 00:00:10");
-            DateTime after = DateTime.Parse("01/01/2015 00:00:05");
+            DateTimeOffset before = DateTimeOffset.Parse("01/01/2015 00:00:10");
+            DateTimeOffset after = DateTimeOffset.Parse("01/01/2015 00:00:05");
 
             long numFramesDifference = before.DifferenceInFrames(after);
             Assert.True(numFramesDifference < 0);
@@ -34,8 +34,8 @@ namespace CBS.Siren.Test.Time
         [InlineData("01/01/2015 00:00:10.010")]
         public void DifferenceInFrames_ReportsZero_WhenDateTimeIsOnSameFrame(string comparison)
         {
-            DateTime before = DateTime.Parse("01/01/2015 00:00:10.000");
-            DateTime after = DateTime.Parse(comparison);
+            DateTimeOffset before = DateTimeOffset.Parse("01/01/2015 00:00:10.000");
+            DateTimeOffset after = DateTimeOffset.Parse(comparison);
 
             long numFramesDifference = before.DifferenceInFrames(after);
             Assert.True(numFramesDifference == 0);
@@ -48,8 +48,8 @@ namespace CBS.Siren.Test.Time
         [InlineData("01/01/2015 00:00:04.919", -3)]
         public void DifferenceInFrames_ReportsCorrectFrameCount(string comparison, int expected)
         {
-            DateTime before = DateTime.Parse("01/01/2015 00:00:05");
-            DateTime after = DateTime.Parse(comparison);
+            DateTimeOffset before = DateTimeOffset.Parse("01/01/2015 00:00:05");
+            DateTimeOffset after = DateTimeOffset.Parse(comparison);
 
             long numFramesDifference = before.DifferenceInFrames(after);
             Assert.Equal(expected, numFramesDifference);

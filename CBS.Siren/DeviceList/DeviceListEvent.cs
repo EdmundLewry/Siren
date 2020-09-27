@@ -25,8 +25,8 @@ namespace CBS.Siren
             } 
         
         }
-        public DateTime StartTime { get; private set; }
-        public DateTime EndTime { get; private set; }
+        public DateTimeOffset StartTime { get; private set; }
+        public DateTimeOffset EndTime { get; private set; }
 
         public DeviceListEvent(string eventData, int? relatedEventId = null)
         {
@@ -57,8 +57,8 @@ namespace CBS.Siren
             catch
             {
                 Console.WriteLine("Unable to parse event data");
-                StartTime = DateTime.MaxValue;
-                EndTime = DateTime.MaxValue;
+                StartTime = DateTimeOffset.MaxValue;
+                EndTime = DateTimeOffset.MaxValue;
             }
         }
 

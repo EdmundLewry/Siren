@@ -12,8 +12,7 @@ namespace CBS.Siren
     public interface IEventTimingStrategy : IEquatable<IEventTimingStrategy>
     {
         string StrategyType { get; }
-        /* Change this so that it receives id of the event being calculated on, and the list */
-        DateTime CalculateStartTime(int? eventId, TransmissionList list);
+        DateTimeOffset CalculateStartTime(int? eventId, TransmissionList list);
         string ToString();
     }
 }

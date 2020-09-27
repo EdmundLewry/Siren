@@ -86,14 +86,14 @@ namespace CBS.Siren
             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
             if (!effectedEvent.ActualStartTime.HasValue)
             {
-                effectedEvent.ActualStartTime = DateTime.Now;
+                effectedEvent.ActualStartTime = DateTimeOffset.UtcNow;
             }
         }
 
         private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
         {
             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
-            effectedEvent.ActualEndTime = DateTime.Now;
+            effectedEvent.ActualEndTime = DateTimeOffset.UtcNow;
             if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
             {
                 TransmissionList.State = TransmissionListState.Stopped;
