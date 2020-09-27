@@ -360,7 +360,7 @@ namespace CBS.Siren.Test.Device
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
 
             DeviceList deviceList = GenerateTestDeviceList();
-            var evt = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
+            _ = await Assert.RaisesAsync<DeviceEventChangedEventArgs>(
                 h => deviceController.OnEventEnded += h,
                 h => deviceController.OnEventEnded -= h,
                 () => Task.Run(async () => {
