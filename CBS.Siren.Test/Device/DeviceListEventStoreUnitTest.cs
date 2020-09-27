@@ -25,12 +25,12 @@ namespace CBS.Siren.Test.Device
             DeviceListEvent listEvent = eventStore.CreateDeviceListEvent("", 0);
 
             DeviceListEvent updatingEvent = new DeviceListEvent(listEvent);
-            updatingEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            updatingEvent.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
             
             eventStore.UpdateDeviceListEvent(updatingEvent);
 
             DeviceListEvent updatedListEvent = eventStore.GetEventById(listEvent.Id);
-            Assert.Equal(DeviceListEventState.Status.PLAYED, updatedListEvent.EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventStatus.PLAYED, updatedListEvent.EventState.CurrentStatus);
         }
     }
 }

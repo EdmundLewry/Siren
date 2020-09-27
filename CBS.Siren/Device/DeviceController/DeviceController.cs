@@ -42,7 +42,7 @@ namespace CBS.Siren.Device
                 if (_activeDeviceList == null)
                 {
                     _activeDeviceList = new DeviceList(value);
-                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
                     EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
                 }
                 else
@@ -51,7 +51,7 @@ namespace CBS.Siren.Device
                     int replacePosition = FindReplacePosition(incomingList);
                     PrepareListsForReplace(incomingList, replacePosition);
 
-                    incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventState.Status.CUED);
+                    incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
                     _activeDeviceList.Events.AddRange(incomingList.Events);
                 }
 
@@ -146,7 +146,7 @@ namespace CBS.Siren.Device
             }
 
             _eventHasStarted = false;
-            endedEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            endedEvent.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
             DeviceListEventStore.UpdateDeviceListEvent(endedEvent);
             OnEventEnded?.Invoke(this, new DeviceEventChangedEventArgs(endedEvent));
         }
@@ -160,7 +160,7 @@ namespace CBS.Siren.Device
         private void CurrentEventStarted()
         {
             _eventHasStarted = true;
-            CurrentEvent.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
+            CurrentEvent.EventState.CurrentStatus = DeviceListEventStatus.PLAYING;
             DeviceListEventStore.UpdateDeviceListEvent(CurrentEvent);
             OnEventStarted?.Invoke(this, new DeviceEventChangedEventArgs(CurrentEvent));
         }

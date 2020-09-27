@@ -40,7 +40,7 @@ namespace CBS.Siren.Test
             DeviceListEvent returnEvent = new DeviceListEvent("") { 
                 RelatedTransmissionListEventId = 0
             };
-            DeviceListEventState returnState = new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED };
+            DeviceListEventState returnState = new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.CUED };
             DeviceListEventStatusChangeArgs args = new DeviceListEventStatusChangeArgs(returnEvent.Id, returnEvent.RelatedTransmissionListEventId, returnState);
 
             eventWatcherUnderTest.OnDeviceListEventStatusChange(mockDevice.Object, args);

@@ -66,7 +66,7 @@ namespace CBS.Siren.Test.Device
             Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
             Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
             Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
-            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventState.Status.CUED, listEvent.EventState.CurrentStatus));
+            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventStatus.CUED, listEvent.EventState.CurrentStatus));
         }
         
         [Fact]
@@ -82,7 +82,7 @@ namespace CBS.Siren.Test.Device
             updateList.Events[0].Id = generatedList.Events[0].Id;
             deviceController.ActiveDeviceList = updateList;
 
-            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventState.Status.CUED, listEvent.EventState.CurrentStatus));
+            Assert.All(deviceController.ActiveDeviceList.Events, (listEvent) => Assert.Equal(DeviceListEventStatus.CUED, listEvent.EventState.CurrentStatus));
         }
         
         [Fact]
@@ -170,7 +170,7 @@ namespace CBS.Siren.Test.Device
 
             deviceController.ActiveDeviceList = generatedList;
 
-            Assert.Equal(DeviceListEventState.Status.CUED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventStatus.CUED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
         }
 
         #endregion
@@ -278,7 +278,7 @@ namespace CBS.Siren.Test.Device
 
             await taskCompletionSource.Task;
 
-            Assert.Equal(DeviceListEventState.Status.PLAYING, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventStatus.PLAYING, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
 
             if (cancellationTokenSource.Token.CanBeCanceled)
             {
@@ -451,7 +451,7 @@ namespace CBS.Siren.Test.Device
 
             await taskCompletionSource.Task;
 
-            Assert.Equal(DeviceListEventState.Status.PLAYED, taskCompletionSource.Task.Result.EventState.CurrentStatus);
+            Assert.Equal(DeviceListEventStatus.PLAYED, taskCompletionSource.Task.Result.EventState.CurrentStatus);
 
             if (cancellationTokenSource.Token.CanBeCanceled)
             {

@@ -175,7 +175,7 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.CUED });
 
             Assert.Equal(TransmissionListEventState.Status.CUEING, event1.EventState.CurrentStatus);
         }
@@ -199,10 +199,10 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
-            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.CUED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.CUED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.CUED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.CUED });
 
             Assert.Equal(TransmissionListEventState.Status.CUED, event1.EventState.CurrentStatus);
         }
@@ -224,8 +224,8 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.CUED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.CUED });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.CUED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.CUED });
 
             Assert.Equal(TransmissionListEventState.Status.CUED, event1.EventState.CurrentStatus);
         }
@@ -247,7 +247,7 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
 
             Assert.Equal(TransmissionListEventState.Status.PLAYING, event1.EventState.CurrentStatus);
         }
@@ -270,7 +270,7 @@ namespace CBS.Siren.Test
             };
 
             DateTimeOffset earliestStartTime = DateTimeOffset.Now;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
             DateTimeOffset latestStartTime = DateTimeOffset.Now;
 
             Assert.NotNull(event1.ActualStartTime);
@@ -296,10 +296,10 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
-            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
 
             Assert.Equal(TransmissionListEventState.Status.PLAYED, event1.EventState.CurrentStatus);
         }
@@ -323,11 +323,11 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
-            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
             DateTimeOffset earliestEndTime = DateTimeOffset.Now;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
             DateTimeOffset latestEndTime = DateTimeOffset.Now;
 
             Assert.NotNull(event1.ActualEndTime);
@@ -353,10 +353,10 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
-            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
 
             Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
         }
@@ -380,10 +380,10 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            deviceEvent2.EventState.CurrentStatus = DeviceListEventState.Status.PLAYING;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYING });
-            deviceEvent1.EventState.CurrentStatus = DeviceListEventState.Status.PLAYED;
-            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventState.Status.PLAYED });
+            deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.PLAYING;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
+            deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
 
             Assert.Equal(TransmissionListEventState.Status.PLAYING, event1.EventState.CurrentStatus);
         }
