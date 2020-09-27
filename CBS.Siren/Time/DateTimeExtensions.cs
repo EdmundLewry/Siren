@@ -10,9 +10,9 @@ namespace CBS.Siren.Time
         private const string DATE_REGEX = "\\b"+ DATE_MATCH + "\\b";
         private const string DATETIME_REGEX = "\\b" + DATE_MATCH + "T" + TIMECODE_MATCH + "\\b";
 
-        public static DateTime ConvertTimecodeStringToDateTime(this string timecode) => FromTimecodeString(timecode);
-        public static DateTime FromTimecodeString(string timecode) => FromTimecodeString(timecode, TimeSource.SourceFrameRate);
-        public static DateTime FromTimecodeString(string timecode, FrameRate frameRate)
+        public static DateTimeOffset ConvertTimecodeStringToDateTime(this string timecode) => FromTimecodeString(timecode);
+        public static DateTimeOffset FromTimecodeString(string timecode) => FromTimecodeString(timecode, TimeSource.SourceFrameRate);
+        public static DateTimeOffset FromTimecodeString(string timecode, FrameRate frameRate)
         {
             Regex timeRegex = new Regex(DATETIME_REGEX);
             Match match = timeRegex.Match(timecode);
@@ -67,8 +67,8 @@ namespace CBS.Siren.Time
             }
         }
 
-        public static string ToTimecodeString(this DateTime dateTime) => ToTimecodeString(dateTime, TimeSource.SourceFrameRate);
-        public static string ToTimecodeString(this DateTime dateTime, FrameRate frameRate)
+        public static string ToTimecodeString(this DateTimeOffset dateTime) => ToTimecodeString(dateTime, TimeSource.SourceFrameRate);
+        public static string ToTimecodeString(this DateTimeOffset dateTime, FrameRate frameRate)
         {
             string timecode = dateTime.ToString("s");
             string seperator = frameRate.IsDropFrame() ? ";" : ":";

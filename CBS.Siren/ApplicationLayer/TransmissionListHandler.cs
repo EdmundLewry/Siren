@@ -9,18 +9,18 @@ using System;
 
 namespace CBS.Siren.Application
 {
-    public class TransmissionListHandler : ITransmissionListHandler
+    public partial class TransmissionListHandler : ITransmissionListHandler
     {
         public ILogger<TransmissionListHandler> Logger { get; }
         public IDataLayer DataLayer { get; }
-        public ITransmissionListService TransmissionListService { get; }
+        public ITransmissionListServiceStore TransmissionListServiceStore { get; }
         public Channel Channel { get; }
 
-        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer, ITransmissionListService transmissionListService, IDeviceManager deviceManager)
+        public TransmissionListHandler(ILogger<TransmissionListHandler> logger, IDataLayer dataLayer, ITransmissionListServiceStore transmissionListServiceStore, IDeviceManager deviceManager)
         {
             Logger = logger;
             DataLayer = dataLayer;
-            TransmissionListService = transmissionListService;
+            TransmissionListServiceStore = transmissionListServiceStore;
 
             Channel = GenerateChannel(deviceManager);
         }
@@ -34,7 +34,7 @@ namespace CBS.Siren.Application
             return new Channel(chainConfiguration);
         }
 
-        private async Task<TransmissionList> GetListBydId(int id)
+        public async Task<TransmissionList> GetListById(int id)
         {
             IEnumerable<TransmissionList> transmissionLists = await DataLayer.TransmissionLists();
 
@@ -56,49 +56,151 @@ namespace CBS.Siren.Application
 
         public async Task<IEnumerable<TransmissionListEvent>> GetListEvents(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             return transmissionList.Events;
         }
 
         public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
+            if (transmissionList == null)
+            {
+                Logger.LogError($"Unable to find list with Id {id}");
+                throw new ArgumentException($"Unable to find list with id: {id}", "id");
+            }
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
-            transmissionList.Events.Add(createdEvent);
+            int insertedAtPosition = InsertEventIntoList(createdEvent, listEvent.ListPosition, transmissionList);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
+
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            transmissionListService?.OnTransmissionListChanged(insertedAtPosition);
             return createdEvent;
+        }
+
+        private int InsertEventIntoList(TransmissionListEvent createdEvent, ListPositionDTO listPosition, TransmissionList transmissionList)
+        {
+            if(listPosition != null)
+            {
+                int foundEventIndex = GetEventPositionById(transmissionList, listPosition.AssociatedEventId);
+                if(foundEventIndex != -1)
+                {
+                    foundEventIndex = listPosition.RelativePosition == RelativePosition.Above ? foundEventIndex : foundEventIndex + 1;
+                    transmissionList.Events.Insert(foundEventIndex, createdEvent);
+                    return foundEventIndex;
+                }
+            }
+
+            transmissionList.Events.Add(createdEvent);
+            return transmissionList.Events.Count-1;
+        }
+
+        private int GetEventPositionById(TransmissionList transmissionList, int eventId)
+        {
+            //This is a fairly expensive way to do this. We may want to add positional data 
+            //to the events and maintain it in some other way
+            //We'll probably need that so that we can order them when they come out of the db anyway
+            return transmissionList.Events.FindIndex((listEvent) => listEvent.Id == eventId);
         }
 
         public async Task RemoveEvent(int listId, int eventId)
         {
-            TransmissionList transmissionList = await GetListBydId(listId);
+            TransmissionList transmissionList = await GetListById(listId);
+            if (transmissionList == null)
+            {
+                Logger.LogError($"Unable to find list with Id {listId}");
+                throw new ArgumentException($"Unable to find list with id: {listId}", "listId");
+            }
 
-            TransmissionListEvent listEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id == eventId);
-            if(listEvent == null)
+            int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
+            if(listEventPositionIndex == -1)
             {
                 throw new ArgumentException($"Unable to find list event with id: {eventId}", "eventId");
             }
 
+            TransmissionListEvent listEvent = transmissionList.Events[listEventPositionIndex];
+
             transmissionList.Events.Remove(listEvent);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
+
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            transmissionListService?.OnTransmissionListChanged(listEventPositionIndex);
         }
 
         public async Task ClearList(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
+            TransmissionList transmissionList = await GetListById(id);
             transmissionList.Events.Clear();
+
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            transmissionListService?.OnTransmissionListChanged();
 
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
         public async Task PlayTransmissionList(int id)
         {
-            TransmissionList transmissionList = await GetListBydId(id);
-            TransmissionListService.TransmissionList = transmissionList;
+            TransmissionList transmissionList = await GetListById(id);
+            if (transmissionList == null)
+            {
+                string message = $"Unable to find list with Id {id}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(id));
+            }
 
-            TransmissionListService.PlayTransmissionList();
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            if (transmissionListService == null)
+            {
+                string message = $"Unable to find list service for list with Id {id}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(id));
+            }
+
+            transmissionListService.PlayTransmissionList();
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
+        }
+
+        public async Task<TransmissionListEvent> ChangeEventPosition(int listId, int eventId, int previousPosition, int targetPosition)
+        {
+            TransmissionList transmissionList = await GetListById(listId);
+            if (transmissionList == null)
+            {
+                string message = $"Unable to find list with Id {listId}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(listId));
+            }
+
+            int foundEventIndex = GetEventPositionById(transmissionList, eventId);
+            if (foundEventIndex == -1)
+            {
+                string message = $"Unable to find list event with id {eventId} at position {previousPosition}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(previousPosition));
+            }
+
+            if (foundEventIndex != previousPosition)
+            {
+                string message = $"Unable to find list event with id {eventId} at position {previousPosition}";
+                Logger.LogError(message);
+                throw new InvalidPositionException(message, nameof(previousPosition));
+            }
+
+            if (targetPosition >= transmissionList.Events.Count)
+            {
+                string message = $"Unable to move list event with id {eventId} to target position {targetPosition}. Position is past the end of the list.";
+                Logger.LogError(message);
+                throw new InvalidPositionException(message, nameof(targetPosition));
+            }
+
+            TransmissionListEvent transmissionListEvent = transmissionList.Events[previousPosition];
+            transmissionList.Events.RemoveAt(previousPosition);
+            transmissionList.Events.Insert(targetPosition, transmissionListEvent);
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+
+            int changePosition = Math.Min(previousPosition, targetPosition);
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            transmissionListService?.OnTransmissionListChanged(changePosition);
+            return transmissionListEvent;
         }
 
         public Task PauseTransmissionList(int id)
@@ -110,5 +212,6 @@ namespace CBS.Siren.Application
         {
             throw new NotImplementedException();
         }
+
     }
 }

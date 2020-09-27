@@ -4,11 +4,17 @@
         {
             "label": "buildAll",
             "dependsOrder": "sequence",
-            "dependsOn": ["build", "buildTests"]  ,
+            "dependsOn": [
+                "build",
+                "buildTests"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
         },
         {
             "label": "build",

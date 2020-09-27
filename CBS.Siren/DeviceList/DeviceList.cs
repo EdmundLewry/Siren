@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -19,12 +20,17 @@ namespace CBS.Siren
             Events = events;
         }
 
+        public DeviceList(DeviceList deviceList)
+        {
+            Events = deviceList.Events.Select((listEvent) => new DeviceListEvent(listEvent)).ToList();
+        }
+
         public override string ToString()
         {
             string result = "";
             for (int i = 0; i < Events.Count; ++i)
             {
-                result = $"{result}\nEvent #{i} - {Events[i].ToString()}\n";
+                result = $"{result}\nEvent #{i} - {Events[i]}\n";
             }
 
             return result;

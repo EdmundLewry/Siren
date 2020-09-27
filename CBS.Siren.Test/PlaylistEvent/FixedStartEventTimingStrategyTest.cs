@@ -15,10 +15,10 @@ namespace CBS.Siren.Test
         public void CalculateStartTime_ReportsGivenTarget()
         {
             const String targetTimeString = "01/10/2019 08:00:00 AM";
-            DateTime target = DateTime.Parse(targetTimeString);
+            DateTimeOffset target = DateTimeOffset.Parse(targetTimeString);
             FixedStartEventTimingStrategy strategy = new FixedStartEventTimingStrategy(target);
 
-            DateTime startTime = strategy.CalculateStartTime(null, null);
+            DateTimeOffset startTime = strategy.CalculateStartTime(null, null);
             Assert.Equal(target, startTime);
         }
     }

@@ -15,15 +15,32 @@ namespace CBS.Siren
         public int? RelatedTransmissionListEventId { get; set; }
 
         public DeviceListEventState EventState { get; set; } = new DeviceListEventState();
-        public string EventData {get;}
-        public DateTime StartTime { get; private set; }
-        public DateTime EndTime { get; private set; }
+
+        private string _eventData;
+        public string EventData {
+            get { return _eventData; }
+            set {
+                _eventData = value;
+                ProcessEventData();
+            } 
+        
+        }
+        public DateTimeOffset StartTime { get; private set; }
+        public DateTimeOffset EndTime { get; private set; }
 
         public DeviceListEvent(string eventData, int? relatedEventId = null)
         {
             Id = IdFactory.NextDeviceListEventId();
             RelatedTransmissionListEventId = relatedEventId;
             EventData = eventData;
+            ProcessEventData();
+        }
+
+        public DeviceListEvent(DeviceListEvent listEvent)
+        {
+            Id = listEvent.Id;
+            RelatedTransmissionListEventId = listEvent.RelatedTransmissionListEventId;
+            EventData = listEvent.EventData;
             ProcessEventData();
         }
 
@@ -40,8 +57,8 @@ namespace CBS.Siren
             catch
             {
                 Console.WriteLine("Unable to parse event data");
-                StartTime = DateTime.MaxValue;
-                EndTime = DateTime.MaxValue;
+                StartTime = DateTimeOffset.MaxValue;
+                EndTime = DateTimeOffset.MaxValue;
             }
         }
 

@@ -107,6 +107,7 @@ namespace CBS.SirenUI.Backend.Middleware
             if (HttpMethods.IsGet(method)) return HttpMethod.Get;
             if (HttpMethods.IsPost(method)) return HttpMethod.Post;
             if (HttpMethods.IsPut(method)) return HttpMethod.Put;
+            if (HttpMethods.IsPatch(method)) return HttpMethod.Patch;
 
             throw new ArgumentException("Unsupported request method found when proxying request", nameof(method));
         }

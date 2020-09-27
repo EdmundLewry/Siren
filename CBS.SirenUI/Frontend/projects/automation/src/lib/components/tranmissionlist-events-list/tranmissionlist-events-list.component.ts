@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { CreateEventDialogComponent } from '../create-event-dialog/create-event-dialog.component';
-import { TransmissionList } from '../../interfaces/itransmission-list';
 import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
 import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
+import { RelativePosition, TransmissionListDetails } from '../../interfaces/interfaces';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -21,21 +22,22 @@ export class TranmissionlistEventsListComponent implements OnInit {
     "eventState",
     "expectedDuration",
     "expectedStartTime",
+    "actualStartTime",
+    "actualEndTime",
     "options"
   ];
 
   private listId?: string;
 
-  private readonly fakeData: TransmissionListEvent[] = [
-    { id: 1, eventState: "Scheduled", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:10:05" },
-    { id: 2, eventState: "Running", expectedDuration: "00:00:30:00", expectedStartTime: "2020-03-22T00:00:40:05" },
-  ];
-
   private readonly httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
+  
+  //Store this enum as a public member so that we can reference it in the html
+  public RelativePosition = RelativePosition;
 
-  private transmissionList: TransmissionList;
+  public transmissionList: TransmissionListDetails;
+  @ViewChild('table') table: MatTable<TransmissionListEvent>
 
   constructor(private http: HttpClient,
               private route: ActivatedRoute,
@@ -48,7 +50,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       this.listId = this.route.snapshot.paramMap.get("itemId") as string;
     }
 
-    this.retrieveEvents();
+    this.retrieveListInformation();
   }
 
   public requestDeleteConfirmation(listEvent: TransmissionListEvent): void {
@@ -56,7 +58,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       if (!confirmed) return;
 
       this.http.delete(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEvent.id}`, this.httpOptions).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
 
@@ -71,7 +73,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   public requestListPlay(): void {
     this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/play`, this.httpOptions).subscribe(result => {
-      this.retrieveEvents();
+      this.retrieveListInformation();
     }, error => console.error(error));
   }
 
@@ -79,7 +81,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
     console.error("Stop not currently supported");
   }
 
-  public requestAddNewEvent(): void {
+  public requestAddNewEvent(relativeEvent: TransmissionListEvent = null, relativePosition: RelativePosition = null): void {
     this.dialog.open(CreateEventDialogComponent, {
       width: '800px',
       data: {}
@@ -87,11 +89,19 @@ export class TranmissionlistEventsListComponent implements OnInit {
     .afterClosed()
       .subscribe((result: TransmissionListEventCreationData) => {
       if (result == null) return;
+      
+      if(relativeEvent != null && relativePosition != null)
+      {
+        result.listPosition = {
+          associatedEventId: relativeEvent.id,
+          relativePosition: relativePosition
+        };
+      }
 
       console.log(result);
 
         this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
   }
@@ -101,7 +111,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
       if (!confirmed) return;
 
       this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/clear`, this.httpOptions).subscribe(result => {
-        this.retrieveEvents();
+        this.retrieveListInformation();
       }, error => console.error(error));
     });
   }
@@ -109,6 +119,37 @@ export class TranmissionlistEventsListComponent implements OnInit {
   private retrieveEvents(): void {
     this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, this.httpOptions).subscribe(result => {
       this.dataSource.data = result;
+    }, error => console.error(error));
+  }
+  
+  private retrieveListInformation(): void {
+    this.http.get<TransmissionListDetails>(`/proxy/api/1/automation/transmissionlist/${this.listId}`, this.httpOptions).subscribe(result => {
+      this.transmissionList = result;
+      this.dataSource.data = this.transmissionList.events;
+    }, error => console.error(error));
+  }
+
+  public getListState(): string {
+    return this.transmissionList?.listState ?? "";
+  }
+
+  public getClearListTooltip(): string {
+    return this.getListState() == "Playing" ? "Can't clear Playing list" : "Clear List";
+  }
+
+  dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
+    
+    let listEventId = this.dataSource.data[event.previousIndex].id;
+
+    let request = {
+      previousPosition: event.previousIndex,
+      targetPosition: event.currentIndex
+    };
+
+    this.http.patch(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${listEventId}/move`, request).subscribe(result => {
+      moveItemInArray(this.dataSource.data, event.previousIndex, event.currentIndex);
+      this.table.renderRows();
+      this.retrieveListInformation();
     }, error => console.error(error));
   }
 }

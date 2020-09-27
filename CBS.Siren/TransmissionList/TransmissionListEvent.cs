@@ -24,13 +24,14 @@ namespace CBS.Siren
         public List<IEventFeature> EventFeatures { get; set; }
 
         public TimeSpan ExpectedDuration { get; set; }
-        public DateTime ExpectedStartTime { get; set; }
+        public DateTimeOffset ExpectedStartTime { get; set; }
+        public DateTimeOffset? ActualStartTime { get; set; } = null;
+        public DateTimeOffset? ActualEndTime { get; set; } = null;
 
         //I think this should just be a way to reference the related playlist event
         //There may not be a related event, so this could be null. We may choose to do
         //this with an id, but no reason not to store the event right now
         public PlaylistEvent RelatedPlaylistEvent { get; set; }
-        public List<int> RelatedDeviceListEvents { get; private set; } = new List<int>();
 
         public TransmissionListEvent(IEventTimingStrategy eventTiming, List<IEventFeature> features, PlaylistEvent PlaylistEvent = null)
         {
@@ -39,12 +40,14 @@ namespace CBS.Siren
             EventTimingStrategy = eventTiming;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             string returnValue = base.ToString() +
                     $":\nId: {Id}" +
                     $"\nExpectedStartTime: {ExpectedStartTime.ToTimecodeString()}" +
                     $"\nExpectedDuration: {ExpectedDuration.ToTimecodeString()}" +
+                    $"\nActualStartTime: {(ActualStartTime != null ? ActualStartTime?.ToTimecodeString() : "null")}" +
+                    $"\nActualEndTime: {(ActualEndTime != null ? ActualEndTime?.ToTimecodeString() : "null")}" +
                     $"\nTimingStategy - {EventTimingStrategy?.ToString()}" +
                     $"\nRelated Playlist Event Id: {RelatedPlaylistEvent?.Id}";
 

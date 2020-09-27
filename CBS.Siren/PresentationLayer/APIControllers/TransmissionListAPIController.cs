@@ -34,6 +34,22 @@ namespace CBS.Siren.Controllers
             var lists = await _handler.GetAllLists();
             return _mapper.Map<List<TransmissionListDTO>>(lists.ToList());
         }
+        
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TransmissionListDetailDTO>> GetListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to Get list with id {0}", id);
+                var list = await _handler.GetListById(id);
+                return _mapper.Map<TransmissionListDetailDTO>(list);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to get list with given id {0}", id);
+                return NotFound(id);
+            }
+        }
 
         [HttpPost("{id}/clear")]
         public async Task<ActionResult> ClearListById(int id)
@@ -95,6 +111,27 @@ namespace CBS.Siren.Controllers
             catch (Exception e)
             {
                 Logger.LogError(e, "Unable to create event for list with given id {0}, {1}", id, e.Message);
+                return NotFound(id);
+            }
+        }
+        
+        [HttpPatch("{id}/events/{eventId}/move")]
+        public async Task<ActionResult<TransmissionListEventDTO>> MoveEvent(int id, int eventId, TransmissionListEventMoveDTO listEventMove)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to move event {0} on list with id {1} from {2} to {3}", id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
+                var updatedListEvent = await _handler.ChangeEventPosition(id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
+                return _mapper.Map<TransmissionListEventDTO>(updatedListEvent);
+            }
+            catch(InvalidPositionException e)
+            {
+                Logger.LogError(e, "Unable to change position of event for list with given id {0}, {1}", id, e.Message);
+                return BadRequest(id);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to change position of event for list with given id {0}, {1}", id, e.Message);
                 return NotFound(id);
             }
         }

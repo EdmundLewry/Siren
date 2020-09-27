@@ -1,5 +1,3 @@
-using System;
-
 namespace CBS.Siren.DTO
 {
     public class TransmissionListEventDTO
@@ -10,6 +8,8 @@ namespace CBS.Siren.DTO
         public int EventFeatureCount { get; set; }
         public string ExpectedDuration { get; set; }
         public string ExpectedStartTime { get; set; }
+        public string ActualStartTime { get; set; }
+        public string ActualEndTime { get; set; }
         public string RelatedPlaylistEvent { get; set; }
         public int RelatedDeviceListEventCount { get; set; }
     }

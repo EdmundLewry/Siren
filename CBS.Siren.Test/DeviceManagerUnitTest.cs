@@ -14,6 +14,7 @@ namespace CBS.Siren.Test
         private readonly Mock<ILogger<DeviceManager>> _logger;
         private readonly Mock<ILoggerFactory> _loggerFactory;
         private readonly Mock<IDeviceFactory> _deviceFactory;
+        private readonly Mock<IDeviceListEventStore> _deviceListEventStore;
         private readonly Mock<IDevice> _mockDevice;
         private readonly Mock<IDataLayer> _dataLayer;
 
@@ -22,16 +23,17 @@ namespace CBS.Siren.Test
             _logger = new Mock<ILogger<DeviceManager>>();
             _loggerFactory = new Mock<ILoggerFactory>();
             _deviceFactory = new Mock<IDeviceFactory>();
+            _deviceListEventStore = new Mock<IDeviceListEventStore>();
             _mockDevice = new Mock<IDevice>();
             _dataLayer = new Mock<IDataLayer>();
         }
 
         private DeviceManager CreateCodeUnderTest()
         {
-            _deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>())).Returns(_mockDevice.Object);
+            _deviceFactory.Setup(mock => mock.CreateDemoDevice(It.IsAny<DeviceModel>(), It.IsAny<ILoggerFactory>(), It.IsAny<IDeviceListEventStore>())).Returns(_mockDevice.Object);
             _dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>())).ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } });
 
-            return new DeviceManager(_dataLayer.Object, _logger.Object, _loggerFactory.Object, _deviceFactory.Object);
+            return new DeviceManager(_dataLayer.Object, _logger.Object, _loggerFactory.Object, _deviceFactory.Object, _deviceListEventStore.Object);
         }
 
         [Fact]

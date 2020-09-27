@@ -28,6 +28,11 @@ namespace CBS.Siren
 
         public void UnsubcsribeFromDevice(IDeviceListEventStatusChangeListener listener, IDevice device)
         {
+            if(!Subscriptions.ContainsKey(device))
+            {
+                return;
+            }
+
             Subscriptions[device].Remove(listener);
 
             if(!Subscriptions[device].Any())
@@ -44,7 +49,7 @@ namespace CBS.Siren
                 return;
             }
 
-            Subscriptions[device].ForEach((listerner) => listerner.OnDeviceListEventStatusChanged(args.EventId, args.NewState));
+            Subscriptions[device].ForEach((listener) => listener.OnDeviceListEventStatusChanged(args.EventId, args.RelatedTransmissionListEventId, args.NewState));
         }
 
         #region IDisposable Support

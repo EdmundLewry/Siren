@@ -9,18 +9,26 @@ namespace CBS.Siren
 {
     public class SimpleScheduler : IScheduler
     {
-        public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventFactory deviceListEventFactory)
+        public Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex = 0)
         {
-            TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList);
-            return GenerateDeviceLists(calculatedTransmsmissionList, deviceListEventFactory);
+            TransmissionList calculatedTransmsmissionList = CalculateListTimings(transmissionList, startIndex);
+            return GenerateDeviceLists(calculatedTransmsmissionList, deviceListEventStore, startIndex);
         }
 
-        private TransmissionList CalculateListTimings(TransmissionList transmissionList)
+        private TransmissionList CalculateListTimings(TransmissionList transmissionList, int startIndex)
         {
-            transmissionList.Events.ForEach((TransmissionListEvent transmissionEvent) => {
-                transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
-                transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
-            });
+            for(int i = startIndex; i<transmissionList.Events.Count; ++i)
+            {
+                TransmissionListEvent transmissionEvent = transmissionList.Events[i];
+                if(!transmissionEvent.HasStartedPlayingOut())
+                {
+                    transmissionEvent.ExpectedStartTime = transmissionEvent.EventTimingStrategy.CalculateStartTime(transmissionEvent.Id, transmissionList);
+                }
+                if(!transmissionEvent.HasCompleted())
+                {
+                    transmissionEvent.ExpectedDuration = CalculateLongestFeatureDuration(transmissionEvent.EventFeatures);
+                }
+            }
 
             return transmissionList;
         }
@@ -30,19 +38,24 @@ namespace CBS.Siren
             return eventFeatures.Select(feature => feature.CalculateDuration()).Max();
         }
 
-        private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList, IDeviceListEventFactory deviceListEventFactory)
+        private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex)
         {
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
-            
-            transmissionList.Events.ForEach((transmissionEvent) => {
-                TranslateListEventToDeviceEvents(transmissionEvent, deviceLists, deviceListEventFactory); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
-                transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
-            });
+
+            for (int i = startIndex; i < transmissionList.Events.Count; ++i)
+            {
+                TransmissionListEvent transmissionEvent = transmissionList.Events[i];
+                TranslateListEventToDeviceEvents(transmissionEvent, deviceLists, deviceListEventStore); //Not sure I'm happy with this implementation. It's relatively efficient, but relies a lot on state
+                if(transmissionEvent.EventState.CurrentStatus == TransmissionListEventState.Status.UNSCHEDULED)
+                {
+                    transmissionEvent.EventState.CurrentStatus = TransmissionListEventState.Status.SCHEDULED;
+                }
+            }
 
             return deviceLists;
         }
 
-        private void TranslateListEventToDeviceEvents(TransmissionListEvent transmissionEvent, Dictionary<IDevice, DeviceList> deviceLists, IDeviceListEventFactory deviceListEventFactory)
+        private void TranslateListEventToDeviceEvents(TransmissionListEvent transmissionEvent, Dictionary<IDevice, DeviceList> deviceLists, IDeviceListEventStore deviceListEventStore)
         {
             transmissionEvent.EventFeatures.ForEach(feature =>
             {
@@ -56,7 +69,7 @@ namespace CBS.Siren
                     deviceLists[feature.Device] = new DeviceList(new List<DeviceListEvent>());
                 }
 
-                DeviceListEvent deviceListEvent = TranslateListEventFeature(transmissionEvent, feature, deviceListEventFactory);
+                DeviceListEvent deviceListEvent = TranslateListEventFeature(transmissionEvent, feature, deviceListEventStore);
                 if (deviceListEvent != null)
                 {
                     deviceLists[feature.Device].Events.Add(deviceListEvent);
@@ -64,12 +77,23 @@ namespace CBS.Siren
             });
         }
 
-        private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature, IDeviceListEventFactory deviceListEventFactory)
+        private DeviceListEvent TranslateListEventFeature(TransmissionListEvent transmissionEvent, IEventFeature feature, IDeviceListEventStore deviceListEventStore)
         {
             string eventData = GenerateEventData(transmissionEvent, feature);
-            DeviceListEvent createdEvent = deviceListEventFactory.CreateDeviceListEvent(eventData, transmissionEvent.Id);
-            transmissionEvent.RelatedDeviceListEvents.Add(createdEvent.Id);
-            return createdEvent;
+            DeviceListEvent deviceEvent;
+            if (feature.DeviceListEventId.HasValue)
+            {
+                deviceEvent =  deviceListEventStore.GetEventById(feature.DeviceListEventId.Value);
+                deviceEvent.EventData = eventData;
+                deviceEvent.RelatedTransmissionListEventId = transmissionEvent.Id;
+            }
+            else
+            {
+                deviceEvent = deviceListEventStore.CreateDeviceListEvent(eventData, transmissionEvent.Id);
+            }
+
+            feature.DeviceListEventId = deviceEvent.Id;
+            return deviceEvent;
         }
 
         private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)

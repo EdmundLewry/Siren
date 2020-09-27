@@ -37,7 +37,8 @@ namespace CBS.Siren.Application
             });
 
             IDeviceFactory deviceFactory = new DeviceFactory();
-            using IDevice device = deviceFactory.CreateDemoDevice(new DeviceModel() { Name = "DemoDevice1" }, _logFactory);
+            IDeviceListEventStore deviceListEventStore = new DeviceListEventStore(_logFactory.CreateLogger<DeviceListEventStore>());
+            using IDevice device = deviceFactory.CreateDemoDevice(new DeviceModel() { Name = "DemoDevice1" }, _logFactory, deviceListEventStore);
             device.OnDeviceStatusChanged += statusEventHandler;
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             Thread deviceThread = new Thread(async () => await device.Run(cancellationTokenSource.Token));
@@ -45,7 +46,7 @@ namespace CBS.Siren.Application
 
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
-            DateTime startTime = DateTime.Now.AddSeconds(3);
+            DateTimeOffset startTime = DateTimeOffset.UtcNow.AddSeconds(3);
             List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime, 3);
 
             Playlist list = new Playlist(events);
@@ -60,7 +61,7 @@ namespace CBS.Siren.Application
 
             _logger.LogInformation("\n*** Generating Device Lists from Transmission List ***\n");
 
-            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), new DeviceListEventFactory(), _logFactory.CreateLogger<TransmissionListService>())
+            using ITransmissionListService transmissionListService = new TransmissionListService(new SimpleScheduler(), new DeviceListEventWatcher(), deviceListEventStore, _logFactory.CreateLogger<TransmissionListService>())
             {
                 TransmissionList = transmissionList
             };
@@ -105,7 +106,7 @@ namespace CBS.Siren.Application
             return new MediaInstance(mediaName, duration, mediaPath, FileType.TEXT);
         }
 
-        private List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTime startTime, int eventCount)
+        private List<PlaylistEvent> GeneratePlaylistEvents(MediaInstance demoMedia, DateTimeOffset startTime, int eventCount)
         {
             List<PlaylistEvent> events = new List<PlaylistEvent>();
             FixedStartEventTimingStrategy fixedStart = new FixedStartEventTimingStrategy(startTime);

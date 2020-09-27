@@ -6,9 +6,9 @@ namespace CBS.Siren
     public class FixedStartEventTimingStrategy : IEventTimingStrategy
     {
         public string StrategyType => "fixed";
-        public DateTime TargetStartTime { get; }
+        public DateTimeOffset TargetStartTime { get; }
 
-        public FixedStartEventTimingStrategy(DateTime startTime)
+        public FixedStartEventTimingStrategy(DateTimeOffset startTime)
         {
             TargetStartTime = startTime;
         }
@@ -24,7 +24,7 @@ namespace CBS.Siren
             throw new ArgumentException("Failed to construct timing strategy. Given strategy was not the same type", "other");
         }
 
-        public DateTime CalculateStartTime(int? eventId, TransmissionList list)
+        public DateTimeOffset CalculateStartTime(int? eventId, TransmissionList list)
         {
             //Fixed time is really easy! We just send back what we got in
             return TargetStartTime;

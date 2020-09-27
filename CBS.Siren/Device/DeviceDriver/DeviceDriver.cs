@@ -28,13 +28,10 @@ namespace CBS.Siren.Device
         {
             if (!disposedValue)
             {
-                if (disposing)
+                if (disposing && Controller != null)
                 {
-                    if(Controller != null)
-                    {
-                        Controller.OnEventStarted -= _deviceEventStart;
-                        Controller.OnEventEnded -= _deviceEventEnd;
-                    }
+                    Controller.OnEventStarted -= _deviceEventStart;
+                    Controller.OnEventEnded -= _deviceEventEnd;
                 }
 
                 disposedValue = true;

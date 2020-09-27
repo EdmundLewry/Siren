@@ -13,6 +13,6 @@ namespace CBS.Siren
     */
     public interface IScheduler
     {
-        Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventFactory deviceListEventFactory);
+        Dictionary<IDevice, DeviceList> ScheduleTransmissionList(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex = 0);
     }
 }
