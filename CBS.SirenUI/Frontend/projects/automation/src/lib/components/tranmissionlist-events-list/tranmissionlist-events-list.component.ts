@@ -105,6 +105,24 @@ export class TranmissionlistEventsListComponent implements OnInit {
       }, error => console.error(error));
     });
   }
+  
+  
+  public requestUpdateEvent(updatingEvent: TransmissionListEvent = null): void {
+    this.dialog.open(CreateEventDialogComponent, {
+      width: '800px',
+      data: updatingEvent
+    })
+    .afterClosed()
+      .subscribe((result: TransmissionListEventCreationData) => {
+        if (result == null) return;
+
+        console.log(result);
+
+        this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, result).subscribe(result => {
+        this.retrieveListInformation();
+      }, error => console.error(error));
+    });
+  }
 
   public requestClearList(): void {
     this.openConfirmationDialog("Clear all events from the list?").afterClosed().subscribe(confirmed => {

@@ -5,7 +5,7 @@ import { PipesModule } from './pipes/pipes.module';
 import { TranmissionlistEventsListComponent } from './components/tranmissionlist-events-list/tranmissionlist-events-list.component';
 
 const routes: Routes = [
-  { path: "txlist/:itemId", component: TranmissionlistEventsListComponent }
+  { path: "transmissionlist/:itemId", component: TranmissionlistEventsListComponent }
 ]
 
 @NgModule({

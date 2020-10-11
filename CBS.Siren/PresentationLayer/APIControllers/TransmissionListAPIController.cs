@@ -122,7 +122,7 @@ namespace CBS.Siren.Controllers
             {
                 Logger.LogDebug("Received request to update event to list with id {0} and list event dto {1}", id, JsonSerializer.Serialize(listEvent));
                 var updatedListEvent = await _handler.UpdateEventDetails(id, eventId, listEvent);
-                return Ok(_mapper.Map<TransmissionListEventDTO>(updatedListEvent));
+                return _mapper.Map<TransmissionListEventDTO>(updatedListEvent);
             }
             catch (Exception e)
             {
