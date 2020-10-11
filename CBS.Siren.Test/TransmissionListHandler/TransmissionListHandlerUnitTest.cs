@@ -28,11 +28,16 @@ namespace CBS.Siren.Test
             _dataLayer = new Mock<IDataLayer>();
             
             _transmissionList = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow), new List<IEventFeature>(){ 
-                    new VideoPlaylistEventFeature(new PrimaryVideoPlayoutStrategy(), 
-                                                  new MediaSourceStrategy(new MediaInstance("Test", TimeSpan.FromSeconds(30)), TimeSpan.Zero, TimeSpan.FromSeconds(30)), null)
-                }),
-                new TransmissionListEvent(null, null)
+                new TransmissionListEvent(new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow), 
+                                          new List<IEventFeature>(){ 
+                                            new VideoPlaylistEventFeature(new PrimaryVideoPlayoutStrategy(), 
+                                                                          new MediaSourceStrategy(new MediaInstance("Test", TimeSpan.FromSeconds(30)), TimeSpan.Zero, TimeSpan.FromSeconds(30)), null)
+                                          }){ 
+                    Id = 1 
+                },
+                new TransmissionListEvent(null, null){ 
+                    Id = 2 
+                }
             })
             {
                 Id = 1

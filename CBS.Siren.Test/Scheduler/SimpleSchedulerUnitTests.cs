@@ -33,10 +33,10 @@ namespace CBS.Siren.Test
             var mockEventTimingStrategy = new Mock<IEventTimingStrategy>();
             mockEventTimingStrategy.Setup(mock => mock.CalculateStartTime(It.IsAny<int>(), It.IsAny<TransmissionList>())).Returns(calculatedStartTime);
 
-            event1 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object));
-            event2 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object));
-            event3 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice2.Object, mockDevice3.Object));
-            event4 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object));
+            event1 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object)) { Id = 1 };
+            event2 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object)) { Id = 2 };
+            event3 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice2.Object, mockDevice3.Object)) { Id = 3 };
+            event4 = new TransmissionListEvent(mockEventTimingStrategy.Object, GenerateMockFeatureList(mockDevice1.Object)) { Id = 4 };
 
             return new TransmissionList(new List<TransmissionListEvent>() {event1, event2, event3, event4}, null);
         }
