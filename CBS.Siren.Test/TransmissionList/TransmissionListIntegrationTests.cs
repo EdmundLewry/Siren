@@ -11,6 +11,7 @@ using Xunit.Abstractions;
 using System.Net;
 using System.Linq;
 using CBS.Siren.Time;
+using CBS.Siren.Utilities;
 
 namespace CBS.Siren.Test
 {
@@ -58,7 +59,7 @@ namespace CBS.Siren.Test
 
             string content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            List<TransmissionListDTO> returnedLists = JsonSerializer.Deserialize<List<TransmissionListDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListDTO> returnedLists = content.DeserializeJson<List<TransmissionListDTO>>();
 
             Assert.Single(returnedLists);
             Assert.Equal("Stopped", returnedLists[0].ListState);
@@ -84,7 +85,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
@@ -92,7 +93,7 @@ namespace CBS.Siren.Test
 
             string content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            TransmissionListDetailDTO returnedList = JsonSerializer.Deserialize<TransmissionListDetailDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListDetailDTO returnedList = content.DeserializeJson<TransmissionListDetailDTO>();
 
             Assert.NotNull(returnedList);
             Assert.Equal("Stopped", returnedList.ListState);
@@ -109,7 +110,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
@@ -117,7 +118,7 @@ namespace CBS.Siren.Test
 
             string content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
 
             Assert.NotEmpty(returnedList);
         }
@@ -144,12 +145,12 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             string content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
 
             Assert.Equal("SCHEDULED", returnedEvent.EventState);
             Assert.Equal(1, returnedEvent.EventFeatureCount);
@@ -165,7 +166,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1000/events", eventCreationData);
 
@@ -206,7 +207,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -214,7 +215,7 @@ namespace CBS.Siren.Test
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
 
             response = await clientUnderTest.DeleteAsync($"api/1/automation/transmissionlist/1/events/{returnedEvent.Id}");
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -222,7 +223,7 @@ namespace CBS.Siren.Test
             response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
 
             content = await response.Content.ReadAsStringAsync();
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
 
             Assert.Single(returnedList);
         }
@@ -249,7 +250,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -262,7 +263,7 @@ namespace CBS.Siren.Test
             response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
 
             string content = await response.Content.ReadAsStringAsync();
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
 
             Assert.Empty(returnedList);
         }
@@ -289,7 +290,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), UnicodeEncoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -302,7 +303,7 @@ namespace CBS.Siren.Test
             response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
 
             string content = await response.Content.ReadAsStringAsync();
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
 
             Assert.Equal(2, returnedList.Count);
             Assert.True(returnedList[0].RelatedDeviceListEventCount > 0);
@@ -319,22 +320,22 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1};
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
 
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
             content = await response.Content.ReadAsStringAsync();
-            returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
 
             Assert.Equal(returnedId, returnedEvent.Id);
             Assert.Equal("SCHEDULED", returnedEvent.EventState);
@@ -351,28 +352,27 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
 
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
             content = await response.Content.ReadAsStringAsync();
-            returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
 
             response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
-
             content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
 
             Assert.Equal(returnedList[1].Id, returnedEvent.Id);
         }
@@ -385,18 +385,18 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/100/events/{returnedId}/move", eventUpdateData);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -410,13 +410,13 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 1 };
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
             HttpResponseMessage response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/100/move", eventUpdateData);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -430,18 +430,18 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 1, TargetPosition = 0 };
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -455,18 +455,18 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             TransmissionListEventMoveDTO moveData = new TransmissionListEventMoveDTO() { PreviousPosition = 0, TargetPosition = 10 };
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(moveData), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(moveData.SerializeToJson(), Encoding.UTF8, "application/json");
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -480,12 +480,12 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
@@ -494,14 +494,14 @@ namespace CBS.Siren.Test
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
             updateDTO.TimingData.TargetStartTime = expectedStartTime;
 
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             _ = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/1/events/{returnedId}", eventUpdateData);
             response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
 
             content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
             TransmissionListEventDTO updatedEvent = returnedList.FirstOrDefault(listEvent => listEvent.Id == returnedId);
 
             Assert.NotNull(updatedEvent);
@@ -516,12 +516,12 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             string content = await response.Content.ReadAsStringAsync();
-            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO returnedEvent = content.DeserializeJson<TransmissionListEventDTO>();
             int returnedId = returnedEvent.Id;
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
@@ -530,7 +530,7 @@ namespace CBS.Siren.Test
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
             updateDTO.TimingData.TargetStartTime = expectedStartTime;
 
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             response = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/100/events/{returnedId}", eventUpdateData);
 
@@ -545,7 +545,7 @@ namespace CBS.Siren.Test
             using HttpClient clientUnderTest = factory.CreateClient();
 
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
-            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
@@ -554,7 +554,7 @@ namespace CBS.Siren.Test
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
             updateDTO.TimingData.TargetStartTime = expectedStartTime;
 
-            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+            var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/1/events/100", eventUpdateData);
 

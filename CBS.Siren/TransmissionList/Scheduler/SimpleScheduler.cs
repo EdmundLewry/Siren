@@ -114,7 +114,7 @@ namespace CBS.Siren
                 Source = source
             };
 
-            return eventData.SerializeObjectDataToJsonString();
+            return eventData.SerializeToJson();
         }
     }
 }
