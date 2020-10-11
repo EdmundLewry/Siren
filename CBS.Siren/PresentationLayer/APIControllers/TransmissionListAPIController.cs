@@ -100,7 +100,7 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpPost("{id}/events")]
-        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
+        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(int id, TransmissionListEventUpsertDTO listEvent)
         {
             try
             {

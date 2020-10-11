@@ -16,12 +16,12 @@ namespace CBS.Siren.Test
         public void BuildTransmissionListEvent_WithFixedTimingData_CreatesEventWithFixedTiming()
         {
             DateTimeOffset targetStartTime = DateTimeOffset.Parse("2020-03-22 00:00:10");
-            TimingStrategyCreationDTO timingData = new TimingStrategyCreationDTO(){
+            TimingStrategyUpsertDTO timingData = new TimingStrategyUpsertDTO(){
                 StrategyType = "fixed",
                 TargetStartTime = targetStartTime
             };
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureCreationDTO>(), null, new Mock<IDataLayer>().Object);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureUpsertDTO>(), null, new Mock<IDataLayer>().Object);
 
             FixedStartEventTimingStrategy expectedStrategy = new FixedStartEventTimingStrategy(targetStartTime);
             Assert.Equal(expectedStrategy, createdEvent.EventTimingStrategy);
@@ -31,11 +31,11 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void BuildTransmissionListEvent_WithSequentialTimingData_CreatesEventWithSequentialTiming()
         {
-            TimingStrategyCreationDTO timingData = new TimingStrategyCreationDTO(){
+            TimingStrategyUpsertDTO timingData = new TimingStrategyUpsertDTO(){
                 StrategyType = "sequential"
             };
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureCreationDTO>(), null, new Mock<IDataLayer>().Object);
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureUpsertDTO>(), null, new Mock<IDataLayer>().Object);
 
             SequentialStartEventTimingStrategy expectedStrategy = new SequentialStartEventTimingStrategy();
             Assert.Equal(expectedStrategy, createdEvent.EventTimingStrategy);
@@ -45,7 +45,7 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void BuildTransmissionListEvent_WithVideoFeature_CreatesEventWithVideoFeature()
         {
-            ListEventFeatureCreationDTO featureData = new ListEventFeatureCreationDTO(){
+            ListEventFeatureUpsertDTO featureData = new ListEventFeatureUpsertDTO(){
                 FeatureType = "video",
                 PlayoutStrategy = new PlayoutStrategyCreationDTO() { StrategyType = "primaryVideo" },
                 SourceStrategy = new SourceStrategyCreationDTO() {
@@ -63,8 +63,8 @@ namespace CBS.Siren.Test
             var mockDataLayer = new Mock<IDataLayer>();
             mockDataLayer.Setup(mock => mock.MediaInstances()).ReturnsAsync(new List<MediaInstance>(){instance});
 
-            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(new TimingStrategyCreationDTO(), 
-                                                                                                        new List<ListEventFeatureCreationDTO>(){featureData}, 
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(new TimingStrategyUpsertDTO(), 
+                                                                                                        new List<ListEventFeatureUpsertDTO>(){featureData}, 
                                                                                                         mockVideoChain.Object,
                                                                                                         mockDataLayer.Object);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();

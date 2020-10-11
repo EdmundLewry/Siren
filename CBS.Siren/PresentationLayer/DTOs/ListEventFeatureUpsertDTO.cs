@@ -1,6 +1,6 @@
 namespace CBS.Siren.DTO
 {
-    public class ListEventFeatureCreationDTO
+    public class ListEventFeatureUpsertDTO
     {
         public string FeatureType { get; set; }
         public PlayoutStrategyCreationDTO PlayoutStrategy { get; set; }
