@@ -115,6 +115,22 @@ namespace CBS.Siren.Controllers
             }
         }
         
+        [HttpPut("{id}/events/{eventId}")]
+        public async Task<ActionResult<TransmissionListEventDTO>> UpdateEvent(int id, int eventId, TransmissionListEventUpsertDTO listEvent)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to update event to list with id {0} and list event dto {1}", id, JsonSerializer.Serialize(listEvent));
+                var updatedListEvent = await _handler.UpdateEventDetails(id, eventId, listEvent);
+                return Ok(_mapper.Map<TransmissionListEventDTO>(updatedListEvent));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to update event for list with given id {0}, {1}", id, e.Message);
+                return NotFound(id);
+            }
+        }
+        
         [HttpPatch("{id}/events/{eventId}/move")]
         public async Task<ActionResult<TransmissionListEventDTO>> MoveEvent(int id, int eventId, TransmissionListEventMoveDTO listEventMove)
         {

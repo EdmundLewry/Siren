@@ -9,6 +9,8 @@ using System;
 using System.Text;
 using Xunit.Abstractions;
 using System.Net;
+using System.Linq;
+using CBS.Siren.Time;
 
 namespace CBS.Siren.Test
 {
@@ -468,6 +470,95 @@ namespace CBS.Siren.Test
             response = await clientUnderTest.PatchAsync($"api/1/automation/transmissionlist/1/events/{returnedId}/move", eventUpdateData);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenUpdateEventIsCalled_SuccessfullyUpdatesEvent()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
+            TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
+            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+
+            _ = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/1/events/{returnedId}", eventUpdateData);
+            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
+
+            content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
+            List<TransmissionListEventDTO> returnedList = JsonSerializer.Deserialize<List<TransmissionListEventDTO>>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            TransmissionListEventDTO updatedEvent = returnedList.FirstOrDefault(listEvent => listEvent.Id == returnedId);
+
+            Assert.NotNull(updatedEvent);
+            Assert.Equal(expectedStartTime, updatedEvent.ExpectedStartTime.ConvertTimecodeStringToDateTime());
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenUpdateEventIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDTO returnedEvent = JsonSerializer.Deserialize<TransmissionListEventDTO>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            int returnedId = returnedEvent.Id;
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
+            TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
+            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+
+            response = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/100/events/{returnedId}", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenUpdateEventIsCalledWithBadEventId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(JsonSerializer.Serialize(creationDTO), Encoding.UTF8, "application/json");
+
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+
+            DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
+            TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
+            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+
+            var eventUpdateData = new StringContent(JsonSerializer.Serialize(updateDTO), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/1/events/100", eventUpdateData);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
         #endregion
     }
