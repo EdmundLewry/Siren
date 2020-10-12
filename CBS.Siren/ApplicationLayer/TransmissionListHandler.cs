@@ -60,6 +60,19 @@ namespace CBS.Siren.Application
             return transmissionList.Events;
         }
 
+        public async Task<TransmissionListEvent> GetListEventById(int listId, int eventId)
+        {
+            TransmissionList transmissionList = await GetListById(listId);
+
+            TransmissionListEvent foundEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id == eventId);
+            if(foundEvent is null)
+            {
+                Logger.LogError("Unable to find list event with id: {TransmissionListEventId}", eventId);
+                throw new ArgumentException($"Unable to find list event with id: {eventId}", nameof(eventId));
+            }
+            return foundEvent;
+        }
+
         public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventUpsertDTO listEvent)
         {
             TransmissionList transmissionList = await GetListById(id);

@@ -121,6 +121,36 @@ namespace CBS.Siren.Test
             Assert.Equal(2, transmissionList.Events.ToList().Count);
             Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
         }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListEventById_WithInvalidListId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListEventById(30, 1));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListEventById_WithInvalidEventId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.GetListEventById(1, 30));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task GetListEventById_WithValidEventId_ReturnsEvent()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            TransmissionListEvent transmissionListEvent = await codeUnderTest.GetListEventById(1, 1);
+
+            Assert.NotNull(transmissionListEvent);
+            Assert.Equal(1, transmissionListEvent.Id);
+        }
         #endregion
 
         #region Add

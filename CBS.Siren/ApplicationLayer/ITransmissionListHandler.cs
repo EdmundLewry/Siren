@@ -9,6 +9,7 @@ namespace CBS.Siren.Application
         Task<IEnumerable<TransmissionList>> GetAllLists();
         Task<TransmissionList> GetListById(int id);
         Task<IEnumerable<TransmissionListEvent>> GetListEvents(int id);
+        Task<TransmissionListEvent> GetListEventById(int listId, int eventId);
         Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventUpsertDTO listEvent);
         Task RemoveEvent(int listId, int eventId);
         Task ClearList(int id);
