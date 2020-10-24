@@ -61,7 +61,9 @@ namespace CBS.Siren.DTO
                         .ForMember(dto => dto.ActualEndTime,
                                 config => config.MapFrom(listEvent => listEvent.ActualEndTime.HasValue ? listEvent.ActualEndTime.Value.ToTimecodeString() : ""))
                         .ForMember(dto => dto.RelatedDeviceListEventCount,
-                            config => config.MapFrom(listEvent => listEvent.EventFeatures.Count(feature => feature.DeviceListEventId.HasValue)));
+                            config => config.MapFrom(listEvent => listEvent.EventFeatures.Count(feature => feature.DeviceListEventId.HasValue)))
+                        .ForMember(dto => dto.RelatedPlaylistEventId,
+                            config => config.MapFrom((listEvent, dto) => listEvent.RelatedPlaylistEvent?.Id));
 
             CreateMap<IEventTimingStrategy, TimingStrategyDTO>()
                         .ForMember(dto => dto.TargetStartTime,

@@ -13,6 +13,6 @@ namespace CBS.Siren.DTO
         public int RelatedDeviceListEventCount { get; set; }
         public TimingStrategyDTO EventTimingStrategy { get; set; }
         public List<ListEventFeatureDTO> EventFeatures { get; set; }
-        public PlaylistEventDTO RelatedPlaylistEvent { get; set; }
+        public int? RelatedPlaylistEventId { get; set; }
     }
 }
