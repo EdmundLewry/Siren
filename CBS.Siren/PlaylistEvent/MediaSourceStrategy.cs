@@ -14,6 +14,7 @@ namespace CBS.Siren
     public class MediaSourceStrategy : ISourceStrategy
     {
         public MediaInstance Instance { get; }
+        public string MediaName { get => Instance?.Name; }
         
         //SOM = Start of Media
         public TimeSpan SOM { get; set; }

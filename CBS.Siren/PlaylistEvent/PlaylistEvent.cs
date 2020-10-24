@@ -15,7 +15,7 @@ namespace CBS.Siren
         public IEventTimingStrategy EventTimingStrategy { get; set; }
 
         public bool IsValid { get; set; }
-        public String ValidationStatus { get; set; }
+        public string ValidationStatus { get; set; }
 
         public int Id { get; set; }
         

@@ -136,6 +136,72 @@ namespace CBS.Siren.Test
         }
         #endregion
 
+        #region GetListEventById
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenGetEventIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1000/events/1");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenGetEventIsCalledWithBadEventId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events/1000");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenGetEventIsCalledWithValidIds_ReturnsCreatedEvent()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListDTO createdEvent = content.DeserializeJson<TransmissionListDTO>();
+            int createdEventId = createdEvent.Id;
+
+            response = await clientUnderTest.GetAsync($"api/1/automation/transmissionlist/1/events/{createdEventId}");
+            content = await response.Content.ReadAsStringAsync();
+            _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
+            TransmissionListEventDetailDTO returnedEvent = content.DeserializeJson<TransmissionListEventDetailDTO>();
+
+            Assert.Equal("SCHEDULED", returnedEvent.EventState);
+            Assert.Single(returnedEvent.EventFeatures);
+            Assert.Equal("video", returnedEvent.EventFeatures[0].FeatureType);
+            Assert.Equal("primaryVideo", returnedEvent.EventFeatures[0].PlayoutStrategy.StrategyType);
+            Assert.Equal("mediaSource", returnedEvent.EventFeatures[0].SourceStrategy.StrategyType);
+            Assert.Equal("00:00:00:00", returnedEvent.EventFeatures[0].SourceStrategy.SOM);
+            Assert.Equal("00:00:30:00", returnedEvent.EventFeatures[0].SourceStrategy.EOM);
+            Assert.Equal("TestInstance", returnedEvent.EventFeatures[0].SourceStrategy.MediaName);
+            Assert.Equal("DemoDevice", returnedEvent.EventFeatures[0].Device.Name);
+            Assert.Equal("STOPPED", returnedEvent.EventFeatures[0].Device.CurrentStatus);
+            Assert.Equal(1, returnedEvent.RelatedDeviceListEventCount);
+            Assert.Equal("fixed", returnedEvent.EventTimingStrategy.StrategyType);
+            Assert.Equal("2020-03-22T12:30:10:00", returnedEvent.EventTimingStrategy.TargetStartTime);
+            Assert.Equal("00:00:30:00", returnedEvent.ExpectedDuration);
+            Assert.Equal("2020-03-22T12:30:10:00", returnedEvent.ExpectedStartTime);
+        }
+        #endregion
+
         #region AddEvent
         [Fact]
         [Trait("TestType", "IntegrationTest")]

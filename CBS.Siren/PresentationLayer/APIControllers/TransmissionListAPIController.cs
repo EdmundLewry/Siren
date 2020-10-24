@@ -50,6 +50,22 @@ namespace CBS.Siren.Controllers
                 return NotFound(id);
             }
         }
+        
+        [HttpGet("{listId}/events/{eventId}")]
+        public async Task<ActionResult<TransmissionListEventDetailDTO>> GetListEventById(int listId, int eventId)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to Get transmission list event with id {TransmissionListEventId}", eventId);
+                var listEvent = await _handler.GetListEventById(listId, eventId);
+                return _mapper.Map<TransmissionListEventDetailDTO>(listEvent);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to get transmission list event with given id {TransmissionListEventId}", eventId);
+                return NotFound(eventId);
+            }
+        }
 
         [HttpPost("{id}/clear")]
         public async Task<ActionResult> ClearListById(int id)
