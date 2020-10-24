@@ -4,11 +4,12 @@ import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
-import { CreateEventDialogComponent } from '../create-event-dialog/create-event-dialog.component';
+import { TransmissionListEventEditDialog } from '../transmission-list-event-edit-dialog/transmission-list-event-edit-dialog.component';
 import { TransmissionListEvent } from '../../interfaces/itransmission-list-event';
 import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
 import { RelativePosition, TransmissionListDetails } from '../../interfaces/interfaces';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { TransmissionListEventDetails } from '../../interfaces/itransmission-list-event-details';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -47,7 +48,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
   public ngOnInit() {
     if (this.route.snapshot.paramMap.has("itemId")) {
-      this.listId = this.route.snapshot.paramMap.get("itemId") as string;
+      this.listId = this.route.snapshot.paramMap.get("itemId");
     }
 
     this.retrieveListInformation();
@@ -61,7 +62,6 @@ export class TranmissionlistEventsListComponent implements OnInit {
         this.retrieveListInformation();
       }, error => console.error(error));
     });
-
   }
 
   private openConfirmationDialog(dialogText: string) {
@@ -82,25 +82,25 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestAddNewEvent(relativeEvent: TransmissionListEvent = null, relativePosition: RelativePosition = null): void {
-    this.dialog.open(CreateEventDialogComponent, {
+    this.dialog.open(TransmissionListEventEditDialog, {
       width: '800px',
       data: {}
     })
     .afterClosed()
       .subscribe((result: TransmissionListEventCreationData) => {
-      if (result == null) return;
-      
-      if(relativeEvent != null && relativePosition != null)
-      {
-        result.listPosition = {
-          associatedEventId: relativeEvent.id,
-          relativePosition: relativePosition
-        };
-      }
+        if (result == null) return;
+        
+        if(relativeEvent != null && relativePosition != null)
+        {
+          result.listPosition = {
+            associatedEventId: relativeEvent.id,
+            relativePosition: relativePosition
+          };
+        }
 
-      console.log(result);
+        console.log(result);
 
-        this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(result => {
+        this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(response => {
         this.retrieveListInformation();
       }, error => console.error(error));
     });
@@ -108,9 +108,10 @@ export class TranmissionlistEventsListComponent implements OnInit {
   
   
   public requestUpdateEvent(updatingEvent: TransmissionListEvent = null): void {
-    this.dialog.open(CreateEventDialogComponent, {
+    var eventDetails = !updatingEvent ? null : this.retrieveEventById(updatingEvent.id);
+    this.dialog.open(TransmissionListEventEditDialog, {
       width: '800px',
-      data: updatingEvent
+      data: eventDetails
     })
     .afterClosed()
       .subscribe((result: TransmissionListEventCreationData) => {
@@ -118,7 +119,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
         console.log(result);
 
-        this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, result).subscribe(result => {
+        this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, result).subscribe(response => {
         this.retrieveListInformation();
       }, error => console.error(error));
     });
@@ -134,10 +135,15 @@ export class TranmissionlistEventsListComponent implements OnInit {
     });
   }
 
-  private retrieveEvents(): void {
-    this.http.get<TransmissionListEvent[]>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, this.httpOptions).subscribe(result => {
-      this.dataSource.data = result;
-    }, error => console.error(error));
+  private retrieveEventById(id: number): TransmissionListEventDetails {
+    var eventDetails = null;
+    this.http.get<TransmissionListEventDetails>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${id}`, this.httpOptions)
+      .subscribe(result => {
+          eventDetails = result;
+        }, 
+        error => console.error(error)
+      );
+    return eventDetails;
   }
   
   private retrieveListInformation(): void {

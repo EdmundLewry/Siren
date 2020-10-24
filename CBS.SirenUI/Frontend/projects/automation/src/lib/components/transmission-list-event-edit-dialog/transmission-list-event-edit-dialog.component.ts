@@ -1,18 +1,18 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
-import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
 import { TimingStrategyTypes } from '../../interfaces/timing-strategy-types.enum';
 import { PlayoutStrategyTypes } from '../../interfaces/playout-strategy-types.enum';
 import { SourceStrategyTypes } from '../../interfaces/source-strategy-types.enum';
 import { FeatureTypes } from '../../interfaces/feature-types.enum';
+import { TransmissionListEventDetails } from '../../interfaces/itransmission-list-event-details';
 
 @Component({
-  selector: 'lib-create-event-dialog',
-  templateUrl: './create-event-dialog.component.html',
-  styleUrls: ['./create-event-dialog.component.css']
+  selector: 'lib-transmission-list-event-edit-dialog',
+  templateUrl: './transmission-list-event-edit-dialog.component.html',
+  styleUrls: ['./transmission-list-event-edit-dialog.component.css']
 })
-export class CreateEventDialogComponent {
+export class TransmissionListEventEditDialog {
   public readonly transmissionListEventForm: FormGroup;
   public readonly timingStrategyTypeControl: FormControl;
   public readonly targetStartTimeControl: FormControl;
@@ -29,8 +29,8 @@ export class CreateEventDialogComponent {
   public timingStrategyTypes: string[] = Object.keys(TimingStrategyTypes);
 
   constructor(
-    public dialogRef: MatDialogRef<CreateEventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventCreationData) {
+    public dialogRef: MatDialogRef<TransmissionListEventEditDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventDetails) {
       this.timingStrategyTypeControl = new FormControl(this.timingStrategyTypes[0]);
       this.targetStartTimeControl = new FormControl();
 
