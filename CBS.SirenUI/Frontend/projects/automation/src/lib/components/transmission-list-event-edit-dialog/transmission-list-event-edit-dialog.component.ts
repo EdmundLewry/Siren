@@ -28,10 +28,14 @@ export class TransmissionListEventEditDialog {
   public sourceStrategyTypes: string[] = Object.keys(SourceStrategyTypes);
   public timingStrategyTypes: string[] = Object.keys(TimingStrategyTypes);
 
+  public isUpdating = false;
+
   constructor(
     public dialogRef: MatDialogRef<TransmissionListEventEditDialog>,
     @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventDetails) {
       
+      this.isUpdating = data != null;
+
       var timingValues: string[] = Object.values(TimingStrategyTypes);
       this.timingStrategyTypeControl = new FormControl(!data ? this.timingStrategyTypes[0] : this.timingStrategyTypes[timingValues.indexOf(data.eventTimingStrategy.strategyType)]);
       this.targetStartTimeControl = new FormControl(!data ? null : data.eventTimingStrategy.targetStartTime);
