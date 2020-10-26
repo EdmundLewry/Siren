@@ -18,7 +18,7 @@ namespace CBS.Siren.Test
             DateTimeOffset targetStartTime = DateTimeOffset.Parse("2020-03-22 00:00:10");
             TimingStrategyUpsertDTO timingData = new TimingStrategyUpsertDTO(){
                 StrategyType = "fixed",
-                TargetStartTime = targetStartTime
+                TargetStartTime = targetStartTime.ToTimecodeString()
             };
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(timingData, new List<ListEventFeatureUpsertDTO>(), null, new Mock<IDataLayer>().Object);

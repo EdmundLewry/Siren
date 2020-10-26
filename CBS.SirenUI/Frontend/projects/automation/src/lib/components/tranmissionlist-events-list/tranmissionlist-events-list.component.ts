@@ -10,6 +10,7 @@ import { TransmissionListEventCreationData } from '../../interfaces/itransmissio
 import { RelativePosition, TransmissionListDetails } from '../../interfaces/interfaces';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { TransmissionListEventDetails } from '../../interfaces/itransmission-list-event-details';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'lib-tranmissionlist-events-list',
@@ -84,23 +85,23 @@ export class TranmissionlistEventsListComponent implements OnInit {
   public requestAddNewEvent(relativeEvent: TransmissionListEvent = null, relativePosition: RelativePosition = null): void {
     this.dialog.open(TransmissionListEventEditDialog, {
       width: '800px',
-      data: {}
+      data: null
     })
     .afterClosed()
-      .subscribe((result: TransmissionListEventCreationData) => {
-        if (result == null) return;
-        
-        if(relativeEvent != null && relativePosition != null)
-        {
-          result.listPosition = {
-            associatedEventId: relativeEvent.id,
-            relativePosition: relativePosition
-          };
-        }
+    .subscribe((creationData: TransmissionListEventCreationData) => {
+      if (creationData == null) return;
+      
+      if(relativeEvent != null && relativePosition != null)
+      {
+        creationData.listPosition = {
+          associatedEventId: relativeEvent.id,
+          relativePosition: relativePosition
+        };
+      }
 
-        console.log(result);
+      console.log(creationData);
 
-        this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, result).subscribe(response => {
+      this.http.post<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events`, creationData).subscribe(response => {
         this.retrieveListInformation();
       }, error => console.error(error));
     });
@@ -108,21 +109,34 @@ export class TranmissionlistEventsListComponent implements OnInit {
   
   
   public requestUpdateEvent(updatingEvent: TransmissionListEvent = null): void {
-    var eventDetails = !updatingEvent ? null : this.retrieveEventById(updatingEvent.id);
-    this.dialog.open(TransmissionListEventEditDialog, {
-      width: '800px',
-      data: eventDetails
-    })
-    .afterClosed()
-      .subscribe((result: TransmissionListEventCreationData) => {
-        if (result == null) return;
+    var eventDetails = null;
+    if(!updatingEvent)
+    {
+      console.error("Received a request to update an event, but no event was passed");
+      return;
+    }
 
-        console.log(result);
+    this.retrieveEventById(updatingEvent.id).subscribe(updatingEventDetails => {
+      if (updatingEventDetails == null) return;
+      
+      console.log(`Received reply to get event by id: ${updatingEventDetails}`);
+      console.log(updatingEventDetails);
 
-        this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, result).subscribe(response => {
-        this.retrieveListInformation();
-      }, error => console.error(error));
-    });
+      this.dialog.open(TransmissionListEventEditDialog, {
+        width: '800px',
+        data: updatingEventDetails
+      })
+      .afterClosed()
+      .subscribe((creationData: TransmissionListEventCreationData) => {
+        if (creationData == null) return;
+
+        console.log(creationData);
+
+        this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, creationData).subscribe(response => {
+          this.retrieveListInformation();
+        }, error => console.error(error));
+      });
+    }, error => console.log(error));
   }
 
   public requestClearList(): void {
@@ -135,15 +149,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
     });
   }
 
-  private retrieveEventById(id: number): TransmissionListEventDetails {
-    var eventDetails = null;
-    this.http.get<TransmissionListEventDetails>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${id}`, this.httpOptions)
-      .subscribe(result => {
-          eventDetails = result;
-        }, 
-        error => console.error(error)
-      );
-    return eventDetails;
+  private retrieveEventById(id: number): Observable<TransmissionListEventDetails> {
+    return this.http.get<TransmissionListEventDetails>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${id}`, this.httpOptions);
   }
   
   private retrieveListInformation(): void {

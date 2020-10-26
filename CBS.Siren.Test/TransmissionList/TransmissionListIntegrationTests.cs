@@ -30,7 +30,7 @@ namespace CBS.Siren.Test
                 TimingData = new TimingStrategyUpsertDTO()
                 {
                     StrategyType = "fixed",
-                    TargetStartTime = DateTimeOffset.Parse("2020-03-22 12:30:10")
+                    TargetStartTime = DateTimeOffset.Parse("2020-03-22 12:30:10").ToTimecodeString()
                 },
                 Features = new List<ListEventFeatureUpsertDTO>(){
                     new ListEventFeatureUpsertDTO(){
@@ -558,7 +558,7 @@ namespace CBS.Siren.Test
 
             DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
-            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+            updateDTO.TimingData.TargetStartTime = expectedStartTime.ToTimecodeString();
 
             var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
@@ -594,7 +594,7 @@ namespace CBS.Siren.Test
 
             DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
-            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+            updateDTO.TimingData.TargetStartTime = expectedStartTime.ToTimecodeString();
 
             var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
@@ -618,7 +618,7 @@ namespace CBS.Siren.Test
 
             DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
-            updateDTO.TimingData.TargetStartTime = expectedStartTime;
+            updateDTO.TimingData.TargetStartTime = expectedStartTime.ToTimecodeString();
 
             var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 

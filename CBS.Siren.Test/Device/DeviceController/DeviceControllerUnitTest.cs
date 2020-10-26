@@ -162,6 +162,29 @@ namespace CBS.Siren.Test.Device
         }
 
         [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndEventTimingDateHasChanged_ReplacesEvent()
+        {
+            IDeviceController deviceController = CreateDeviceController();
+            DeviceList generatedList = GenerateTestDeviceList(2);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), generatedList.Events[0].EndTime);
+            deviceListEvent.Id = generatedList.Events[1].Id;
+            updateList.Events.Add(deviceListEvent);
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
+            Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(generatedList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[1].Id);
+            Assert.Equal(updateList.Events[1].StartTime, deviceController.ActiveDeviceList.Events[1].StartTime);
+            Assert.Equal(updateList.Events[1].EndTime, deviceController.ActiveDeviceList.Events[1].EndTime);
+        }
+
+        [Fact]
         [Trait("TestType", "UnitTest")]
         public void WhenDeviceListSet_DeviceController_SetsEventsStateToCued()
         {

@@ -1,4 +1,4 @@
 export interface TimingStrategy {
-    timingStrategyType: string;
+    strategyType: string;
     targetStartTime?: string;
 }

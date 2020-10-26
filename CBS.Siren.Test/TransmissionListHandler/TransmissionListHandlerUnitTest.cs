@@ -6,6 +6,7 @@ using CBS.Siren.Application;
 using CBS.Siren.Data;
 using CBS.Siren.Device;
 using CBS.Siren.DTO;
+using CBS.Siren.Time;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -50,7 +51,7 @@ namespace CBS.Siren.Test
                 TimingData = new TimingStrategyUpsertDTO()
                 {
                     StrategyType = "fixed",
-                    TargetStartTime = DateTimeOffset.Parse("2020-03-22 12:30:10")
+                    TargetStartTime = DateTimeOffset.Parse("2020-03-22 12:30:10").ToTimecodeString()
                 },
                 Features = new List<ListEventFeatureUpsertDTO>(){
                     new ListEventFeatureUpsertDTO(){
@@ -522,7 +523,7 @@ namespace CBS.Siren.Test
 
             int eventId = _transmissionList.Events[0].Id;
             TransmissionListEventUpsertDTO listEventUpdateDTO = GetListEventCreationDTO();
-            listEventUpdateDTO.TimingData.TargetStartTime = newStartTime;
+            listEventUpdateDTO.TimingData.TargetStartTime = newStartTime.ToTimecodeString();
             TransmissionListEvent returnedEvent = await codeUnderTest.UpdateEventDetails(_transmissionList.Id, eventId, listEventUpdateDTO);
 
             Assert.Equal(eventId, returnedEvent.Id);
