@@ -55,6 +55,6 @@
 
   <div mat-dialog-actions>
     <button mat-raised-button (click)="onNoClick()">Cancel</button>
-    <button mat-raised-button type="submit" [mat-dialog-close]="getResult()" cdkFocusInitial>{{isUpdating ? 'Update' : 'Create'}}</button>
+    <button mat-raised-button type="submit" color="primary" [mat-dialog-close]="getResult()" cdkFocusInitial>{{isUpdating ? 'Update' : 'Create'}}</button>
   </div>
 </form>
