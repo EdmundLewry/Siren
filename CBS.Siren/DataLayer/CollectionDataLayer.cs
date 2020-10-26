@@ -1,5 +1,8 @@
 using CBS.Siren.Device;
+using CBS.Siren.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CBS.Siren.Data
@@ -34,14 +37,23 @@ namespace CBS.Siren.Data
 
                     foundList.SourceList = list.SourceList ?? foundList.SourceList;
                     foundList.Events = list.Events ?? foundList.Events;
+                    AssignTransmissionListEventIds(foundList);
+                    
                     continue;
                 }
 
                 list.Id = ++_nextListId;
+                AssignTransmissionListEventIds(list);
                 StoredTransmissionLists.Add(list.Id, list);
             }
 
             return Task.CompletedTask;
+        }
+
+        private void AssignTransmissionListEventIds(TransmissionList list)
+        {
+            List<TransmissionListEvent> eventsWithDefaultId = list.Events.Where(listEvent => listEvent.Id == default).ToList();
+            eventsWithDefaultId.ForEach(listEvent => listEvent.Id = IdFactory.NextTransmissionListEventId());
         }
 
         private TransmissionList GetTransmissionListById(int id)

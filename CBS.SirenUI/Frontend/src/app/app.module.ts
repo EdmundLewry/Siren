@@ -16,7 +16,7 @@ import { SidenavMenuComponent } from './components/sidenav-menu/sidenav-menu.com
 
 const routes: Routes = [
   { path: "automation", loadChildren: () => import('automation').then((library) => library.AutomationModule) },
-  { path: "", redirectTo: "automation/txlist/1", pathMatch: 'full' }
+  { path: "", redirectTo: "automation/transmissionlist/1", pathMatch: 'full' }
 ]
 
 @NgModule({

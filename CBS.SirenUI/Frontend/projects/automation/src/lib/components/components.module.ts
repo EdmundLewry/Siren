@@ -20,13 +20,13 @@ import { MatChipsModule } from '@angular/material/chips';
 
 import { TranmissionlistEventsListComponent } from './tranmissionlist-events-list/tranmissionlist-events-list.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
-import { CreateEventDialogComponent } from './create-event-dialog/create-event-dialog.component';
+import { TransmissionListEventEditDialog } from './transmission-list-event-edit-dialog/transmission-list-event-edit-dialog.component';
 
 @NgModule({
   declarations: [
     TranmissionlistEventsListComponent,
     ConfirmationDialogComponent,
-    CreateEventDialogComponent
+    TransmissionListEventEditDialog
   ],
   imports: [
     RouterModule,

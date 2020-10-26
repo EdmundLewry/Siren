@@ -9,7 +9,7 @@ using System;
 
 namespace CBS.Siren.Application
 {
-    public partial class TransmissionListHandler : ITransmissionListHandler
+    public class TransmissionListHandler : ITransmissionListHandler
     {
         public ILogger<TransmissionListHandler> Logger { get; }
         public IDataLayer DataLayer { get; }
@@ -60,14 +60,22 @@ namespace CBS.Siren.Application
             return transmissionList.Events;
         }
 
-        public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventCreationDTO listEvent)
+        public async Task<TransmissionListEvent> GetListEventById(int listId, int eventId)
+        {
+            TransmissionList transmissionList = await GetListById(listId);
+
+            TransmissionListEvent foundEvent = transmissionList.Events.FirstOrDefault(listEvent => listEvent.Id == eventId);
+            if(foundEvent is null)
+            {
+                Logger.LogError("Unable to find list event with id: {TransmissionListEventId}", eventId);
+                throw new ArgumentException($"Unable to find list event with id: {eventId}", nameof(eventId));
+            }
+            return foundEvent;
+        }
+
+        public async Task<TransmissionListEvent> AddEvent(int id, TransmissionListEventUpsertDTO listEvent)
         {
             TransmissionList transmissionList = await GetListById(id);
-            if (transmissionList == null)
-            {
-                Logger.LogError($"Unable to find list with Id {id}");
-                throw new ArgumentException($"Unable to find list with id: {id}", "id");
-            }
 
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEvent.TimingData, listEvent.Features, Channel.ChainConfiguration, DataLayer);
             int insertedAtPosition = InsertEventIntoList(createdEvent, listEvent.ListPosition, transmissionList);
@@ -100,23 +108,18 @@ namespace CBS.Siren.Application
             //This is a fairly expensive way to do this. We may want to add positional data 
             //to the events and maintain it in some other way
             //We'll probably need that so that we can order them when they come out of the db anyway
-            return transmissionList.Events.FindIndex((listEvent) => listEvent.Id == eventId);
+            int listEventPositionIndex = transmissionList.Events.FindIndex((listEvent) => listEvent.Id == eventId);
+            if (listEventPositionIndex == -1)
+            {
+                throw new ArgumentException($"Unable to find list event with id: {eventId}", nameof(eventId));
+            }
+            return listEventPositionIndex;
         }
 
         public async Task RemoveEvent(int listId, int eventId)
         {
             TransmissionList transmissionList = await GetListById(listId);
-            if (transmissionList == null)
-            {
-                Logger.LogError($"Unable to find list with Id {listId}");
-                throw new ArgumentException($"Unable to find list with id: {listId}", "listId");
-            }
-
             int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
-            if(listEventPositionIndex == -1)
-            {
-                throw new ArgumentException($"Unable to find list event with id: {eventId}", "eventId");
-            }
 
             TransmissionListEvent listEvent = transmissionList.Events[listEventPositionIndex];
 
@@ -141,12 +144,6 @@ namespace CBS.Siren.Application
         public async Task PlayTransmissionList(int id)
         {
             TransmissionList transmissionList = await GetListById(id);
-            if (transmissionList == null)
-            {
-                string message = $"Unable to find list with Id {id}";
-                Logger.LogError(message);
-                throw new ArgumentException(message, nameof(id));
-            }
 
             ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
             if (transmissionListService == null)
@@ -163,20 +160,7 @@ namespace CBS.Siren.Application
         public async Task<TransmissionListEvent> ChangeEventPosition(int listId, int eventId, int previousPosition, int targetPosition)
         {
             TransmissionList transmissionList = await GetListById(listId);
-            if (transmissionList == null)
-            {
-                string message = $"Unable to find list with Id {listId}";
-                Logger.LogError(message);
-                throw new ArgumentException(message, nameof(listId));
-            }
-
             int foundEventIndex = GetEventPositionById(transmissionList, eventId);
-            if (foundEventIndex == -1)
-            {
-                string message = $"Unable to find list event with id {eventId} at position {previousPosition}";
-                Logger.LogError(message);
-                throw new ArgumentException(message, nameof(previousPosition));
-            }
 
             if (foundEventIndex != previousPosition)
             {
@@ -213,5 +197,22 @@ namespace CBS.Siren.Application
             throw new NotImplementedException();
         }
 
+        public async Task<TransmissionListEvent> UpdateEventDetails(int listId, int eventId, TransmissionListEventUpsertDTO listEventUpdate)
+        {
+            TransmissionList transmissionList = await GetListById(listId);
+            int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
+
+            TransmissionListEvent transmissionListEvent = transmissionList.Events[listEventPositionIndex];
+            TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEventUpdate.TimingData, listEventUpdate.Features, Channel.ChainConfiguration, DataLayer);
+            
+            //Replace timing strategy is all we're supporting at the moment
+            transmissionListEvent.EventTimingStrategy = createdEvent.EventTimingStrategy;
+
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+            
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            transmissionListService?.OnTransmissionListChanged(listEventPositionIndex);
+            return transmissionListEvent;
+        }
     }
 }

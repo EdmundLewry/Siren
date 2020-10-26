@@ -44,6 +44,26 @@ namespace CBS.Siren.Test
 
             Assert.NotNull(lists[0].SourceList);
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task AddUpdateTransmissionLists_WhenListExists_EnsuresAllEventsHaveAnId()
+        {
+            TransmissionList initialList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            CollectionDataLayer codeUnderTest = new CollectionDataLayer();
+            await codeUnderTest.AddUpdateTransmissionLists(initialList);
+            
+            TransmissionList changedList = (await codeUnderTest.TransmissionLists()).First();
+            changedList.Events = new List<TransmissionListEvent>() { new TransmissionListEvent(null, null), new TransmissionListEvent(null, null) };
+
+            await codeUnderTest.AddUpdateTransmissionLists(changedList);
+
+            List<TransmissionList> lists = (await codeUnderTest.TransmissionLists()).ToList(); 
+            Assert.Single(lists);
+
+            Assert.NotEqual(0, lists[0].Events[0].Id);
+            Assert.NotEqual(0, lists[0].Events[1].Id);
+        }
         #endregion
 
         #region Device

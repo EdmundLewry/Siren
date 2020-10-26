@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Create Transmission List Event</h2>
+<h2 mat-dialog-title>{{isUpdating ? 'Update' : 'Create'}} Transmission List Event</h2>
 <form [formGroup]="transmissionListEventForm">
   <div mat-dialog-content>
 
@@ -12,7 +12,7 @@
     <br />
     <mat-form-field *ngIf="isUsingFixedTiming()" color="accent">
       <mat-label>Target Start Time</mat-label>
-      <input matInput type="datetime-local" formControlName="targetStartTime">
+      <input matInput type="text" formControlName="targetStartTime">
     </mat-form-field>
 
     <mat-divider></mat-divider>
@@ -55,6 +55,6 @@
 
   <div mat-dialog-actions>
     <button mat-raised-button (click)="onNoClick()">Cancel</button>
-    <button mat-raised-button type="submit" [mat-dialog-close]="getResult()" cdkFocusInitial>Ok</button>
+    <button mat-raised-button type="submit" color="primary" [mat-dialog-close]="getResult()" cdkFocusInitial>{{isUpdating ? 'Update' : 'Create'}}</button>
   </div>
 </form>

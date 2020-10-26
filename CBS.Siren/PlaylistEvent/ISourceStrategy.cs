@@ -10,6 +10,9 @@ namespace CBS.Siren
     public interface ISourceStrategy : IEquatable<ISourceStrategy>
     {
         string StrategyType { get; }
+        TimeSpan SOM { get; }
+        TimeSpan EOM { get; }
+        string MediaName { get; }
         TimeSpan GetDuration();
         object BuildStrategyData();
     }

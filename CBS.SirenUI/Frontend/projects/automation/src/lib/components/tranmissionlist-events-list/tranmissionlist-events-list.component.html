@@ -90,6 +90,9 @@ cdkDropList
       </button>
       <mat-menu #menu="matMenu">
         <div class="button-wrapper">
+          <button mat-menu-item class="more-option-update" (click)="requestUpdateEvent(row)" [disabled]="row.eventState == 'PLAYING'">Update</button>
+        </div>
+        <div class="button-wrapper">
           <button mat-menu-item class="more-option-insert-above" (click)="requestAddNewEvent(row, RelativePosition.Above)">Insert Event Above</button>
         </div>
         <div class="button-wrapper">

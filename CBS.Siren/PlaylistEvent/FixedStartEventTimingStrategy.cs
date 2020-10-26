@@ -6,7 +6,7 @@ namespace CBS.Siren
     public class FixedStartEventTimingStrategy : IEventTimingStrategy
     {
         public string StrategyType => "fixed";
-        public DateTimeOffset TargetStartTime { get; }
+        public DateTimeOffset? TargetStartTime { get; }
 
         public FixedStartEventTimingStrategy(DateTimeOffset startTime)
         {
@@ -27,7 +27,7 @@ namespace CBS.Siren
         public DateTimeOffset CalculateStartTime(int? eventId, TransmissionList list)
         {
             //Fixed time is really easy! We just send back what we got in
-            return TargetStartTime;
+            return TargetStartTime.Value;
         }
 
         public override string ToString()

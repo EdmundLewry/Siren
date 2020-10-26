@@ -78,13 +78,23 @@ namespace CBS.Siren.Device
         {
             for (int i = 0; i < _activeDeviceList.Events.Count; ++i)
             {
-                if (i >= incomingList.Events.Count || _activeDeviceList.Events[i].Id != incomingList.Events[i].Id)
+                if (ListsDiverge(incomingList, i) || EventDiverges(incomingList, i))
                 {
                     return i;
                 }
             }
 
             return -1;
+        }
+
+        private bool ListsDiverge(DeviceList incomingList, int eventIndex)
+        {
+            return eventIndex >= incomingList.Events.Count || _activeDeviceList.Events[eventIndex].Id != incomingList.Events[eventIndex].Id;
+        }
+        private bool EventDiverges(DeviceList incomingList, int eventIndex)
+        {
+            return _activeDeviceList.Events[eventIndex].StartTime != incomingList.Events[eventIndex].StartTime ||
+                   _activeDeviceList.Events[eventIndex].EndTime != incomingList.Events[eventIndex].EndTime;
         }
 
         public async Task Run(CancellationToken token)

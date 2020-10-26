@@ -6,7 +6,9 @@ namespace CBS.Siren
     public class SequentialStartEventTimingStrategy : IEventTimingStrategy
     {
         public string StrategyType => "sequential";
-        
+
+        public DateTimeOffset? TargetStartTime => null;
+
         public SequentialStartEventTimingStrategy() {}
         public SequentialStartEventTimingStrategy(IEventTimingStrategy other)
         {

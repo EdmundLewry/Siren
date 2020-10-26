@@ -81,12 +81,14 @@ namespace CBS.Siren.Test
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
             TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
             {
+                Id = 1,
                 ExpectedDuration = new TimeSpan(0, 30, 0),
                 ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00")
             };
 
             SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
-            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>());
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>()) { Id = 2 };
+
             list.Events.Add(precedingEvent);
             list.Events.Add(listEvent);
 

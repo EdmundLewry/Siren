@@ -10,7 +10,7 @@ namespace CBS.Siren
 {
     public static class TransmissionListEventFactory
     {
-        public static TransmissionListEvent BuildTransmissionListEvent(TimingStrategyCreationDTO timingData, List<ListEventFeatureCreationDTO> featureData, IVideoChain videoChain, IDataLayer dataLayer)
+        public static TransmissionListEvent BuildTransmissionListEvent(TimingStrategyUpsertDTO timingData, List<ListEventFeatureUpsertDTO> featureData, IVideoChain videoChain, IDataLayer dataLayer)
         {
             IEventTimingStrategy timingStrategy = ConstructTimingStrategyFromType(timingData);
             List<IEventFeature> features = ConstructEventFeaturesFromList(featureData, videoChain, dataLayer);
@@ -24,7 +24,7 @@ namespace CBS.Siren
             return new TransmissionListEvent(timingStrategy, features, playlistEvent);
         }
 
-        private static List<IEventFeature> ConstructEventFeaturesFromList(List<ListEventFeatureCreationDTO> featureData, IVideoChain videoChain, IDataLayer dataLayer)
+        private static List<IEventFeature> ConstructEventFeaturesFromList(List<ListEventFeatureUpsertDTO> featureData, IVideoChain videoChain, IDataLayer dataLayer)
         {
             List<IEventFeature> features = new List<IEventFeature>();
 
@@ -46,7 +46,7 @@ namespace CBS.Siren
             return features;
         }
 
-        private static IEventFeature ConstructEventFeatureFromType(ListEventFeatureCreationDTO feature, IVideoChain videoChain, IDataLayer dataLayer)
+        private static IEventFeature ConstructEventFeatureFromType(ListEventFeatureUpsertDTO feature, IVideoChain videoChain, IDataLayer dataLayer)
         {
             IDevice deviceToPlayOn = FindDevice(videoChain);
 
@@ -95,11 +95,11 @@ namespace CBS.Siren
             };
         }
 
-        private static IEventTimingStrategy ConstructTimingStrategyFromType(TimingStrategyCreationDTO timingData)
+        private static IEventTimingStrategy ConstructTimingStrategyFromType(TimingStrategyUpsertDTO timingData)
         {
             return timingData.StrategyType switch
             {
-                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime.GetValueOrDefault()),
+                "fixed" => new FixedStartEventTimingStrategy(timingData.TargetStartTime.ConvertTimecodeStringToDateTime()),
                 "sequential" => new SequentialStartEventTimingStrategy(),
                 _ => null
             };

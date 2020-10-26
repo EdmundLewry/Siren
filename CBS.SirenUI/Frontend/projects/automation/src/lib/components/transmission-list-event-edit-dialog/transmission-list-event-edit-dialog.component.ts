@@ -1,18 +1,18 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormGroup, FormControl } from '@angular/forms';
-import { TransmissionListEventCreationData } from '../../interfaces/itransmission-list-event-creation-data';
 import { TimingStrategyTypes } from '../../interfaces/timing-strategy-types.enum';
 import { PlayoutStrategyTypes } from '../../interfaces/playout-strategy-types.enum';
 import { SourceStrategyTypes } from '../../interfaces/source-strategy-types.enum';
 import { FeatureTypes } from '../../interfaces/feature-types.enum';
+import { TransmissionListEventDetails } from '../../interfaces/itransmission-list-event-details';
 
 @Component({
-  selector: 'lib-create-event-dialog',
-  templateUrl: './create-event-dialog.component.html',
-  styleUrls: ['./create-event-dialog.component.css']
+  selector: 'lib-transmission-list-event-edit-dialog',
+  templateUrl: './transmission-list-event-edit-dialog.component.html',
+  styleUrls: ['./transmission-list-event-edit-dialog.component.css']
 })
-export class CreateEventDialogComponent {
+export class TransmissionListEventEditDialog {
   public readonly transmissionListEventForm: FormGroup;
   public readonly timingStrategyTypeControl: FormControl;
   public readonly targetStartTimeControl: FormControl;
@@ -28,18 +28,32 @@ export class CreateEventDialogComponent {
   public sourceStrategyTypes: string[] = Object.keys(SourceStrategyTypes);
   public timingStrategyTypes: string[] = Object.keys(TimingStrategyTypes);
 
-  constructor(
-    public dialogRef: MatDialogRef<CreateEventDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventCreationData) {
-      this.timingStrategyTypeControl = new FormControl(this.timingStrategyTypes[0]);
-      this.targetStartTimeControl = new FormControl();
+  public isUpdating = false;
 
-      this.featureTypeControl = new FormControl(this.featureTypes[0]);
-      this.playoutStrategyTypeControl = new FormControl(this.playoutStrategyTypes[0]);
-      this.sourceStrategyTypeControl = new FormControl(this.sourceStrategyTypes[0]);
-      this.somControl = new FormControl("00:00:00:00");
-      this.eomControl = new FormControl("00:00:30:00");
-      this.mediaNameControl = new FormControl("TestInstance");
+  constructor(
+    public dialogRef: MatDialogRef<TransmissionListEventEditDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventDetails) {
+      
+      this.isUpdating = data != null;
+
+      var timingValues: string[] = Object.values(TimingStrategyTypes);
+      this.timingStrategyTypeControl = new FormControl(!data ? this.timingStrategyTypes[0] : this.timingStrategyTypes[timingValues.indexOf(data.eventTimingStrategy.strategyType)]);
+
+      var defaultTargetStart = this.getDefaultTargetStartTimeValue();
+      this.targetStartTimeControl = new FormControl(!data?.eventTimingStrategy.targetStartTime ? defaultTargetStart : data.eventTimingStrategy.targetStartTime);
+
+      var eventFeature = data?.eventFeatures.length ? data.eventFeatures[0] : null;
+      var featureValues: string[] = Object.values(FeatureTypes);
+      this.featureTypeControl = new FormControl({value: !eventFeature ? this.featureTypes[0] : this.featureTypes[featureValues.indexOf(eventFeature.featureType)], disabled: this.isUpdating});
+      
+      var playoutStrategyValues: string[] = Object.values(PlayoutStrategyTypes);
+      this.playoutStrategyTypeControl = new FormControl({value: !eventFeature ? this.playoutStrategyTypes[0] : this.playoutStrategyTypes[playoutStrategyValues.indexOf(eventFeature.playoutStrategy.strategyType)], disabled: this.isUpdating});
+      
+      var sourceStrategyValues: string[] = Object.values(SourceStrategyTypes);
+      this.sourceStrategyTypeControl = new FormControl({value: !eventFeature ? this.sourceStrategyTypes[0] : this.sourceStrategyTypes[sourceStrategyValues.indexOf(eventFeature.sourceStrategy.strategyType)], disabled: this.isUpdating});
+      this.somControl = new FormControl({value: !eventFeature?.sourceStrategy.som ? "00:00:00:00" : eventFeature.sourceStrategy.som, disabled: this.isUpdating});
+      this.eomControl = new FormControl({value: !eventFeature?.sourceStrategy.eom ? "00:00:30:00" : eventFeature.sourceStrategy.eom, disabled: this.isUpdating});
+      this.mediaNameControl = new FormControl({value: !eventFeature?.sourceStrategy.mediaName ? "TestInstance" : eventFeature.sourceStrategy.mediaName, disabled: this.isUpdating});
 
       this.transmissionListEventForm = new FormGroup({
           timingStrategyType: this.timingStrategyTypeControl,
@@ -89,5 +103,9 @@ export class CreateEventDialogComponent {
 
   public isUsingMediaSource(): boolean {
     return SourceStrategyTypes[this.sourceStrategyTypeControl.value] == SourceStrategyTypes.MediaSource;
+  }
+
+  public getDefaultTargetStartTimeValue(): string {
+    return new Date().toISOString().replace(/\..+/, '') + ":00";
   }
 }
