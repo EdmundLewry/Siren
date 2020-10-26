@@ -118,9 +118,6 @@ export class TranmissionlistEventsListComponent implements OnInit {
 
     this.retrieveEventById(updatingEvent.id).subscribe(updatingEventDetails => {
       if (updatingEventDetails == null) return;
-      
-      console.log(`Received reply to get event by id: ${updatingEventDetails}`);
-      console.log(updatingEventDetails);
 
       this.dialog.open(TransmissionListEventEditDialog, {
         width: '800px',
@@ -129,8 +126,6 @@ export class TranmissionlistEventsListComponent implements OnInit {
       .afterClosed()
       .subscribe((creationData: TransmissionListEventCreationData) => {
         if (creationData == null) return;
-
-        console.log(creationData);
 
         this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, creationData).subscribe(response => {
           this.retrieveListInformation();

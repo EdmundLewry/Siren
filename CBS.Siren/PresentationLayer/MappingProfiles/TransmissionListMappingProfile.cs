@@ -67,7 +67,7 @@ namespace CBS.Siren.DTO
 
             CreateMap<IEventTimingStrategy, TimingStrategyDTO>()
                         .ForMember(dto => dto.TargetStartTime,
-                                    config => config.MapFrom(timingStrategy => timingStrategy.TargetStartTime.ToTimecodeString()));
+                                    config => config.MapFrom((timingStrategy, dto)=> timingStrategy.TargetStartTime?.ToTimecodeString()));
 
             CreateMap<IEventFeature, ListEventFeatureDTO>();
             CreateMap<IPlayoutStrategy, PlayoutStrategyDTO>();

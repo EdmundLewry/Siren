@@ -38,7 +38,9 @@ export class TransmissionListEventEditDialog {
 
       var timingValues: string[] = Object.values(TimingStrategyTypes);
       this.timingStrategyTypeControl = new FormControl(!data ? this.timingStrategyTypes[0] : this.timingStrategyTypes[timingValues.indexOf(data.eventTimingStrategy.strategyType)]);
-      this.targetStartTimeControl = new FormControl(!data ? null : data.eventTimingStrategy.targetStartTime);
+
+      var defaultTargetStart = this.getDefaultTargetStartTimeValue();
+      this.targetStartTimeControl = new FormControl(!data?.eventTimingStrategy.targetStartTime ? defaultTargetStart : data.eventTimingStrategy.targetStartTime);
 
       var eventFeature = data?.eventFeatures.length ? data.eventFeatures[0] : null;
       var featureValues: string[] = Object.values(FeatureTypes);
@@ -101,5 +103,9 @@ export class TransmissionListEventEditDialog {
 
   public isUsingMediaSource(): boolean {
     return SourceStrategyTypes[this.sourceStrategyTypeControl.value] == SourceStrategyTypes.MediaSource;
+  }
+
+  public getDefaultTargetStartTimeValue(): string {
+    return new Date().toISOString().replace(/\..+/, '') + ":00";
   }
 }
