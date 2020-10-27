@@ -188,6 +188,7 @@ namespace CBS.Siren.Test
             Assert.Equal("SCHEDULED", returnedEvent.EventState);
             Assert.Single(returnedEvent.EventFeatures);
             Assert.Equal("video", returnedEvent.EventFeatures[0].FeatureType);
+            Assert.Equal("00:00:30:00", returnedEvent.EventFeatures[0].Duration);
             Assert.Equal("primaryVideo", returnedEvent.EventFeatures[0].PlayoutStrategy.StrategyType);
             Assert.Equal("mediaSource", returnedEvent.EventFeatures[0].SourceStrategy.StrategyType);
             Assert.Equal("00:00:00:00", returnedEvent.EventFeatures[0].SourceStrategy.SOM);
@@ -558,21 +559,24 @@ namespace CBS.Siren.Test
             _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
 
             DateTimeOffset expectedStartTime = DateTimeOffset.Parse("2020-05-22 17:30:36");
+            TimeSpan expectedFeatureDuration = TimeSpan.FromSeconds(40);
             TransmissionListEventUpsertDTO updateDTO = GetListEventCreationDTO();
             updateDTO.TimingData.TargetStartTime = expectedStartTime.ToTimecodeString();
+            updateDTO.Features[0].Duration = expectedFeatureDuration.ToTimecodeString();
 
             var eventUpdateData = new StringContent(updateDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
             _ = await clientUnderTest.PutAsync($"api/1/automation/transmissionlist/1/events/{returnedId}", eventUpdateData);
-            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1/events");
+            response = await clientUnderTest.GetAsync($"api/1/automation/transmissionlist/1/events/{returnedId}");
 
             content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
-            List<TransmissionListEventDTO> returnedList = content.DeserializeJson<List<TransmissionListEventDTO>>();
-            TransmissionListEventDTO updatedEvent = returnedList.FirstOrDefault(listEvent => listEvent.Id == returnedId);
+            TransmissionListEventDetailDTO updatedEvent = content.DeserializeJson<TransmissionListEventDetailDTO>();
 
             Assert.NotNull(updatedEvent);
             Assert.Equal(expectedStartTime, updatedEvent.ExpectedStartTime.ConvertTimecodeStringToDateTime());
+            Assert.Single(updatedEvent.EventFeatures);
+            Assert.Equal(expectedFeatureDuration, updatedEvent.EventFeatures[0].Duration.ConvertTimecodeStringToTimeSpan());
         }
 
         [Fact]
