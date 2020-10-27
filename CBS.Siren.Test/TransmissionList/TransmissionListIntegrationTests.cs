@@ -41,7 +41,8 @@ namespace CBS.Siren.Test
                             SOM = "00:00:00:00",
                             EOM = "00:00:30:00",
                             MediaName = "TestInstance"
-                        }
+                        },
+                        Duration = "00:00:30:00"
                     }
                 }
             };

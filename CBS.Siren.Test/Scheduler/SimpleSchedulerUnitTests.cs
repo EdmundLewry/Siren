@@ -54,7 +54,7 @@ namespace CBS.Siren.Test
             var mockFeature = new Mock<IEventFeature>();
             MediaInstance mediaInstance = new MediaInstance("test1", TimeSpan.Zero);
             mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, TimeSpan.Zero, new TimeSpan(0, 0, 30)));
-            mockFeature.Setup(mock => mock.CalculateDuration()).Returns(new TimeSpan(0, 0, 30));
+            mockFeature.Setup(mock => mock.Duration).Returns(new TimeSpan(0, 0, 30));
             mockFeature.Setup(mock => mock.Device).Returns(device);
             mockFeature.SetupProperty(mock => mock.DeviceListEventId);
 
@@ -223,7 +223,7 @@ namespace CBS.Siren.Test
             
             TimeSpan longestDuration = new TimeSpan(0, 0, 40);
             Mock<IEventFeature> extraFeature = GenerateMockFeature(mockDevice1.Object);
-            extraFeature.Setup(mock => mock.CalculateDuration()).Returns(longestDuration);
+            extraFeature.Setup(mock => mock.Duration).Returns(longestDuration);
             event1.EventFeatures.Add(extraFeature.Object);
 
             SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
@@ -241,7 +241,7 @@ namespace CBS.Siren.Test
                                   .Returns((string s, int id) => new DeviceListEvent(s, id));
             
             Mock<IEventFeature> extraFeature = GenerateMockFeature(mockDevice1.Object);
-            extraFeature.Setup(mock => mock.CalculateDuration()).Returns(new TimeSpan(0, 0, 40));
+            extraFeature.Setup(mock => mock.Duration).Returns(new TimeSpan(0, 0, 40));
             event1.EventFeatures.Add(extraFeature.Object);
             TimeSpan setDuration = new TimeSpan(0, 0, 20);
             event1.ExpectedDuration = setDuration;

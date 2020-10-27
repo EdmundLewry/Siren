@@ -35,7 +35,7 @@ namespace CBS.Siren
 
         private TimeSpan CalculateLongestFeatureDuration(List<IEventFeature> eventFeatures)
         {
-            return eventFeatures.Select(feature => feature.CalculateDuration()).Max();
+            return eventFeatures.Select(feature => feature.Duration).Max();
         }
 
         private Dictionary<IDevice, DeviceList> GenerateDeviceLists(TransmissionList transmissionList, IDeviceListEventStore deviceListEventStore, int startIndex)

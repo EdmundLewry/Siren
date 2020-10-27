@@ -54,6 +54,7 @@ namespace CBS.Siren
             {
                 "video" => new VideoPlaylistEventFeature(ConstructPlayoutStrategyFromType(feature.PlayoutStrategy),
                                                         ConstructSourceStrategyFromType(feature.SourceStrategy, deviceToPlayOn, dataLayer),
+                                                        feature.Duration.ConvertTimecodeStringToTimeSpan(),
                                                         deviceToPlayOn),
                 _ => null
             };
@@ -67,6 +68,7 @@ namespace CBS.Siren
             {
                 "video" => new VideoPlaylistEventFeature(ConstructPlayoutStrategyFromType(feature.PlayoutStrategy),
                                                         ConstructSourceStrategyFromType(feature.SourceStrategy),
+                                                        feature.Duration,
                                                         deviceToPlayOn),
                 _ => null
             };

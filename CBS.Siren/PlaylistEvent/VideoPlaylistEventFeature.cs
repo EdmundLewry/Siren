@@ -11,16 +11,18 @@ namespace CBS.Siren
         public ISourceStrategy SourceStrategy { get; set; }
         public IDevice Device { get; set; }
         public int? DeviceListEventId { get; set; }
+        public TimeSpan Duration { get; set; }
 
-        public VideoPlaylistEventFeature(IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy, IDevice device = null)
+        public VideoPlaylistEventFeature(IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy, TimeSpan duration, IDevice device = null)
         {
             PlayoutStrategy = playoutStrategy;
             SourceStrategy = sourceStrategy;
             Device = device;
+            Duration = duration;
         }
 
-        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance, IDevice device = null) :
-            this(factory.CreatePrimaryVideoPlayoutStrategy(), factory.CreateMediaSourceStrategy(mediaInstance), device)
+        public VideoPlaylistEventFeature(IFeaturePropertiesFactory factory, MediaInstance mediaInstance, TimeSpan? duration = null, IDevice device = null) :
+            this(factory.CreatePrimaryVideoPlayoutStrategy(), factory.CreateMediaSourceStrategy(mediaInstance), duration ?? mediaInstance.Duration, device)
         {
         }
 
@@ -40,12 +42,6 @@ namespace CBS.Siren
                     PlayoutStrategy.Equals(other.PlayoutStrategy) &&
                     SourceStrategy.Equals(other.SourceStrategy) &&
                     Device?.Model?.Name == other.Device?.Model?.Name;
-        }
-
-        public TimeSpan CalculateDuration()
-        {
-            //For our duration, we only care about the length of the Media Source Strategy
-            return SourceStrategy.GetDuration();
         }
     }
 }

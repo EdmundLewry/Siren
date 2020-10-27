@@ -10,6 +10,6 @@ namespace CBS.Siren
         ISourceStrategy SourceStrategy { get; set; }
         IDevice Device { get; set; }
         int? DeviceListEventId { get; set; }
-        TimeSpan CalculateDuration();
+        TimeSpan Duration { get; set; }
     }
 }

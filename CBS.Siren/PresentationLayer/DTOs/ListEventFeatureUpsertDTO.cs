@@ -5,5 +5,6 @@ namespace CBS.Siren.DTO
         public string FeatureType { get; set; }
         public PlayoutStrategyCreationDTO PlayoutStrategy { get; set; }
         public SourceStrategyCreationDTO SourceStrategy { get; set; }
+        public string Duration { get; set; }
     }
 }

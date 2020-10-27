@@ -53,13 +53,14 @@ namespace CBS.Siren.Test
                     SOM = "00:00:00:00",
                     EOM = "00:00:30:00",
                     MediaName = "TestInstance"
-                }
+                },
+                Duration = "00:00:30:00"
             };
 
             var mockVideoChain = new Mock<IVideoChain>();
             mockVideoChain.Setup(mock => mock.ChainDevices).Returns(new List<IDevice>(){new Mock<IDevice>().Object});
 
-            MediaInstance instance = new MediaInstance("TestInstance", TimeSpanExtensions.FromTimecodeString("00:00:30:00"));
+            MediaInstance instance = new MediaInstance("TestInstance", TimeSpan.FromSeconds(30));
             var mockDataLayer = new Mock<IDataLayer>();
             mockDataLayer.Setup(mock => mock.MediaInstances()).ReturnsAsync(new List<MediaInstance>(){instance});
 
@@ -69,10 +70,11 @@ namespace CBS.Siren.Test
                                                                                                         mockDataLayer.Object);
             PrimaryVideoPlayoutStrategy playoutStrategy = new PrimaryVideoPlayoutStrategy();
 
-            TimeSpan som = TimeSpanExtensions.FromTimecodeString("00:00:00:00");
-            TimeSpan eom = TimeSpanExtensions.FromTimecodeString("00:00:30:00");
+            TimeSpan som = TimeSpan.Zero;
+            TimeSpan eom = TimeSpan.FromSeconds(30);
+            TimeSpan duration = TimeSpan.FromSeconds(40);
             MediaSourceStrategy sourceStrategy = new MediaSourceStrategy(instance, som, eom);
-            VideoPlaylistEventFeature expectedFeature = new VideoPlaylistEventFeature(playoutStrategy, sourceStrategy);
+            VideoPlaylistEventFeature expectedFeature = new VideoPlaylistEventFeature(playoutStrategy, sourceStrategy, duration);
 
             Assert.Single(createdEvent.EventFeatures);
             Assert.Equal(expectedFeature, createdEvent.EventFeatures[0]);
