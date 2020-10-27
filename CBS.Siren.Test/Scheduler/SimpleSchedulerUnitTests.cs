@@ -22,6 +22,7 @@ namespace CBS.Siren.Test
         private readonly TransmissionList transmissionList;
 
         private readonly DateTimeOffset calculatedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00");
+        private readonly TimeSpan featureDuration = TimeSpan.FromSeconds(40);
 
         public SimpleSchedulerUnitTests()
         {
@@ -54,7 +55,7 @@ namespace CBS.Siren.Test
             var mockFeature = new Mock<IEventFeature>();
             MediaInstance mediaInstance = new MediaInstance("test1", TimeSpan.Zero);
             mockFeature.Setup(mock => mock.SourceStrategy).Returns(new MediaSourceStrategy(mediaInstance, TimeSpan.Zero, new TimeSpan(0, 0, 30)));
-            mockFeature.Setup(mock => mock.Duration).Returns(new TimeSpan(0, 0, 30));
+            mockFeature.Setup(mock => mock.Duration).Returns(featureDuration);
             mockFeature.Setup(mock => mock.Device).Returns(device);
             mockFeature.SetupProperty(mock => mock.DeviceListEventId);
 
@@ -165,7 +166,7 @@ namespace CBS.Siren.Test
             
             JsonElement timingElement = eventDataJson.GetProperty("timing");
             Assert.Equal(event1.ExpectedStartTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("startTime").GetString()));
-            Assert.Equal(event1.ExpectedDuration, TimeSpanExtensions.FromTimecodeString(timingElement.GetProperty("duration").GetString()));
+            Assert.Equal(featureDuration, TimeSpanExtensions.FromTimecodeString(timingElement.GetProperty("duration").GetString()));
 
             DateTimeOffset expectedEndTime = event1.ExpectedStartTime.AddSeconds(event1.ExpectedDuration.TotalSeconds);
             Assert.Equal(expectedEndTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("endTime").GetString()));

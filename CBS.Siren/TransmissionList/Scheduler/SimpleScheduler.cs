@@ -100,8 +100,8 @@ namespace CBS.Siren
         {
             var timing = new { 
                 StartTime = transmissionEvent.ExpectedStartTime.ToTimecodeString(),
-                Duration = transmissionEvent.ExpectedDuration.ToTimecodeString(),
-                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(transmissionEvent.ExpectedDuration.TotalSeconds).ToTimecodeString()
+                Duration = feature.Duration.ToTimecodeString(),
+                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(feature.Duration.TotalSeconds).ToTimecodeString()
             };
 
             var source = new {
