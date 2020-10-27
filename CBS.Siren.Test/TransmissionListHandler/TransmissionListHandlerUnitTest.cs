@@ -521,10 +521,12 @@ namespace CBS.Siren.Test
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             DateTimeOffset newStartTime = DateTimeOffset.Parse("12/02/2020 12:00:00");
+            TimeSpan newDuration = TimeSpan.FromSeconds(40);
 
             int eventId = _transmissionList.Events[0].Id;
             TransmissionListEventUpsertDTO listEventUpdateDTO = GetListEventCreationDTO();
             listEventUpdateDTO.TimingData.TargetStartTime = newStartTime.ToTimecodeString();
+            listEventUpdateDTO.Features[0].Duration = newDuration.ToTimecodeString();
             TransmissionListEvent returnedEvent = await codeUnderTest.UpdateEventDetails(_transmissionList.Id, eventId, listEventUpdateDTO);
 
             Assert.Equal(eventId, returnedEvent.Id);
@@ -532,6 +534,7 @@ namespace CBS.Siren.Test
             Assert.Equal(TransmissionListEventState.Status.UNSCHEDULED, returnedEvent.EventState.CurrentStatus);
             Assert.Single(returnedEvent.EventFeatures);
             Assert.Null(returnedEvent.EventFeatures[0].DeviceListEventId);
+            Assert.Equal(newDuration, returnedEvent.EventFeatures[0].Duration);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy.StrategyType);
             Assert.Equal(newStartTime, returnedEvent.EventTimingStrategy.CalculateStartTime(eventId, _transmissionList));
         }

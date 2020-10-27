@@ -207,6 +207,7 @@ namespace CBS.Siren.Application
             
             //Replace timing strategy is all we're supporting at the moment
             transmissionListEvent.EventTimingStrategy = createdEvent.EventTimingStrategy;
+            transmissionListEvent.EventFeatures = createdEvent.EventFeatures;
 
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
             
