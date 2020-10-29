@@ -8,4 +8,5 @@ export interface TransmissionListEventFeature {
     sourceStrategy: MediaSourceStrategy;
     device: Device;
     deviceListEventId?: number;
+    duration: string;
   }

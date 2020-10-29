@@ -7,6 +7,7 @@ export interface TransmissionListEventFeatureCreationData {
   featureType: string;
   playoutStrategy: PlayoutStrategy;
   sourceStrategy: MediaSourceStrategy;
+  duration: string;
 }
 
 export interface ListPositionData{
