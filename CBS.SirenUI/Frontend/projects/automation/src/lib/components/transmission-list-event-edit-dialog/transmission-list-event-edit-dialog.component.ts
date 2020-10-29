@@ -22,6 +22,7 @@ export class TransmissionListEventEditDialog {
   public readonly somControl: FormControl;
   public readonly eomControl: FormControl;
   public readonly mediaNameControl: FormControl;
+  public readonly featureDurationControl: FormControl;
 
   public featureTypes: string[] = Object.keys(FeatureTypes);
   public playoutStrategyTypes: string[] = Object.keys(PlayoutStrategyTypes);
@@ -44,16 +45,17 @@ export class TransmissionListEventEditDialog {
 
       var eventFeature = data?.eventFeatures.length ? data.eventFeatures[0] : null;
       var featureValues: string[] = Object.values(FeatureTypes);
-      this.featureTypeControl = new FormControl({value: !eventFeature ? this.featureTypes[0] : this.featureTypes[featureValues.indexOf(eventFeature.featureType)], disabled: this.isUpdating});
+      this.featureTypeControl = new FormControl(!eventFeature ? this.featureTypes[0] : this.featureTypes[featureValues.indexOf(eventFeature.featureType)]);
       
       var playoutStrategyValues: string[] = Object.values(PlayoutStrategyTypes);
-      this.playoutStrategyTypeControl = new FormControl({value: !eventFeature ? this.playoutStrategyTypes[0] : this.playoutStrategyTypes[playoutStrategyValues.indexOf(eventFeature.playoutStrategy.strategyType)], disabled: this.isUpdating});
+      this.playoutStrategyTypeControl = new FormControl(!eventFeature ? this.playoutStrategyTypes[0] : this.playoutStrategyTypes[playoutStrategyValues.indexOf(eventFeature.playoutStrategy.strategyType)]);
       
       var sourceStrategyValues: string[] = Object.values(SourceStrategyTypes);
-      this.sourceStrategyTypeControl = new FormControl({value: !eventFeature ? this.sourceStrategyTypes[0] : this.sourceStrategyTypes[sourceStrategyValues.indexOf(eventFeature.sourceStrategy.strategyType)], disabled: this.isUpdating});
-      this.somControl = new FormControl({value: !eventFeature?.sourceStrategy.som ? "00:00:00:00" : eventFeature.sourceStrategy.som, disabled: this.isUpdating});
-      this.eomControl = new FormControl({value: !eventFeature?.sourceStrategy.eom ? "00:00:30:00" : eventFeature.sourceStrategy.eom, disabled: this.isUpdating});
-      this.mediaNameControl = new FormControl({value: !eventFeature?.sourceStrategy.mediaName ? "TestInstance" : eventFeature.sourceStrategy.mediaName, disabled: this.isUpdating});
+      this.sourceStrategyTypeControl = new FormControl(!eventFeature ? this.sourceStrategyTypes[0] : this.sourceStrategyTypes[sourceStrategyValues.indexOf(eventFeature.sourceStrategy.strategyType)]);
+      this.somControl = new FormControl(!eventFeature?.sourceStrategy.som ? "00:00:00:00" : eventFeature.sourceStrategy.som);
+      this.eomControl = new FormControl(!eventFeature?.sourceStrategy.eom ? "00:00:30:00" : eventFeature.sourceStrategy.eom);
+      this.mediaNameControl = new FormControl(!eventFeature?.sourceStrategy.mediaName ? "TestInstance" : eventFeature.sourceStrategy.mediaName);
+      this.featureDurationControl = new FormControl(!eventFeature ? "00:00:30:00" : eventFeature.duration);
 
       this.transmissionListEventForm = new FormGroup({
           timingStrategyType: this.timingStrategyTypeControl,
@@ -63,7 +65,8 @@ export class TransmissionListEventEditDialog {
           sourceStrategyType: this.sourceStrategyTypeControl,
           som: this.somControl,
           eom: this.eomControl,
-          mediaName: this.mediaNameControl
+          mediaName: this.mediaNameControl,
+          featureDuration: this.featureDurationControl
       });
     }
 
@@ -88,7 +91,8 @@ export class TransmissionListEventEditDialog {
           som: formValue.som,
           eom: formValue.eom,
           mediaName: formValue.mediaName
-        }
+        },
+        duration: formValue.featureDuration
       }]
     };
   }
