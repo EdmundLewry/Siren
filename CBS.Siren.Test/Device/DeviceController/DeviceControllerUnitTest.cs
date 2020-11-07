@@ -163,7 +163,7 @@ namespace CBS.Siren.Test.Device
 
         [Fact]
         [Trait("TestType","UnitTest")]
-        public void WhenDeviceListSet_WithExistingActiveListAndEventTimingDateHasChanged_ReplacesEvent()
+        public void WhenDeviceListSet_WithExistingActiveListAndEventTimingDataHasChanged_ReplacesEvent()
         {
             IDeviceController deviceController = CreateDeviceController();
             DeviceList generatedList = GenerateTestDeviceList(2);
@@ -171,7 +171,7 @@ namespace CBS.Siren.Test.Device
             deviceController.ActiveDeviceList = generatedList;
 
             DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { generatedList.Events[0] });
-            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), generatedList.Events[0].EndTime);
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(DateTimeOffset.UtcNow.AddSeconds(2), DateTimeOffset.UtcNow.AddSeconds(20));
             deviceListEvent.Id = generatedList.Events[1].Id;
             updateList.Events.Add(deviceListEvent);
             deviceController.ActiveDeviceList = updateList;
@@ -182,6 +182,33 @@ namespace CBS.Siren.Test.Device
             Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[1].Id);
             Assert.Equal(updateList.Events[1].StartTime, deviceController.ActiveDeviceList.Events[1].StartTime);
             Assert.Equal(updateList.Events[1].EndTime, deviceController.ActiveDeviceList.Events[1].EndTime);
+        }
+        
+        [Fact]
+        [Trait("TestType","UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndActiveEventTimingDataHasChanged_UpdatesEventEndTime()
+        {
+            IDeviceController deviceController = CreateDeviceController();
+            DeviceList generatedList = GenerateTestDeviceList(2);
+            DateTimeOffset originalStartTime = generatedList.Events[0].StartTime;
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            DateTimeOffset newStartTime = DateTimeOffset.UtcNow.AddSeconds(2);
+            DateTimeOffset newEndTime = DateTimeOffset.UtcNow.AddSeconds(20);
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(newStartTime, newEndTime);
+            deviceListEvent.Id = generatedList.Events[0].Id;
+            DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent, generatedList.Events[1] });
+            deviceController.ActiveDeviceList = updateList;
+
+            Assert.Equal(generatedList.Events[0].Id, deviceController.CurrentEvent.Id);
+            Assert.Equal(2, deviceController.ActiveDeviceList.Events.Count);
+            Assert.Equal(updateList.Events[0].Id, deviceController.ActiveDeviceList.Events[0].Id);
+            Assert.Equal(updateList.Events[1].Id, deviceController.ActiveDeviceList.Events[1].Id);
+            Assert.Equal(originalStartTime, deviceController.ActiveDeviceList.Events[0].StartTime);
+            //When we construct the event data while generating the DeviceListEvent we set times to Timecode Strings which
+            //loses the fideleity of the milliseconds by rounding to the nearest frame. So compare timecode strings here
+            Assert.Equal(newEndTime.ToTimecodeString(), deviceController.ActiveDeviceList.Events[0].EndTime.ToTimecodeString());
         }
 
         [Fact]

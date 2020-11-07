@@ -2,6 +2,7 @@
 {
     public class ListEventFeatureDTO
     {
+        public string Uid { get; set; }
         public string FeatureType { get; set; }
         public PlayoutStrategyDTO PlayoutStrategy { get; set; }
         public SourceStrategyDTO SourceStrategy { get; set; }

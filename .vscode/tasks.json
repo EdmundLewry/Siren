@@ -6,7 +6,8 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "build",
-                "buildTests"
+                "buildTests",
+                "buildFrontend"
             ],
             "group": {
                 "kind": "build",
@@ -74,6 +75,33 @@
                 "${workspaceFolder}/CBS.Siren.Test/CBS.Siren.Test.csproj"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+        {
+            "label": "buildFrontend",
+            "type": "npm",
+            "script": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "label": "serve",
+            "type": "process",
+            "command": "ng",
+            "args": [
+                "serve",
+                "${workspaceFolder}/CBS.Siren.UI/Frontend/"
+            ],
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
     ]
 }

@@ -25,8 +25,8 @@ namespace CBS.Siren
             } 
         
         }
-        public DateTimeOffset StartTime { get; private set; }
-        public DateTimeOffset EndTime { get; private set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
 
         public DeviceListEvent(string eventData, int? relatedEventId = null)
         {

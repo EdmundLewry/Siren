@@ -121,8 +121,8 @@ namespace CBS.Siren.Application
 
         private PlaylistEvent GeneratePlaylistEvent(IEventTimingStrategy timingStrategy, MediaInstance mediaInstance)
         {
-                VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(new FeaturePropertiesFactory(), mediaInstance);
-                return new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
+            VideoPlaylistEventFeature videoFeature = new VideoPlaylistEventFeature(Guid.Empty, new FeaturePropertiesFactory(), mediaInstance);
+            return new PlaylistEvent(new List<IEventFeature>() { videoFeature }, timingStrategy);
         }
 
         private void PrintTransmissionListContent(TransmissionList list)

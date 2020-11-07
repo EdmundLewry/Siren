@@ -83,7 +83,7 @@ namespace CBS.Siren
             DeviceListEvent deviceEvent;
             if (feature.DeviceListEventId.HasValue)
             {
-                deviceEvent =  deviceListEventStore.GetEventById(feature.DeviceListEventId.Value);
+                deviceEvent = deviceListEventStore.GetEventById(feature.DeviceListEventId.Value);
                 deviceEvent.EventData = eventData;
                 deviceEvent.RelatedTransmissionListEventId = transmissionEvent.Id;
             }

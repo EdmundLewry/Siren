@@ -36,6 +36,8 @@ export class TransmissionListEventEditDialog {
     public dialogRef: MatDialogRef<TransmissionListEventEditDialog>,
     @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventDetails) {
       
+      console.log("Current data: ", data);
+
       this.isUpdating = data != null;
       this.eventIsPlaying = data?.eventState == 'PLAYING';
 
@@ -83,6 +85,7 @@ export class TransmissionListEventEditDialog {
         targetStartTime: this.targetStartTimeControl.value
       },
       features: [{
+        uid: this.data?.eventFeatures.length > 0 ? this.data?.eventFeatures[0].uid : null,
         featureType: FeatureTypes[this.featureTypeControl.value],
         playoutStrategy: {
           strategyType: PlayoutStrategyTypes[this.playoutStrategyTypeControl.value]
