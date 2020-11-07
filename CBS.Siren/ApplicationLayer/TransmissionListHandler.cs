@@ -203,11 +203,21 @@ namespace CBS.Siren.Application
             int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
 
             TransmissionListEvent transmissionListEvent = transmissionList.Events[listEventPositionIndex];
+
             TransmissionListEvent createdEvent = TransmissionListEventFactory.BuildTransmissionListEvent(listEventUpdate.TimingData, listEventUpdate.Features, Channel.ChainConfiguration, DataLayer);
             
-            //Replace timing strategy is all we're supporting at the moment
             transmissionListEvent.EventTimingStrategy = createdEvent.EventTimingStrategy;
+            createdEvent.EventFeatures.ForEach((feature) =>
+            {
+                IEventFeature existingFeature = transmissionListEvent.EventFeatures.FirstOrDefault((oldFeature) => oldFeature.Uid == feature.Uid);
+                if(existingFeature != null)
+                {
+                    feature.DeviceListEventId = existingFeature.DeviceListEventId;
+                    feature.Device = existingFeature.Device;
+                }
+            });
 
+            transmissionListEvent.EventFeatures = createdEvent.EventFeatures;
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
             
             ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);

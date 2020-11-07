@@ -22,6 +22,7 @@ export class TransmissionListEventEditDialog {
   public readonly somControl: FormControl;
   public readonly eomControl: FormControl;
   public readonly mediaNameControl: FormControl;
+  public readonly featureDurationControl: FormControl;
 
   public featureTypes: string[] = Object.keys(FeatureTypes);
   public playoutStrategyTypes: string[] = Object.keys(PlayoutStrategyTypes);
@@ -29,31 +30,36 @@ export class TransmissionListEventEditDialog {
   public timingStrategyTypes: string[] = Object.keys(TimingStrategyTypes);
 
   public isUpdating = false;
+  public eventIsPlaying = false;
 
   constructor(
     public dialogRef: MatDialogRef<TransmissionListEventEditDialog>,
     @Inject(MAT_DIALOG_DATA) public data: TransmissionListEventDetails) {
       
+      console.log("Current data: ", data);
+
       this.isUpdating = data != null;
+      this.eventIsPlaying = data?.eventState == 'PLAYING';
 
       var timingValues: string[] = Object.values(TimingStrategyTypes);
-      this.timingStrategyTypeControl = new FormControl(!data ? this.timingStrategyTypes[0] : this.timingStrategyTypes[timingValues.indexOf(data.eventTimingStrategy.strategyType)]);
+      this.timingStrategyTypeControl = new FormControl({value: !data ? this.timingStrategyTypes[0] : this.timingStrategyTypes[timingValues.indexOf(data.eventTimingStrategy.strategyType)], disabled: this.eventIsPlaying});
 
       var defaultTargetStart = this.getDefaultTargetStartTimeValue();
-      this.targetStartTimeControl = new FormControl(!data?.eventTimingStrategy.targetStartTime ? defaultTargetStart : data.eventTimingStrategy.targetStartTime);
+      this.targetStartTimeControl = new FormControl({value: !data?.eventTimingStrategy.targetStartTime ? defaultTargetStart : data.eventTimingStrategy.targetStartTime, disabled: this.eventIsPlaying});
 
       var eventFeature = data?.eventFeatures.length ? data.eventFeatures[0] : null;
       var featureValues: string[] = Object.values(FeatureTypes);
-      this.featureTypeControl = new FormControl({value: !eventFeature ? this.featureTypes[0] : this.featureTypes[featureValues.indexOf(eventFeature.featureType)], disabled: this.isUpdating});
+      this.featureTypeControl = new FormControl({value: !eventFeature ? this.featureTypes[0] : this.featureTypes[featureValues.indexOf(eventFeature.featureType)], disabled: this.eventIsPlaying});
       
       var playoutStrategyValues: string[] = Object.values(PlayoutStrategyTypes);
-      this.playoutStrategyTypeControl = new FormControl({value: !eventFeature ? this.playoutStrategyTypes[0] : this.playoutStrategyTypes[playoutStrategyValues.indexOf(eventFeature.playoutStrategy.strategyType)], disabled: this.isUpdating});
+      this.playoutStrategyTypeControl = new FormControl({value: !eventFeature ? this.playoutStrategyTypes[0] : this.playoutStrategyTypes[playoutStrategyValues.indexOf(eventFeature.playoutStrategy.strategyType)], disabled: this.eventIsPlaying});
       
       var sourceStrategyValues: string[] = Object.values(SourceStrategyTypes);
-      this.sourceStrategyTypeControl = new FormControl({value: !eventFeature ? this.sourceStrategyTypes[0] : this.sourceStrategyTypes[sourceStrategyValues.indexOf(eventFeature.sourceStrategy.strategyType)], disabled: this.isUpdating});
-      this.somControl = new FormControl({value: !eventFeature?.sourceStrategy.som ? "00:00:00:00" : eventFeature.sourceStrategy.som, disabled: this.isUpdating});
-      this.eomControl = new FormControl({value: !eventFeature?.sourceStrategy.eom ? "00:00:30:00" : eventFeature.sourceStrategy.eom, disabled: this.isUpdating});
-      this.mediaNameControl = new FormControl({value: !eventFeature?.sourceStrategy.mediaName ? "TestInstance" : eventFeature.sourceStrategy.mediaName, disabled: this.isUpdating});
+      this.sourceStrategyTypeControl = new FormControl({value: !eventFeature ? this.sourceStrategyTypes[0] : this.sourceStrategyTypes[sourceStrategyValues.indexOf(eventFeature.sourceStrategy.strategyType)], disabled: this.eventIsPlaying});
+      this.somControl = new FormControl({value: !eventFeature?.sourceStrategy.som ? "00:00:00:00" : eventFeature.sourceStrategy.som, disabled: this.eventIsPlaying});
+      this.eomControl = new FormControl({value: !eventFeature?.sourceStrategy.eom ? "00:00:30:00" : eventFeature.sourceStrategy.eom, disabled: this.eventIsPlaying});
+      this.mediaNameControl = new FormControl({value: !eventFeature?.sourceStrategy.mediaName ? "TestInstance" : eventFeature.sourceStrategy.mediaName, disabled: this.eventIsPlaying});
+      this.featureDurationControl = new FormControl(!eventFeature ? "00:00:30:00" : eventFeature.duration);
 
       this.transmissionListEventForm = new FormGroup({
           timingStrategyType: this.timingStrategyTypeControl,
@@ -63,7 +69,8 @@ export class TransmissionListEventEditDialog {
           sourceStrategyType: this.sourceStrategyTypeControl,
           som: this.somControl,
           eom: this.eomControl,
-          mediaName: this.mediaNameControl
+          mediaName: this.mediaNameControl,
+          featureDuration: this.featureDurationControl
       });
     }
 
@@ -72,23 +79,24 @@ export class TransmissionListEventEditDialog {
   }
 
   public getResult() {
-    let formValue = this.transmissionListEventForm.value;
     return {
       timingData: {
-        strategyType: TimingStrategyTypes[formValue.timingStrategyType],
-        targetStartTime: formValue.targetStartTime
+        strategyType: TimingStrategyTypes[this.timingStrategyTypeControl.value],
+        targetStartTime: this.targetStartTimeControl.value
       },
       features: [{
-        featureType: FeatureTypes[formValue.featureType],
+        uid: this.data?.eventFeatures.length > 0 ? this.data?.eventFeatures[0].uid : null,
+        featureType: FeatureTypes[this.featureTypeControl.value],
         playoutStrategy: {
-          strategyType: PlayoutStrategyTypes[formValue.playoutStrategyType]
+          strategyType: PlayoutStrategyTypes[this.playoutStrategyTypeControl.value]
         },
         sourceStrategy: {
-          strategyType: SourceStrategyTypes[formValue.sourceStrategyType],
-          som: formValue.som,
-          eom: formValue.eom,
-          mediaName: formValue.mediaName
-        }
+          strategyType: SourceStrategyTypes[this.sourceStrategyTypeControl.value],
+          som: this.somControl.value,
+          eom: this.eomControl.value,
+          mediaName: this.mediaNameControl.value
+        },
+        duration: this.featureDurationControl.value
       }]
     };
   }

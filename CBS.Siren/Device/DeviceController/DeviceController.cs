@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CBS.Siren.Time;
@@ -59,6 +58,12 @@ namespace CBS.Siren.Device
             _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
         }
 
+        private void UpdateCurrentEventDetails(DeviceList incomingList, int replacePosition)
+        {
+            //Currently, you can only update the end time of the current event
+            _activeDeviceList.Events[replacePosition].EndTime = incomingList.Events[0].EndTime;
+        }
+
         private void PrepareListsForReplace(DeviceList value, int replacePosition)
         {
             if (replacePosition == -1)
@@ -67,7 +72,17 @@ namespace CBS.Siren.Device
                 return;
             }
 
-            _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
+            if (replacePosition == EventIndex)
+            {
+                UpdateCurrentEventDetails(value, replacePosition);
+                //Move the replace position on as we've already processed the first event
+                replacePosition++;
+            }
+
+            if (replacePosition < _activeDeviceList.Events.Count)
+            {
+                _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
+            }
             if (replacePosition <= value.Events.Count)
             {
                 value.Events.RemoveRange(0, replacePosition);
@@ -123,11 +138,9 @@ namespace CBS.Siren.Device
 
         private bool ListIsPlaying() => ActiveDeviceList?.Events.Count > 0 && CurrentEvent != null;
 
-        private bool TimeHasPassed(string timeToCheck)
+        private bool TimeHasPassed(DateTimeOffset timeToCheck)
         {
-            DateTimeOffset expectedTime = DateTimeExtensions.FromTimecodeString(timeToCheck);
-
-            if (expectedTime.DifferenceInFrames(DateTimeOffset.UtcNow) >= 0)
+            if (timeToCheck.DifferenceInFrames(DateTimeOffset.UtcNow) >= 0)
             {
                 return true;
             }
@@ -137,8 +150,7 @@ namespace CBS.Siren.Device
 
         private bool CheckForEventEnd()
         {
-            JsonElement endTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("endTime");
-            return TimeHasPassed(endTimeElement.GetString());
+            return TimeHasPassed(CurrentEvent.EndTime);
         }
 
         private void CurrentEventEnded()
@@ -163,8 +175,7 @@ namespace CBS.Siren.Device
 
         private bool CheckForEventStart()
         {
-            JsonElement startTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("startTime");
-            return TimeHasPassed(startTimeElement.GetString());
+            return TimeHasPassed(CurrentEvent.StartTime);
         }
 
         private void CurrentEventStarted()

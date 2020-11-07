@@ -127,6 +127,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
       .subscribe((creationData: TransmissionListEventCreationData) => {
         if (creationData == null) return;
 
+        console.log("Creation Data: ", creationData);
+        
         this.http.put<TransmissionListEvent>(`/proxy/api/1/automation/transmissionlist/${this.listId}/events/${updatingEvent.id}`, creationData).subscribe(response => {
           this.retrieveListInformation();
         }, error => console.error(error));
@@ -163,7 +165,7 @@ export class TranmissionlistEventsListComponent implements OnInit {
     return this.getListState() == "Playing" ? "Can't clear Playing list" : "Clear List";
   }
 
-  dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
+  public dropTable(event: CdkDragDrop<TransmissionListEvent[]>) {
     
     let listEventId = this.dataSource.data[event.previousIndex].id;
 

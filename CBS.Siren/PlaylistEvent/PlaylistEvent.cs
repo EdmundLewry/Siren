@@ -11,7 +11,7 @@ namespace CBS.Siren
      */
     public class PlaylistEvent
     {
-        public IEnumerable<IEventFeature> EventFeatures { get; set; }
+        public List<IEventFeature> EventFeatures { get; set; }
         public IEventTimingStrategy EventTimingStrategy { get; set; }
 
         public bool IsValid { get; set; }
@@ -19,7 +19,7 @@ namespace CBS.Siren
 
         public int Id { get; set; }
         
-        public PlaylistEvent(IEnumerable<IEventFeature> features, IEventTimingStrategy timingStrategy)
+        public PlaylistEvent(List<IEventFeature> features, IEventTimingStrategy timingStrategy)
         {
             EventFeatures = features;
             EventTimingStrategy = timingStrategy;

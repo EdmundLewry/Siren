@@ -31,8 +31,9 @@ namespace CBS.Siren.Test
             _transmissionList = new TransmissionList(new List<TransmissionListEvent>(){
                 new TransmissionListEvent(new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow), 
                                           new List<IEventFeature>(){ 
-                                            new VideoPlaylistEventFeature(new PrimaryVideoPlayoutStrategy(), 
-                                                                          new MediaSourceStrategy(new MediaInstance("Test", TimeSpan.FromSeconds(30)), TimeSpan.Zero, TimeSpan.FromSeconds(30)), null)
+                                            new VideoPlaylistEventFeature(Guid.NewGuid(),
+                                                                          new PrimaryVideoPlayoutStrategy(), 
+                                                                          new MediaSourceStrategy(new MediaInstance("Test", TimeSpan.FromSeconds(30)), TimeSpan.Zero, TimeSpan.FromSeconds(30)), TimeSpan.FromSeconds(30))
                                           }){ 
                     Id = 1 
                 },
@@ -62,7 +63,8 @@ namespace CBS.Siren.Test
                             SOM = "00:00:00:00",
                             EOM = "00:00:30:00",
                             MediaName = "TestInstance"
-                        }
+                        },
+                        Duration = "00:00:30:00"
                     }
                 }
             };
@@ -520,10 +522,12 @@ namespace CBS.Siren.Test
             TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
 
             DateTimeOffset newStartTime = DateTimeOffset.Parse("12/02/2020 12:00:00");
+            TimeSpan newDuration = TimeSpan.FromSeconds(40);
 
             int eventId = _transmissionList.Events[0].Id;
             TransmissionListEventUpsertDTO listEventUpdateDTO = GetListEventCreationDTO();
             listEventUpdateDTO.TimingData.TargetStartTime = newStartTime.ToTimecodeString();
+            listEventUpdateDTO.Features[0].Duration = newDuration.ToTimecodeString();
             TransmissionListEvent returnedEvent = await codeUnderTest.UpdateEventDetails(_transmissionList.Id, eventId, listEventUpdateDTO);
 
             Assert.Equal(eventId, returnedEvent.Id);
@@ -531,8 +535,55 @@ namespace CBS.Siren.Test
             Assert.Equal(TransmissionListEventState.Status.UNSCHEDULED, returnedEvent.EventState.CurrentStatus);
             Assert.Single(returnedEvent.EventFeatures);
             Assert.Null(returnedEvent.EventFeatures[0].DeviceListEventId);
+            Assert.Equal(newDuration, returnedEvent.EventFeatures[0].Duration);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy.StrategyType);
             Assert.Equal(newStartTime, returnedEvent.EventTimingStrategy.CalculateStartTime(eventId, _transmissionList));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task UpdateEvent_WithFeatureWithoutUid_LosesDeviceListEventRelationship()
+        {
+            Guid? guid = _transmissionList.Events[0].EventFeatures[0].Uid;
+            _transmissionList.Events[0].EventFeatures[0].DeviceListEventId = 1;
+
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+            
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            int eventId = _transmissionList.Events[0].Id;
+            TransmissionListEventUpsertDTO listEventUpdateDTO = GetListEventCreationDTO();
+            listEventUpdateDTO.Features[0].Uid = null;
+            TransmissionListEvent returnedEvent = await codeUnderTest.UpdateEventDetails(_transmissionList.Id, eventId, listEventUpdateDTO);
+
+            Assert.Single(returnedEvent.EventFeatures);
+            Assert.NotNull(returnedEvent.EventFeatures[0].Uid);
+            Assert.NotEqual(guid, returnedEvent.EventFeatures[0].Uid);
+            Assert.Null(returnedEvent.EventFeatures[0].DeviceListEventId);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task UpdateEvent_WithFeatureWithUid_MaintainsDeviceListEventRelationship()
+        {
+            int deviceListEventId = 1;
+            Guid? guid = _transmissionList.Events[0].EventFeatures[0].Uid;
+            _transmissionList.Events[0].EventFeatures[0].DeviceListEventId = deviceListEventId;
+
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            int eventId = _transmissionList.Events[0].Id;
+            TransmissionListEventUpsertDTO listEventUpdateDTO = GetListEventCreationDTO();
+            listEventUpdateDTO.Features[0].Uid = guid.ToString();
+            TransmissionListEvent returnedEvent = await codeUnderTest.UpdateEventDetails(_transmissionList.Id, eventId, listEventUpdateDTO);
+
+            Assert.Single(returnedEvent.EventFeatures);
+            Assert.Equal(guid, returnedEvent.EventFeatures[0].Uid);
+            Assert.Equal(deviceListEventId, returnedEvent.EventFeatures[0].DeviceListEventId);
         }
         
         [Fact]

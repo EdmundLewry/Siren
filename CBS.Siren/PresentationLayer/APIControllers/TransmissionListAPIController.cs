@@ -116,13 +116,13 @@ namespace CBS.Siren.Controllers
         }
 
         [HttpPost("{id}/events")]
-        public async Task<ActionResult<TransmissionListEventDTO>> AddEvent(int id, TransmissionListEventUpsertDTO listEvent)
+        public async Task<ActionResult<TransmissionListEventDetailDTO>> AddEvent(int id, TransmissionListEventUpsertDTO listEvent)
         {
             try
             {
                 Logger.LogDebug("Received request to add event to list with id {0} and list event dto {1}", id, JsonSerializer.Serialize(listEvent));
                 var createdListEvent = await _handler.AddEvent(id, listEvent);
-                return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDTO>(createdListEvent));
+                return CreatedAtAction(nameof(AddEvent), _mapper.Map<TransmissionListEventDetailDTO>(createdListEvent));
             }
             catch (Exception e)
             {
@@ -148,13 +148,13 @@ namespace CBS.Siren.Controllers
         }
         
         [HttpPatch("{id}/events/{eventId}/move")]
-        public async Task<ActionResult<TransmissionListEventDTO>> MoveEvent(int id, int eventId, TransmissionListEventMoveDTO listEventMove)
+        public async Task<ActionResult<TransmissionListEventDetailDTO>> MoveEvent(int id, int eventId, TransmissionListEventMoveDTO listEventMove)
         {
             try
             {
                 Logger.LogDebug("Received request to move event {0} on list with id {1} from {2} to {3}", id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
                 var updatedListEvent = await _handler.ChangeEventPosition(id, eventId, listEventMove.PreviousPosition, listEventMove.TargetPosition);
-                return _mapper.Map<TransmissionListEventDTO>(updatedListEvent);
+                return _mapper.Map<TransmissionListEventDetailDTO>(updatedListEvent);
             }
             catch(InvalidPositionException e)
             {

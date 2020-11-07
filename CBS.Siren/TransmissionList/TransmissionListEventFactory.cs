@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,24 +51,32 @@ namespace CBS.Siren
         {
             IDevice deviceToPlayOn = FindDevice(videoChain);
 
-            return feature.FeatureType switch
+            IPlayoutStrategy playoutStrategy = ConstructPlayoutStrategyFromType(feature.PlayoutStrategy);
+            ISourceStrategy sourceStrategy = ConstructSourceStrategyFromType(feature.SourceStrategy, deviceToPlayOn, dataLayer);
+            TimeSpan duration = feature.Duration.ConvertTimecodeStringToTimeSpan();
+            Guid? featureUid = null;
+            if (feature.Uid != null)
             {
-                "video" => new VideoPlaylistEventFeature(ConstructPlayoutStrategyFromType(feature.PlayoutStrategy),
-                                                        ConstructSourceStrategyFromType(feature.SourceStrategy, deviceToPlayOn, dataLayer),
-                                                        deviceToPlayOn),
-                _ => null
-            };
+                featureUid = Guid.Parse(feature.Uid);
+            }
+
+            return ConstructEventFeature(feature.FeatureType, featureUid, playoutStrategy, sourceStrategy, duration, deviceToPlayOn);
         }
 
         private static IEventFeature ConstructEventFeatureFromType(IEventFeature feature, IVideoChain videoChain)
         {
+            IPlayoutStrategy playoutStrategy = ConstructPlayoutStrategyFromType(feature.PlayoutStrategy);
+            ISourceStrategy sourceStrategy = ConstructSourceStrategyFromType(feature.SourceStrategy);
             IDevice deviceToPlayOn = FindDevice(videoChain);
 
-            return feature.FeatureType switch
+            return ConstructEventFeature(feature.FeatureType, feature.Uid, playoutStrategy, sourceStrategy, feature.Duration, deviceToPlayOn);
+        }
+
+        private static IEventFeature ConstructEventFeature(string featureType, Guid? uid, IPlayoutStrategy playoutStrategy, ISourceStrategy sourceStrategy, TimeSpan duration, IDevice device)
+        {
+            return featureType switch
             {
-                "video" => new VideoPlaylistEventFeature(ConstructPlayoutStrategyFromType(feature.PlayoutStrategy),
-                                                        ConstructSourceStrategyFromType(feature.SourceStrategy),
-                                                        deviceToPlayOn),
+                "video" => new VideoPlaylistEventFeature(uid ?? Guid.NewGuid(), playoutStrategy, sourceStrategy, duration, device),
                 _ => null
             };
         }

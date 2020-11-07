@@ -4,9 +4,11 @@ import { TimingStrategy } from "./itiming-strategy";
 import { RelativePosition } from "./relative-position.enum";
 
 export interface TransmissionListEventFeatureCreationData {
+  uid?: string;
   featureType: string;
   playoutStrategy: PlayoutStrategy;
   sourceStrategy: MediaSourceStrategy;
+  duration: string;
 }
 
 export interface ListPositionData{
