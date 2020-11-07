@@ -76,6 +76,37 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void AddDevice_WhenCalledWithNoProperties_AddsDeviceToDataLayerWithDefaultProperties()
+        {
+            DeviceManager codeUnderTest = CreateCodeUnderTest();
+            DeviceModel deviceModel = null;
+            _dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>()))
+                            .ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } })
+                            .Callback((DeviceModel[] arg) => deviceModel = arg[0]);
+
+            codeUnderTest.AddDevice("Test");
+
+            Assert.Equal(TimeSpan.Zero, deviceModel.DeviceProperties.Preroll);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void AddDevice_WhenCalledWithProperties_AddsDeviceToDataLayerWithGivenProperties()
+        {
+            DeviceManager codeUnderTest = CreateCodeUnderTest();
+            DeviceModel deviceModel = null;
+            _dataLayer.Setup(mock => mock.AddUpdateDevices(It.IsAny<DeviceModel[]>()))
+                            .ReturnsAsync(new List<DeviceModel>() { new DeviceModel() { Id = 0, Name = "Test" } })
+                            .Callback((DeviceModel[] arg) => deviceModel = arg[0]);
+
+            DeviceProperties deviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(59)};
+            codeUnderTest.AddDevice("Test", deviceProperties);
+
+            Assert.Equal(TimeSpan.FromSeconds(59), deviceModel.DeviceProperties.Preroll);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void AddDevice_WhenCalled_StartDeviceProcess()
         {
             string name = "Test";
@@ -106,8 +137,9 @@ namespace CBS.Siren.Test
         public void GetDevice_WhenIdExists_ReturnsDevice()
         {
             string expectedName = "Test";
+            TimeSpan expectedPreroll = TimeSpan.FromSeconds(40);
 
-            DeviceModel deviceModel = new DeviceModel() { Id = 1, Name = expectedName };
+            DeviceModel deviceModel = new DeviceModel() { Id = 1, Name = expectedName, DeviceProperties = new DeviceProperties() { Preroll = expectedPreroll } };
             _dataLayer.Setup(mock => mock.Devices()).Returns(Task.FromResult<IEnumerable<DeviceModel>>(new List<DeviceModel>() { deviceModel }));
 
             _mockDevice.Setup(mock => mock.Model).Returns(deviceModel);
@@ -116,6 +148,7 @@ namespace CBS.Siren.Test
 
             IDevice device = codeUnderTest.GetDevice(1);
             Assert.Equal(expectedName, device.Model.Name);
+            Assert.Equal(expectedPreroll, device.Model.DeviceProperties.Preroll);
         }
         #endregion
     }

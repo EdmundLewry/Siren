@@ -4,5 +4,6 @@
     {
         public int Id { get; set; } = 0;
         public string Name { get; set; }
+        public DeviceProperties DeviceProperties { get; set; } = new DeviceProperties();
     }
 }

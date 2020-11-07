@@ -3,6 +3,6 @@
     public interface IDeviceManager
     {
         IDevice GetDevice(int id);
-        void AddDevice(string name);
+        void AddDevice(string name, DeviceProperties deviceProperties = null);
     }
 }

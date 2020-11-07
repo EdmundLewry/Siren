@@ -89,7 +89,12 @@ namespace CBS.Siren.DTO
             CreateMap<IDevice, DeviceDTO>()
                 .ForMember(dto => dto.Id, config => config.MapFrom(device => device.Model.Id))
                 .ForMember(dto => dto.Name, config => config.MapFrom(device => device.Model.Name))
+                .ForMember(dto => dto.DeviceProperties, config => config.MapFrom(device => device.Model.DeviceProperties))
                 .ForMember(dto => dto.CurrentStatus, config => config.MapFrom(device => Enum.GetName(typeof(IDevice.DeviceStatus), device.CurrentStatus)));
+
+            CreateMap<DeviceProperties, DevicePropertiesDTO>()
+                .ForMember(dto => dto.Preroll,
+                           config => config.MapFrom(deviceProperties => deviceProperties.Preroll.ToTimecodeString()));
         }
     }
 }
