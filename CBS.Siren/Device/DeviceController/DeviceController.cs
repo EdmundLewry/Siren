@@ -140,8 +140,6 @@ namespace CBS.Siren.Device
 
         private bool TimeHasPassed(DateTimeOffset timeToCheck)
         {
-            //DateTimeOffset expectedTime = DateTimeExtensions.FromTimecodeString(timeToCheck);
-
             if (timeToCheck.DifferenceInFrames(DateTimeOffset.UtcNow) >= 0)
             {
                 return true;
@@ -152,7 +150,6 @@ namespace CBS.Siren.Device
 
         private bool CheckForEventEnd()
         {
-            //JsonElement endTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("endTime");
             return TimeHasPassed(CurrentEvent.EndTime);
         }
 
@@ -178,7 +175,6 @@ namespace CBS.Siren.Device
 
         private bool CheckForEventStart()
         {
-            //JsonElement startTimeElement = JsonDocument.Parse(CurrentEvent.EventData).RootElement.GetProperty("timing").GetProperty("startTime");
             return TimeHasPassed(CurrentEvent.StartTime);
         }
 

@@ -6,7 +6,6 @@ using CBS.Siren.Data;
 using CBS.Siren.Device;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CBS.Siren.Application
 {
