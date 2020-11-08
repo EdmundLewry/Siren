@@ -90,7 +90,7 @@ namespace CBS.Siren.Application
         {
             if(listPosition != null)
             {
-                int foundEventIndex = GetEventPositionById(transmissionList, listPosition.AssociatedEventId);
+                int foundEventIndex = transmissionList.GetEventPositionById(listPosition.AssociatedEventId);
                 if(foundEventIndex != -1)
                 {
                     foundEventIndex = listPosition.RelativePosition == RelativePosition.Above ? foundEventIndex : foundEventIndex + 1;
@@ -103,23 +103,10 @@ namespace CBS.Siren.Application
             return transmissionList.Events.Count-1;
         }
 
-        private int GetEventPositionById(TransmissionList transmissionList, int eventId)
-        {
-            //This is a fairly expensive way to do this. We may want to add positional data 
-            //to the events and maintain it in some other way
-            //We'll probably need that so that we can order them when they come out of the db anyway
-            int listEventPositionIndex = transmissionList.Events.FindIndex((listEvent) => listEvent.Id == eventId);
-            if (listEventPositionIndex == -1)
-            {
-                throw new ArgumentException($"Unable to find list event with id: {eventId}", nameof(eventId));
-            }
-            return listEventPositionIndex;
-        }
-
         public async Task RemoveEvent(int listId, int eventId)
         {
             TransmissionList transmissionList = await GetListById(listId);
-            int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
+            int listEventPositionIndex = transmissionList.GetEventPositionById(eventId);
 
             TransmissionListEvent listEvent = transmissionList.Events[listEventPositionIndex];
 
@@ -160,7 +147,7 @@ namespace CBS.Siren.Application
         public async Task<TransmissionListEvent> ChangeEventPosition(int listId, int eventId, int previousPosition, int targetPosition)
         {
             TransmissionList transmissionList = await GetListById(listId);
-            int foundEventIndex = GetEventPositionById(transmissionList, eventId);
+            int foundEventIndex = transmissionList.GetEventPositionById(eventId);
 
             if (foundEventIndex != previousPosition)
             {
@@ -200,7 +187,7 @@ namespace CBS.Siren.Application
         public async Task<TransmissionListEvent> UpdateEventDetails(int listId, int eventId, TransmissionListEventUpsertDTO listEventUpdate)
         {
             TransmissionList transmissionList = await GetListById(listId);
-            int listEventPositionIndex = GetEventPositionById(transmissionList, eventId);
+            int listEventPositionIndex = transmissionList.GetEventPositionById(eventId);
 
             TransmissionListEvent transmissionListEvent = transmissionList.Events[listEventPositionIndex];
 

@@ -136,7 +136,8 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore);
+            int startIndex = TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, startIndex);
 
             DeliverDeviceLists(deviceLists);
             if(deviceLists.Any())
