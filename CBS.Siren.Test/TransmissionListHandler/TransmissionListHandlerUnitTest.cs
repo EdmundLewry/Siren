@@ -29,7 +29,7 @@ namespace CBS.Siren.Test
             _dataLayer = new Mock<IDataLayer>();
             
             _transmissionList = new TransmissionList(new List<TransmissionListEvent>(){
-                new TransmissionListEvent(new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow), 
+                new TransmissionListEvent(new FixedStartEventTimingStrategy(TimeSource.Now), 
                                           new List<IEventFeature>(){ 
                                             new VideoPlaylistEventFeature(Guid.NewGuid(),
                                                                           new PrimaryVideoPlayoutStrategy(), 
@@ -330,6 +330,17 @@ namespace CBS.Siren.Test
             await codeUnderTest.ClearList(1);
 
             Assert.Empty(_transmissionList.Events);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithValidInput_SetsCurrentEventIdToNull()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+            _transmissionList.CurrentEventId = 2;
+            await codeUnderTest.ClearList(1);
+
+            Assert.Null(_transmissionList.CurrentEventId);
         }
 
         [Fact]

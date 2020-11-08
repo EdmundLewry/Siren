@@ -48,7 +48,7 @@ namespace CBS.Siren
             });
 
             IDeviceManager deviceManager = app.ApplicationServices.GetService<IDeviceManager>();
-            deviceManager.AddDevice("DemoDevice");
+            deviceManager.AddDevice("DemoDevice", new DeviceProperties() { Preroll = TimeSpan.FromSeconds(5) });
 
             IDataLayer dataLayer = app.ApplicationServices.GetService<IDataLayer>();
             dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0,0,30)));

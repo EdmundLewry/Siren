@@ -37,20 +37,20 @@ namespace CBS.Siren.Device
             });
         }
 
-        public void AddDevice(string name)
+        public void AddDevice(string name, DeviceProperties deviceProperties = null)
         {
             if(string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("Name parameter cannot be null or empty", "name");
             }
 
-            DeviceModel model = StoreDevice(name).Result;
+            DeviceModel model = StoreDevice(name, deviceProperties).Result;
             CreateDevice(model);
         }
 
-        public async Task<DeviceModel> StoreDevice(string name)
+        public async Task<DeviceModel> StoreDevice(string name, DeviceProperties deviceProperties = null)
         {
-            DeviceModel deviceModel = new DeviceModel() { Name = name };
+            DeviceModel deviceModel = new DeviceModel() { Name = name, DeviceProperties = deviceProperties ?? new DeviceProperties() };
             List<DeviceModel> addedModels = await DataLayer.AddUpdateDevices(deviceModel);
 
             return addedModels[0];

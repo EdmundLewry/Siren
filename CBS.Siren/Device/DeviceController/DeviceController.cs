@@ -28,6 +28,8 @@ namespace CBS.Siren.Device
         public DeviceListEvent CurrentEvent { get => EventIndex==INVALID_INDEX ? null : ActiveDeviceList.Events[EventIndex]; }
         public IDeviceListEventStore DeviceListEventStore { get; }
 
+        public ITimeSourceProvider Clock { get; set; } = TimeSource.TimeProvider;
+
         public DeviceController(ILogger logger, IDeviceListEventStore deviceListEventStore)
         {
             _logger = logger;
@@ -140,7 +142,7 @@ namespace CBS.Siren.Device
 
         private bool TimeHasPassed(DateTimeOffset timeToCheck)
         {
-            if (timeToCheck.DifferenceInFrames(DateTimeOffset.UtcNow) >= 0)
+            if (timeToCheck.DifferenceInFrames(Clock.Now) >= 0)
             {
                 return true;
             }

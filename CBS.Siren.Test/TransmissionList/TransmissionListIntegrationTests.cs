@@ -79,7 +79,7 @@ namespace CBS.Siren.Test
 
         [Fact]
         [Trait("TestType", "IntegrationTest")]
-        public async Task Service_WhenTransmissionListRequestedById_ReturnsTransmissionLists()
+        public async Task Service_WhenTransmissionListRequestedById_ReturnsTransmissionList()
         {
             using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
             using HttpClient clientUnderTest = factory.CreateClient();
@@ -98,6 +98,7 @@ namespace CBS.Siren.Test
             Assert.NotNull(returnedList);
             Assert.Equal("Stopped", returnedList.ListState);
             Assert.Single(returnedList.Events);
+            Assert.Null(returnedList.CurrentEventId);
         }
         #endregion
 
@@ -195,6 +196,7 @@ namespace CBS.Siren.Test
             Assert.Equal("00:00:30:00", returnedEvent.EventFeatures[0].SourceStrategy.EOM);
             Assert.Equal("TestInstance", returnedEvent.EventFeatures[0].SourceStrategy.MediaName);
             Assert.Equal("DemoDevice", returnedEvent.EventFeatures[0].Device.Name);
+            Assert.Equal("00:00:00:00", returnedEvent.EventFeatures[0].Device.DeviceProperties.Preroll);
             Assert.Equal("STOPPED", returnedEvent.EventFeatures[0].Device.CurrentStatus);
             Assert.Equal(1, returnedEvent.RelatedDeviceListEventCount);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy.StrategyType);

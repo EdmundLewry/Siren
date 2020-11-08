@@ -1,5 +1,7 @@
+using CBS.Siren.Time;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -8,6 +10,7 @@ namespace CBS.Siren
         public string StrategyType => "sequential";
 
         public DateTimeOffset? TargetStartTime => null;
+        public ITimeSourceProvider Clock { get; set; } = TimeSource.TimeProvider;
 
         public SequentialStartEventTimingStrategy() {}
         public SequentialStartEventTimingStrategy(IEventTimingStrategy other)
@@ -24,7 +27,7 @@ namespace CBS.Siren
         {
             if(!eventId.HasValue || list == null)
             {
-                return DateTimeOffset.UtcNow;
+                return Clock.Now;
             }
 
             //This is not very efficient...
@@ -41,12 +44,35 @@ namespace CBS.Siren
                 precedingEvent = listEvent;
             }
 
-            if(precedingEvent == null)
+            if(relatedEvent?.ActualStartTime != null)
             {
-                return relatedEvent?.ActualStartTime ?? DateTimeOffset.UtcNow;
+                return relatedEvent.ActualStartTime.Value;
             }
 
-            return precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
+            DateTimeOffset calculatedStartTime = Clock.Now;
+            if (precedingEvent != null)
+            {
+                calculatedStartTime = precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
+            }
+
+            TimeSpan largestPreroll = CalculateLargestDevicePreroll(relatedEvent);
+            if(StartIsWithinPreroll(calculatedStartTime, largestPreroll))
+            {
+                calculatedStartTime = Clock.Now + largestPreroll;
+            }
+
+            return calculatedStartTime;
+        }
+
+        private bool StartIsWithinPreroll(DateTimeOffset calculatedStartTime, TimeSpan largestPreroll)
+        {
+            return (calculatedStartTime - Clock.Now) < largestPreroll;
+        }
+
+        private TimeSpan CalculateLargestDevicePreroll(TransmissionListEvent relatedEvent)
+        {
+            TimeSpan? largestPreroll = relatedEvent.EventFeatures.Max((feature) => feature?.Device?.Model.DeviceProperties.Preroll);
+            return largestPreroll ?? TimeSpan.Zero;
         }
 
         public override string ToString()

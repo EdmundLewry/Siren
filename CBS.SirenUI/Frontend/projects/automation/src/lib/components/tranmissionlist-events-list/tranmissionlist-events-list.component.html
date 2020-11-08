@@ -106,7 +106,9 @@ cdkDropList
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag [cdkDragData]="row">
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+      cdkDrag [cdkDragData]="row"
+      [class.current-event]="transmissionList.currentEventId == row.id">
     <div class="drop-placeholder" *cdkDragPlaceholder></div>
   </tr>
 </table>

@@ -1,9 +1,9 @@
 using Xunit;
-
 using System;
 using System.Collections.Generic;
-
 using CBS.Siren.Time;
+using Moq;
+using CBS.Siren.Device;
 
 namespace CBS.Siren.Test
 {
@@ -13,28 +13,36 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_WhenRelatedEventIdIsEmpty_ReportsCurrentTime()
         {
-            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
+            DateTimeOffset expectedTime = DateTimeOffset.Parse("01/01/2020 15:45:26");
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(expectedTime);
 
-            DateTimeOffset target = DateTimeOffset.UtcNow;
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy()
+            {
+                Clock = timeSourceProvider.Object
+            };
+
             DateTimeOffset startTime = strategy.CalculateStartTime(null, new TransmissionList(new List<TransmissionListEvent>(), null));
 
-            //Using difference in frames to account for potential millisecond difference in DateTimeOffset.UtcNow
-            //rather than writing a Time abstraction
-            Assert.Equal(0, target.DifferenceInFrames(startTime));
+            Assert.Equal(expectedTime, startTime);
         }
         
         [Fact]
         [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_WhenRelatedListIsNull_ReportsCurrentTime()
         {
-            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
+            DateTimeOffset expectedTime = DateTimeOffset.Parse("01/01/2020 15:45:26");
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(expectedTime);
 
-            DateTimeOffset target = DateTimeOffset.UtcNow;
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy()
+            {
+                Clock = timeSourceProvider.Object
+            };
+
             DateTimeOffset startTime = strategy.CalculateStartTime(0, null);
 
-            //Using difference in frames to account for potential millisecond difference in DateTimeOffset.UtcNow
-            //rather than writing a Time abstraction
-            Assert.True(target.DifferenceInFrames(startTime)==0);
+            Assert.Equal(expectedTime, startTime);
         }
 
         [Fact]
@@ -46,7 +54,7 @@ namespace CBS.Siren.Test
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>());
             list.Events.Add(listEvent);
 
-            DateTimeOffset target = DateTimeOffset.UtcNow;
+            DateTimeOffset target = TimeSource.Now;
             DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
             Assert.Equal(0, target.DifferenceInFrames(startTime));
@@ -78,6 +86,9 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventIsValid_ReportsStartAfterPreviousEvent()
         {
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 00:00:00"));
+
             TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
             TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
             {
@@ -86,7 +97,10 @@ namespace CBS.Siren.Test
                 ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00")
             };
 
-            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy()
+            {
+                Clock = timeSourceProvider.Object
+            };
             TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>()) { Id = 2 };
 
             list.Events.Add(precedingEvent);
@@ -96,6 +110,71 @@ namespace CBS.Siren.Test
             DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
 
             Assert.Equal(target, startTime);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void CalculateStartTime_WhenCalculatedTimeIsLessThanPrerollInFuture_ReturnsNowPlusLargestPreroll()
+        {
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 14:30:00"));
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
+            {
+                Id = 1,
+                ExpectedDuration = new TimeSpan(0, 0, 30),
+                ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00")
+            };
+
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy
+            {
+                Clock = timeSourceProvider.Object
+            };
+
+            Mock<IDevice> device1 = new Mock<IDevice>();
+            device1.Setup(mockDevice => mockDevice.Model).Returns(new DeviceModel() { DeviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(20) } });
+            Mock <IEventFeature> feature1 = new Mock<IEventFeature>();
+            feature1.Setup(mock => mock.Device).Returns(device1.Object);
+            Mock<IDevice> device2 = new Mock<IDevice>();
+            device2.Setup(mockDevice => mockDevice.Model).Returns(new DeviceModel() { DeviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(40) } });
+            Mock<IEventFeature> feature2 = new Mock<IEventFeature>();
+            feature2.Setup(mock => mock.Device).Returns(device2.Object);
+            List<IEventFeature> features = new List<IEventFeature>() { feature1.Object, feature2.Object };
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, features) { Id = 2 };
+
+            list.Events.Add(precedingEvent);
+            list.Events.Add(listEvent);
+
+            DateTimeOffset target = DateTimeOffset.Parse("01/01/2020 14:30:40");
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
+
+            Assert.Equal(target, startTime);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void CalculateStartTime_WhenNoPrecedingEventAndFeatureDevicesHavePreroll_ReportsCurrentTimePlusLargestPreroll()
+        {
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy();
+            Mock<IDevice> device1 = new Mock<IDevice>();
+            device1.Setup(mockDevice => mockDevice.Model).Returns(new DeviceModel() { DeviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(20) } });
+            Mock<IEventFeature> feature1 = new Mock<IEventFeature>();
+            feature1.Setup(mock => mock.Device).Returns(device1.Object);
+            Mock<IDevice> device2 = new Mock<IDevice>();
+            device2.Setup(mockDevice => mockDevice.Model).Returns(new DeviceModel() { DeviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(40) } });
+            Mock<IEventFeature> feature2 = new Mock<IEventFeature>();
+            feature2.Setup(mock => mock.Device).Returns(device2.Object);
+            List<IEventFeature> features = new List<IEventFeature>() { feature1.Object, feature2.Object };
+
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, features);
+            list.Events.Add(listEvent);
+
+            DateTimeOffset target = TimeSource.Now + TimeSpan.FromSeconds(40);
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
+
+            Assert.Equal(0, target.DifferenceInFrames(startTime));
         }
     }
 }

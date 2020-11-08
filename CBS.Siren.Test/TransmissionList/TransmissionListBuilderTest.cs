@@ -1,4 +1,5 @@
 using CBS.Siren.Device;
+using CBS.Siren.Time;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace CBS.Siren.Test
             };
             IEventTimingStrategy timingStrategy = strategyType switch
             {
-                TimingStrategyType.Fixed => new FixedStartEventTimingStrategy(DateTimeOffset.UtcNow),
+                TimingStrategyType.Fixed => new FixedStartEventTimingStrategy(TimeSource.Now),
                 TimingStrategyType.Sequential => new SequentialStartEventTimingStrategy(),
                 _ => null
             };

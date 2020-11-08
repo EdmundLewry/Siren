@@ -1,4 +1,5 @@
 ﻿using CBS.Siren.Device;
+using CBS.Siren.Time;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -60,6 +61,65 @@ namespace CBS.Siren.Test
             serviceUnderTest.PlayTransmissionList();
 
             mockDevice.VerifySet(mock => mock.ActiveList = It.IsAny<DeviceList>());
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenPlayCalledWithNoCurrentEvent_SchedulesListFromStart()
+        {
+            var mockDevice = new Mock<IDevice>();
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>()
+            {
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
+            };
+            var mockScheduler = new Mock<IScheduler>();
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
+                                                                                         new Mock<IDeviceListEventWatcher>().Object,
+                                                                                         new Mock<IDeviceListEventStore>().Object,
+                                                                                         new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.PlayTransmissionList();
+
+            mockScheduler.Verify(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), 0));
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenPlayCalledCurrentEventSet_SchedulesListFromEventIndex()
+        {
+            var mockDevice = new Mock<IDevice>();
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>()
+            {
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
+            };
+            var mockScheduler = new Mock<IScheduler>();
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
+
+            List<TransmissionListEvent> events = new List<TransmissionListEvent>(){
+                new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 1 },
+                new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 3 },
+                new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 2 }
+            };
+            TransmissionList transmissionList = new TransmissionList(events, null) { CurrentEventId = 3 };
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
+                                                                                         new Mock<IDeviceListEventWatcher>().Object,
+                                                                                         new Mock<IDeviceListEventStore>().Object,
+                                                                                         new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.PlayTransmissionList();
+
+            mockScheduler.Verify(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), 1));
         }
         
         [Fact]
@@ -254,6 +314,28 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldSetCurrentEventId()
+        {
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object);
+            event1.EventFeatures[0].DeviceListEventId = deviceEvent1.Id;
+            event1.EventFeatures[1].DeviceListEventId = deviceEvent2.Id;
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<IDeviceListEventStore>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
+
+            Assert.Equal(event1.Id, transmissionList.CurrentEventId);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldSetTransmissionListEventActualStartTime()
         {
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");
@@ -269,9 +351,9 @@ namespace CBS.Siren.Test
                 TransmissionList = transmissionList
             };
 
-            DateTimeOffset earliestStartTime = DateTimeOffset.Now;
+            DateTimeOffset earliestStartTime = TimeSource.Now;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
-            DateTimeOffset latestStartTime = DateTimeOffset.Now;
+            DateTimeOffset latestStartTime = TimeSource.Now;
 
             Assert.NotNull(event1.ActualStartTime);
             Assert.True(event1.ActualStartTime.Value >= earliestStartTime && event1.ActualStartTime.Value <= latestStartTime);
@@ -326,9 +408,9 @@ namespace CBS.Siren.Test
             deviceEvent1.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
             deviceEvent2.EventState.CurrentStatus = DeviceListEventStatus.PLAYED;
-            DateTimeOffset earliestEndTime = DateTimeOffset.Now;
+            DateTimeOffset earliestEndTime = TimeSource.Now;
             serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent2.Id, null, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYED });
-            DateTimeOffset latestEndTime = DateTimeOffset.Now;
+            DateTimeOffset latestEndTime = TimeSource.Now;
 
             Assert.NotNull(event1.ActualEndTime);
             Assert.True(event1.ActualEndTime.Value >= earliestEndTime && event1.ActualEndTime.Value <= latestEndTime);
