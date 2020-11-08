@@ -255,6 +255,28 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldSetCurrentEventId()
+        {
+            DeviceListEvent deviceEvent1 = new DeviceListEvent("");
+            DeviceListEvent deviceEvent2 = new DeviceListEvent("");
+
+            TransmissionListEvent event1 = GenerateTestTransmissionListEvent(new Mock<IDevice>().Object, new Mock<IDevice>().Object);
+            event1.EventFeatures[0].DeviceListEventId = deviceEvent1.Id;
+            event1.EventFeatures[1].DeviceListEventId = deviceEvent2.Id;
+
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1 }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(new Mock<IScheduler>().Object, new Mock<IDeviceListEventWatcher>().Object, new Mock<IDeviceListEventStore>().Object, new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.OnDeviceListEventStatusChanged(deviceEvent1.Id, event1.Id, new DeviceListEventState() { CurrentStatus = DeviceListEventStatus.PLAYING });
+
+            Assert.Equal(event1.Id, transmissionList.CurrentEventId);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenOneDeviceListEventPlaying_ShouldSetTransmissionListEventActualStartTime()
         {
             DeviceListEvent deviceEvent1 = new DeviceListEvent("");

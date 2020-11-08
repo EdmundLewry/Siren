@@ -90,6 +90,7 @@ namespace CBS.Siren
             {
                 effectedEvent.ActualStartTime = Clock.Now;
             }
+            TransmissionList.CurrentEventId = effectedEvent.Id;
         }
 
         private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
