@@ -121,6 +121,7 @@ namespace CBS.Siren.Application
         {
             TransmissionList transmissionList = await GetListById(id);
             transmissionList.Events.Clear();
+            transmissionList.CurrentEventId = null;
 
             ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
             transmissionListService?.OnTransmissionListChanged();

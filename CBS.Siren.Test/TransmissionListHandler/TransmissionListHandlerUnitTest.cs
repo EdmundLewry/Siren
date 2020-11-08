@@ -331,6 +331,17 @@ namespace CBS.Siren.Test
 
             Assert.Empty(_transmissionList.Events);
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ClearList_WithValidInput_SetsCurrentEventIdToNull()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+            _transmissionList.CurrentEventId = 2;
+            await codeUnderTest.ClearList(1);
+
+            Assert.Null(_transmissionList.CurrentEventId);
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
