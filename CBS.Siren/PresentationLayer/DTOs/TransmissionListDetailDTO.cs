@@ -8,5 +8,6 @@ namespace CBS.Siren.DTO
         public PlaylistDTO SourceList { get; set; }
         public List<TransmissionListEventDTO> Events { get; set; }
         public string ListState { get; set; }
+        public int? CurrentEventId { get; set; }
     }
 }

@@ -79,7 +79,7 @@ namespace CBS.Siren.Test
 
         [Fact]
         [Trait("TestType", "IntegrationTest")]
-        public async Task Service_WhenTransmissionListRequestedById_ReturnsTransmissionLists()
+        public async Task Service_WhenTransmissionListRequestedById_ReturnsTransmissionList()
         {
             using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
             using HttpClient clientUnderTest = factory.CreateClient();
@@ -98,6 +98,7 @@ namespace CBS.Siren.Test
             Assert.NotNull(returnedList);
             Assert.Equal("Stopped", returnedList.ListState);
             Assert.Single(returnedList.Events);
+            Assert.Null(returnedList.CurrentEventId);
         }
         #endregion
 
