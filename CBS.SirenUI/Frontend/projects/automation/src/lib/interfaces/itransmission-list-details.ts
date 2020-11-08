@@ -5,4 +5,5 @@ export interface TransmissionListDetails {
     playlistId: number;
     events: TransmissionListEvent[];
     listState: string;
+    currentEventId?: number;
 }
