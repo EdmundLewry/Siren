@@ -1,4 +1,5 @@
 ﻿using CBS.Siren.Device;
+using CBS.Siren.Time;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace CBS.Siren
         public IDeviceListEventWatcher DeviceListEventWatcher { get; }
         public IDeviceListEventStore DeviceListEventStore { get; }
         private HashSet<IDevice> SubscribedDevices { get; set; } = new HashSet<IDevice>();
+        public ITimeSourceProvider Clock { get; set; } = TimeSource.TimeProvider;
 
         private TransmissionList _transmissionList;
         public TransmissionList TransmissionList 
@@ -86,14 +88,14 @@ namespace CBS.Siren
             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYING);
             if (!effectedEvent.ActualStartTime.HasValue)
             {
-                effectedEvent.ActualStartTime = DateTimeOffset.UtcNow;
+                effectedEvent.ActualStartTime = Clock.Now;
             }
         }
 
         private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
         {
             UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
-            effectedEvent.ActualEndTime = DateTimeOffset.UtcNow;
+            effectedEvent.ActualEndTime = Clock.Now;
             if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
             {
                 TransmissionList.State = TransmissionListState.Stopped;

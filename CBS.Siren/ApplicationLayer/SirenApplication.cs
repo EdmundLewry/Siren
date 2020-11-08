@@ -46,7 +46,7 @@ namespace CBS.Siren.Application
 
             MediaInstance demoMedia = CreateDemoMediaInstance();
 
-            DateTimeOffset startTime = DateTimeOffset.UtcNow.AddSeconds(3);
+            DateTimeOffset startTime = TimeSource.Now.AddSeconds(3);
             List<PlaylistEvent> events = GeneratePlaylistEvents(demoMedia, startTime, 3);
 
             Playlist list = new Playlist(events);
