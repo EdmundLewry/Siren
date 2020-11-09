@@ -98,6 +98,22 @@ namespace CBS.Siren.Controllers
                 return NotFound(id);
             }
         }
+        
+        [HttpPost("{id}/stop")]
+        public async Task<ActionResult> StopTransmissionListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to stop list with id {0}", id);
+                await _handler.StopTransmissionList(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to Stop list with given id {0}, {1}", id, e.Message);
+                return NotFound(id);
+            }
+        }
 
         [HttpGet("{id}/events")]
         public async Task<ActionResult<IEnumerable<TransmissionListEventDTO>>> GetEvents(int id)

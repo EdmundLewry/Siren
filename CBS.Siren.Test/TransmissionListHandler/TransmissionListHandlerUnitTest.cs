@@ -399,6 +399,39 @@ namespace CBS.Siren.Test
             _listService.Verify(mock => mock.PlayTransmissionList(), Times.Once);
         }
         #endregion
+        
+        #region Stop
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task StopTransmisionList_WithInvalidListId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.StopTransmissionList(30));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task StopTransmissionList_WithValidInput_UpdatesDataLayer()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.StopTransmissionList(1);
+
+            _dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task StopTransmisionList_WithValidId_InvokesTransmissionListServicePlay()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.StopTransmissionList(1);
+
+            _listService.Verify(mock => mock.StopTransmissionList(), Times.Once);
+        }
+        #endregion
 
         #region Update
         [Fact]

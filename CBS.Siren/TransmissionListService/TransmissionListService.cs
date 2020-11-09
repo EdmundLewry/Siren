@@ -146,6 +146,11 @@ namespace CBS.Siren
             }
         }
 
+        public void StopTransmissionList()
+        {
+            throw new NotImplementedException();
+        }
+
         public void OnTransmissionListChanged(int changeIndex = 0)
         {
             if(!TransmissionList.Events.Any())

@@ -175,9 +175,20 @@ namespace CBS.Siren.Application
             return transmissionListEvent;
         }
 
-        public Task PauseTransmissionList(int id)
+        public async Task StopTransmissionList(int id)
         {
-            throw new NotImplementedException();
+            TransmissionList transmissionList = await GetListById(id);
+
+            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            if (transmissionListService == null)
+            {
+                string message = $"Unable to find list service for list with Id {id}";
+                Logger.LogError(message);
+                throw new ArgumentException(message, nameof(id));
+            }
+
+            transmissionListService.StopTransmissionList();
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
         public Task NextTransmissionList(int id)
