@@ -148,7 +148,31 @@ namespace CBS.Siren
 
         public void StopTransmissionList()
         {
-            throw new NotImplementedException();
+            if(TransmissionList.CurrentEventId != null)
+            {
+                int eventIndex = TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+                TransmissionList.Events[eventIndex].ActualStartTime = null;
+            }
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
+
+            TransmissionList.Events.ForEach(transmissionEvent =>
+            {
+                transmissionEvent.EventFeatures.ForEach(feature =>
+                {
+                    if (feature.Device == null)
+                    {
+                        return;
+                    }
+
+                    if (!deviceLists.ContainsKey(feature.Device))
+                    {
+                        deviceLists[feature.Device] = new DeviceList(new List<DeviceListEvent>());
+                    }
+                });
+            });
+            DeliverDeviceLists(deviceLists);
+            TransmissionList.State = TransmissionListState.Stopped;
         }
 
         public void OnTransmissionListChanged(int changeIndex = 0)
