@@ -79,7 +79,9 @@ export class TranmissionlistEventsListComponent implements OnInit {
   }
 
   public requestListStop(): void {
-    console.error("Stop not currently supported");
+    this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/stop`, this.httpOptions).subscribe(result => {
+      this.retrieveListInformation();
+    }, error => console.error(error));
   }
 
   public requestAddNewEvent(relativeEvent: TransmissionListEvent = null, relativePosition: RelativePosition = null): void {

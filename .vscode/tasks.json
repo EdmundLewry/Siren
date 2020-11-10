@@ -103,5 +103,31 @@
                 "$tsc"
             ]
         },
+        {
+            "label": "Build UI (Development)",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "group": "build",
+            "presentation": {
+                "group": "build-dev"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build Frontend (Development)",
+            "type": "npm",
+            "script": "build",
+            "path": "Frontend/",
+            "group": "build",
+            "problemMatcher": ["$tsc", "$node-sass"],
+            "presentation": {
+                "group": "build-dev"
+            }
+        },
     ]
 }
