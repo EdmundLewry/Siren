@@ -177,11 +177,15 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenStopCalled_DeliversEmptyListToDevice()
         {
-            //Test doesn't work because we don't have Devices set on the features of the events in the list
             var mockDevice = new Mock<IDevice>();
+            mockDevice.SetupProperty(mock => mock.ActiveList, null);
+
             var mockScheduler = new Mock<IScheduler>();
 
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            Mock<IEventFeature> mockFeature = new Mock<IEventFeature>();
+            mockFeature.Setup(mock => mock.Device).Returns(mockDevice.Object);
+            TransmissionListEvent transmissionListEvent = new TransmissionListEvent(null, new List<IEventFeature>() { mockFeature.Object });
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null);
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
                                                                                          new Mock<IDeviceListEventWatcher>().Object,
                                                                                          new Mock<IDeviceListEventStore>().Object,
@@ -192,7 +196,35 @@ namespace CBS.Siren.Test
 
             serviceUnderTest.StopTransmissionList();
 
-            mockDevice.VerifySet(mock => mock.ActiveList = new DeviceList(new List<DeviceListEvent>()));
+            Assert.NotNull(mockDevice.Object.ActiveList);
+            Assert.Empty(mockDevice.Object.ActiveList.Events);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void TransmissionListService_WhenStopCalled_ClearsFeatureDeviceListEvents()
+        {
+            var mockDevice = new Mock<IDevice>();
+            mockDevice.SetupProperty(mock => mock.ActiveList, null);
+
+            var mockScheduler = new Mock<IScheduler>();
+
+            Mock<IEventFeature> mockFeature = new Mock<IEventFeature>();
+            mockFeature.Setup(mock => mock.Device).Returns(mockDevice.Object);
+            mockFeature.SetupProperty(mock => mock.DeviceListEventId, 20);
+            TransmissionListEvent transmissionListEvent = new TransmissionListEvent(null, new List<IEventFeature>() { mockFeature.Object });
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null);
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
+                                                                                         new Mock<IDeviceListEventWatcher>().Object,
+                                                                                         new Mock<IDeviceListEventStore>().Object,
+                                                                                         new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.StopTransmissionList();
+
+            Assert.Null(mockFeature.Object.DeviceListEventId);
         }
         
         [Fact]

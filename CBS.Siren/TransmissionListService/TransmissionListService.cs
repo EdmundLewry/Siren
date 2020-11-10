@@ -165,6 +165,7 @@ namespace CBS.Siren
                         return;
                     }
 
+                    feature.DeviceListEventId = null;
                     if (!deviceLists.ContainsKey(feature.Device))
                     {
                         deviceLists[feature.Device] = new DeviceList(new List<DeviceListEvent>());
