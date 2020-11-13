@@ -102,6 +102,12 @@ namespace CBS.Siren
                 TransmissionList.State = TransmissionListState.Stopped;
             }
         }
+        
+        private void OnTransmissionListEventReset(TransmissionListEvent effectedEvent)
+        {
+            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.SCHEDULED);
+            effectedEvent.ActualStartTime = null;
+        }
 
         private bool AreAllFeatureDeviceEventsInState(TransmissionListEvent effectedEvent, IDeviceListEventStore deviceListEventStore, DeviceListEventStatus targetState)
         {
@@ -144,6 +150,42 @@ namespace CBS.Siren
             {
                 TransmissionList.State = TransmissionListState.Playing;
             }
+        }
+
+        public void StopTransmissionList()
+        {
+            if (TransmissionList.State == TransmissionListState.Stopped)
+            {
+                return;
+            }
+
+            if (TransmissionList.CurrentEventId != null)
+            {
+                TransmissionListEvent effectedEvent = GetTransmissionListEventById(TransmissionList.CurrentEventId.Value);
+                OnTransmissionListEventReset(effectedEvent);
+            }
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
+
+            TransmissionList.Events.ForEach(transmissionEvent =>
+            {
+                transmissionEvent.EventFeatures.ForEach(feature =>
+                {
+                    if (feature.Device == null)
+                    {
+                        return;
+                    }
+
+                    feature.DeviceListEventId = null;
+                    if (!deviceLists.ContainsKey(feature.Device))
+                    {
+                        deviceLists[feature.Device] = null;
+                    }
+                });
+            });
+
+            DeliverDeviceLists(deviceLists);
+            TransmissionList.State = TransmissionListState.Stopped;
         }
 
         public void OnTransmissionListChanged(int changeIndex = 0)

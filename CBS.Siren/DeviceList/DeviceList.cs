@@ -22,7 +22,7 @@ namespace CBS.Siren
 
         public DeviceList(DeviceList deviceList)
         {
-            Events = deviceList.Events.Select((listEvent) => new DeviceListEvent(listEvent)).ToList();
+            Events = deviceList?.Events.Select((listEvent) => new DeviceListEvent(listEvent)).ToList();
         }
 
         public override string ToString()

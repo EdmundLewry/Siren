@@ -196,7 +196,7 @@ namespace CBS.Siren.Test
             Assert.Equal("00:00:30:00", returnedEvent.EventFeatures[0].SourceStrategy.EOM);
             Assert.Equal("TestInstance", returnedEvent.EventFeatures[0].SourceStrategy.MediaName);
             Assert.Equal("DemoDevice", returnedEvent.EventFeatures[0].Device.Name);
-            Assert.Equal("00:00:00:00", returnedEvent.EventFeatures[0].Device.DeviceProperties.Preroll);
+            Assert.Equal("00:00:05:00", returnedEvent.EventFeatures[0].Device.DeviceProperties.Preroll);
             Assert.Equal("STOPPED", returnedEvent.EventFeatures[0].Device.CurrentStatus);
             Assert.Equal(1, returnedEvent.RelatedDeviceListEventCount);
             Assert.Equal("fixed", returnedEvent.EventTimingStrategy.StrategyType);
@@ -398,6 +398,54 @@ namespace CBS.Siren.Test
             Assert.Equal(2, returnedList.Count);
             Assert.True(returnedList[0].RelatedDeviceListEventCount > 0);
             Assert.True(returnedList[1].RelatedDeviceListEventCount > 0);
+        }
+        #endregion
+        
+        #region Stop
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenStopTransmissionListIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1000/stop", new StringContent(""));
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenStopTransmissionListIsCalled_UpdatesListStateAndClearsDeviceList()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/play", new StringContent(""));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/stop", new StringContent(""));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1");
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListDetailDTO returnedList = content.DeserializeJson<TransmissionListDetailDTO>();
+
+            Assert.Equal("Stopped", returnedList.ListState);
+            Assert.Equal(2, returnedList.Events.Count);
+            Assert.True(returnedList.Events[0].RelatedDeviceListEventCount == 0);
+            Assert.True(returnedList.Events[1].RelatedDeviceListEventCount == 0);
+
+
         }
         #endregion
 

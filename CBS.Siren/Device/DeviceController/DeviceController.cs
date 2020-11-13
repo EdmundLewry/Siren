@@ -40,6 +40,13 @@ namespace CBS.Siren.Device
         {
             lock (_deviceListLock)
             {
+                if(value is null)
+                {
+                    Reset();
+                    _logger.LogInformation($"Device List has been reset");
+                    return;
+                }
+
                 if (_activeDeviceList == null)
                 {
                     _activeDeviceList = new DeviceList(value);
@@ -60,10 +67,11 @@ namespace CBS.Siren.Device
             _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
         }
 
-        private void UpdateCurrentEventDetails(DeviceList incomingList, int replacePosition)
+        private void Reset()
         {
-            //Currently, you can only update the end time of the current event
-            _activeDeviceList.Events[replacePosition].EndTime = incomingList.Events[0].EndTime;
+            EventIndex = INVALID_INDEX;
+            _eventHasStarted = false;
+            _activeDeviceList = null;
         }
 
         private void PrepareListsForReplace(DeviceList value, int replacePosition)
@@ -91,6 +99,12 @@ namespace CBS.Siren.Device
             }
         }
 
+        private void UpdateCurrentEventDetails(DeviceList incomingList, int replacePosition)
+        {
+            //Currently, you can only update the end time of the current event
+            _activeDeviceList.Events[replacePosition].EndTime = incomingList.Events[0].EndTime;
+        }
+
         private int FindReplacePosition(DeviceList incomingList)
         {
             for (int i = 0; i < _activeDeviceList.Events.Count; ++i)
@@ -106,7 +120,7 @@ namespace CBS.Siren.Device
 
         private bool ListsDiverge(DeviceList incomingList, int eventIndex)
         {
-            return eventIndex >= incomingList.Events.Count || _activeDeviceList.Events[eventIndex].Id != incomingList.Events[eventIndex].Id;
+            return  eventIndex >= incomingList.Events.Count || _activeDeviceList.Events[eventIndex].Id != incomingList.Events[eventIndex].Id;
         }
         private bool EventDiverges(DeviceList incomingList, int eventIndex)
         {

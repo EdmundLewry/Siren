@@ -18,7 +18,7 @@ namespace CBS.Siren.Application
         Task<TransmissionListEvent> UpdateEventDetails(int listId, int eventId, TransmissionListEventUpsertDTO listEventUpdate);
 
         Task PlayTransmissionList(int id);
-        Task PauseTransmissionList(int id);
+        Task StopTransmissionList(int id);
         Task NextTransmissionList(int id);
     }
 }
