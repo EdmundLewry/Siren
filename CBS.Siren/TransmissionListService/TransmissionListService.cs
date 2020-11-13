@@ -102,6 +102,12 @@ namespace CBS.Siren
                 TransmissionList.State = TransmissionListState.Stopped;
             }
         }
+        
+        private void OnTransmissionListEventReset(TransmissionListEvent effectedEvent)
+        {
+            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.SCHEDULED);
+            effectedEvent.ActualStartTime = null;
+        }
 
         private bool AreAllFeatureDeviceEventsInState(TransmissionListEvent effectedEvent, IDeviceListEventStore deviceListEventStore, DeviceListEventStatus targetState)
         {
@@ -148,10 +154,15 @@ namespace CBS.Siren
 
         public void StopTransmissionList()
         {
-            if(TransmissionList.CurrentEventId != null)
+            if (TransmissionList.State == TransmissionListState.Stopped)
             {
-                int eventIndex = TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
-                TransmissionList.Events[eventIndex].ActualStartTime = null;
+                return;
+            }
+
+            if (TransmissionList.CurrentEventId != null)
+            {
+                TransmissionListEvent effectedEvent = GetTransmissionListEventById(TransmissionList.CurrentEventId.Value);
+                OnTransmissionListEventReset(effectedEvent);
             }
 
             Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>();
@@ -168,10 +179,11 @@ namespace CBS.Siren
                     feature.DeviceListEventId = null;
                     if (!deviceLists.ContainsKey(feature.Device))
                     {
-                        deviceLists[feature.Device] = new DeviceList(new List<DeviceListEvent>());
+                        deviceLists[feature.Device] = null;
                     }
                 });
             });
+
             DeliverDeviceLists(deviceLists);
             TransmissionList.State = TransmissionListState.Stopped;
         }

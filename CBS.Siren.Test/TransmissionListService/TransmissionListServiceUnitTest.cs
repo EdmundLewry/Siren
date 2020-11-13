@@ -175,17 +175,21 @@ namespace CBS.Siren.Test
         #region Stop
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void TransmissionListService_WhenStopCalled_DeliversEmptyListToDevice()
+        public void TransmissionListService_WhenStopCalledOnPlayingList_DeliversNullListToDevices()
         {
             var mockDevice = new Mock<IDevice>();
-            mockDevice.SetupProperty(mock => mock.ActiveList, null);
+            DeviceList existingList = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent("") });
+            mockDevice.SetupProperty(mock => mock.ActiveList, existingList);
 
             var mockScheduler = new Mock<IScheduler>();
 
             Mock<IEventFeature> mockFeature = new Mock<IEventFeature>();
             mockFeature.Setup(mock => mock.Device).Returns(mockDevice.Object);
             TransmissionListEvent transmissionListEvent = new TransmissionListEvent(null, new List<IEventFeature>() { mockFeature.Object });
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null);
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null)
+            {
+                State = TransmissionListState.Playing
+            };
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
                                                                                          new Mock<IDeviceListEventWatcher>().Object,
                                                                                          new Mock<IDeviceListEventStore>().Object,
@@ -196,8 +200,7 @@ namespace CBS.Siren.Test
 
             serviceUnderTest.StopTransmissionList();
 
-            Assert.NotNull(mockDevice.Object.ActiveList);
-            Assert.Empty(mockDevice.Object.ActiveList.Events);
+            Assert.Null(mockDevice.Object.ActiveList);
         }
         
         [Fact]
@@ -213,7 +216,10 @@ namespace CBS.Siren.Test
             mockFeature.Setup(mock => mock.Device).Returns(mockDevice.Object);
             mockFeature.SetupProperty(mock => mock.DeviceListEventId, 20);
             TransmissionListEvent transmissionListEvent = new TransmissionListEvent(null, new List<IEventFeature>() { mockFeature.Object });
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null);
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null)
+            {
+                State = TransmissionListState.Playing
+            };
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
                                                                                          new Mock<IDeviceListEventWatcher>().Object,
                                                                                          new Mock<IDeviceListEventStore>().Object,
@@ -259,10 +265,13 @@ namespace CBS.Siren.Test
         [Trait("TestType", "UnitTest")]
         public void TransmissionListService_WhenStopCalledOnStoppedList_ListStateIsUnchanged()
         {
+            var mockDevice = new Mock<IDevice>();
             var mockScheduler = new Mock<IScheduler>();
-            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(new Dictionary<IDevice, DeviceList>());
 
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
+            Mock<IEventFeature> mockFeature = new Mock<IEventFeature>();
+            mockFeature.Setup(mock => mock.Device).Returns(mockDevice.Object);
+            TransmissionListEvent transmissionListEvent = new TransmissionListEvent(null, new List<IEventFeature>() { mockFeature.Object });
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { transmissionListEvent }, null);
             using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
                                                                                          new Mock<IDeviceListEventWatcher>().Object,
                                                                                          new Mock<IDeviceListEventStore>().Object,
@@ -274,11 +283,12 @@ namespace CBS.Siren.Test
             serviceUnderTest.StopTransmissionList();
 
             Assert.Equal(TransmissionListState.Stopped, transmissionList.State);
+            mockDevice.VerifySet(mock => mock.ActiveList = It.IsAny<DeviceList>(), Times.Never);
         }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void TransmissionListService_WhenStopCalledCurrentEventSet_ResetsTheActualStartTime()
+        public void TransmissionListService_WhenStopCalledCurrentEventSet_ResetsTheCurrentEvent()
         {
             var mockDevice = new Mock<IDevice>();
 
@@ -290,8 +300,16 @@ namespace CBS.Siren.Test
             mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
 
             List<TransmissionListEvent> events = new List<TransmissionListEvent>(){
-                new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 1, ActualStartTime = DateTimeOffset.Parse("12/02/2020 12:00:00") },
-                new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 3, ActualStartTime = DateTimeOffset.Parse("12/02/2020 14:00:00") },
+                new TransmissionListEvent(null, new List<IEventFeature>())
+                { 
+                    Id = 1, ActualStartTime = DateTimeOffset.Parse("12/02/2020 12:00:00"), 
+                    EventState = new TransmissionListEventState(){ CurrentStatus = TransmissionListEventState.Status.PLAYED} 
+                },
+                new TransmissionListEvent(null, new List<IEventFeature>())
+                { 
+                    Id = 3, ActualStartTime = DateTimeOffset.Parse("12/02/2020 14:00:00"), 
+                    EventState = new TransmissionListEventState(){ CurrentStatus = TransmissionListEventState.Status.PLAYING}
+                },
                 new TransmissionListEvent(null, new List<IEventFeature>()){ Id = 2 }
             };
             TransmissionList transmissionList = new TransmissionList(events, null) { CurrentEventId = 3 };
@@ -307,7 +325,9 @@ namespace CBS.Siren.Test
             serviceUnderTest.StopTransmissionList();
 
             Assert.NotNull(transmissionList.Events[0].ActualStartTime);
+            Assert.Equal(TransmissionListEventState.Status.PLAYED, transmissionList.Events[0].EventState.CurrentStatus);
             Assert.Null(transmissionList.Events[1].ActualStartTime);
+            Assert.Equal(TransmissionListEventState.Status.SCHEDULED, transmissionList.Events[1].EventState.CurrentStatus);
         }
         #endregion
 

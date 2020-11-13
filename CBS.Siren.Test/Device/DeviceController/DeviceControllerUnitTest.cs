@@ -229,6 +229,20 @@ namespace CBS.Siren.Test.Device
             Assert.Equal(DeviceListEventStatus.CUED, deviceController.ActiveDeviceList.Events[0].EventState.CurrentStatus);
         }
 
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void WhenDeviceListSet_WithExistingActiveListAndIncomingListIsNull_ClearsList()
+        {
+            IDeviceController deviceController = CreateDeviceController();
+            DeviceList generatedList = GenerateTestDeviceList(2);
+
+            deviceController.ActiveDeviceList = generatedList;
+
+            deviceController.ActiveDeviceList = null;
+
+            Assert.Null(deviceController.ActiveDeviceList);
+        }
+
         #endregion
 
         #region Event Start
