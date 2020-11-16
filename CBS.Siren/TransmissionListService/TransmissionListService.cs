@@ -154,6 +154,18 @@ namespace CBS.Siren
 
         public void NextTransmissionList()
         {
+            //TODO: Should AddEvent be updated to set the current event to the first event if none is selected? Yeah 
+
+            //if we're playing 
+                //Update the ActualEnd of the current event
+            //if we aren't playing
+                //set the next event as the current event id?
+
+            //If we're past the last event
+                //Stop List and return
+
+            //Schedule the list using the next event as the start index
+            //Deliver to device lists
             throw new NotImplementedException();
         }
 
@@ -195,6 +207,7 @@ namespace CBS.Siren
 
         public void OnTransmissionListChanged(int changeIndex = 0)
         {
+            //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
                 TransmissionList.State = TransmissionListState.Stopped;

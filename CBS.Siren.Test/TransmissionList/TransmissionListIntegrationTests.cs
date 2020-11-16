@@ -488,7 +488,6 @@ namespace CBS.Siren.Test
             string content = await response.Content.ReadAsStringAsync();
             TransmissionListDetailDTO returnedList = content.DeserializeJson<TransmissionListDetailDTO>();
 
-            Assert.Equal("Playing", returnedList.ListState);
             Assert.Equal(2, returnedList.Events.Count);
             Assert.Equal(returnedList.Events[1].Id, returnedList.CurrentEventId);
             Assert.True(returnedList.Events[0].EventState == "PLAYED");
