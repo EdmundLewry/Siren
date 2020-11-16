@@ -449,6 +449,52 @@ namespace CBS.Siren.Test
         }
         #endregion
 
+        #region Next
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenNextTransmissionListIsCalledWithBadListId_ReturnsNotFound()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1000/next", new StringContent(""));
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task Service_WhenNextTransmissionListIsCalled_MovesPlayToTheSubsequentEvent()
+        {
+            using WebApplicationFactory<Startup> factory = new WebApplicationFactory<Startup>();
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
+            var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/play", new StringContent(""));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+            response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/next", new StringContent(""));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1");
+
+            string content = await response.Content.ReadAsStringAsync();
+            TransmissionListDetailDTO returnedList = content.DeserializeJson<TransmissionListDetailDTO>();
+
+            Assert.Equal("Playing", returnedList.ListState);
+            Assert.Equal(2, returnedList.Events.Count);
+            Assert.Equal(returnedList.Events[1].Id, returnedList.CurrentEventId);
+            Assert.True(returnedList.Events[0].EventState == "PLAYED");
+        }
+        #endregion
+
         #region Update Event
         [Fact]
         [Trait("TestType", "IntegrationTest")]

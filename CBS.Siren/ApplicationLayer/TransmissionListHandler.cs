@@ -81,7 +81,7 @@ namespace CBS.Siren.Application
             int insertedAtPosition = InsertEventIntoList(createdEvent, listEvent.ListPosition, transmissionList);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
 
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            ITransmissionListService transmissionListService = RetrieveListService(id);
             transmissionListService?.OnTransmissionListChanged(insertedAtPosition);
             return createdEvent;
         }
@@ -113,7 +113,7 @@ namespace CBS.Siren.Application
             transmissionList.Events.Remove(listEvent);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
 
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            ITransmissionListService transmissionListService = RetrieveListService(listId);
             transmissionListService?.OnTransmissionListChanged(listEventPositionIndex);
         }
 
@@ -123,7 +123,7 @@ namespace CBS.Siren.Application
             transmissionList.Events.Clear();
             transmissionList.CurrentEventId = null;
 
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
+            ITransmissionListService transmissionListService = RetrieveListService(id);
             transmissionListService?.OnTransmissionListChanged();
 
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
@@ -133,13 +133,7 @@ namespace CBS.Siren.Application
         {
             TransmissionList transmissionList = await GetListById(id);
 
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
-            if (transmissionListService == null)
-            {
-                string message = $"Unable to find list service for list with Id {id}";
-                Logger.LogError(message);
-                throw new ArgumentException(message, nameof(id));
-            }
+            ITransmissionListService transmissionListService = RetrieveListService(id);
 
             transmissionListService.PlayTransmissionList();
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
@@ -170,15 +164,33 @@ namespace CBS.Siren.Application
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
 
             int changePosition = Math.Min(previousPosition, targetPosition);
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            ITransmissionListService transmissionListService = RetrieveListService(listId);
             transmissionListService?.OnTransmissionListChanged(changePosition);
             return transmissionListEvent;
+        }
+
+        public async Task NextTransmissionList(int id)
+        {
+            TransmissionList transmissionList = await GetListById(id);
+
+            ITransmissionListService transmissionListService = RetrieveListService(id);
+
+            transmissionListService.NextTransmissionList();
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
         }
 
         public async Task StopTransmissionList(int id)
         {
             TransmissionList transmissionList = await GetListById(id);
 
+            ITransmissionListService transmissionListService = RetrieveListService(id);
+
+            transmissionListService.StopTransmissionList();
+            await DataLayer.AddUpdateTransmissionLists(transmissionList);
+        }
+
+        private ITransmissionListService RetrieveListService(int id)
+        {
             ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(id);
             if (transmissionListService == null)
             {
@@ -187,13 +199,7 @@ namespace CBS.Siren.Application
                 throw new ArgumentException(message, nameof(id));
             }
 
-            transmissionListService.StopTransmissionList();
-            await DataLayer.AddUpdateTransmissionLists(transmissionList);
-        }
-
-        public Task NextTransmissionList(int id)
-        {
-            throw new NotImplementedException();
+            return transmissionListService;
         }
 
         public async Task<TransmissionListEvent> UpdateEventDetails(int listId, int eventId, TransmissionListEventUpsertDTO listEventUpdate)
@@ -219,7 +225,7 @@ namespace CBS.Siren.Application
             transmissionListEvent.EventFeatures = createdEvent.EventFeatures;
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
             
-            ITransmissionListService transmissionListService = TransmissionListServiceStore.GetTransmissionListServiceByListId(listId);
+            ITransmissionListService transmissionListService = RetrieveListService(listId);
             transmissionListService?.OnTransmissionListChanged(listEventPositionIndex);
             return transmissionListEvent;
         }

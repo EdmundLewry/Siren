@@ -152,6 +152,11 @@ namespace CBS.Siren
             }
         }
 
+        public void NextTransmissionList()
+        {
+            throw new NotImplementedException();
+        }
+
         public void StopTransmissionList()
         {
             if (TransmissionList.State == TransmissionListState.Stopped)

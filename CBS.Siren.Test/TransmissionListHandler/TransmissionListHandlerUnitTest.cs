@@ -433,6 +433,39 @@ namespace CBS.Siren.Test
         }
         #endregion
 
+        #region Next
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task NextTransmisionList_WithInvalidListId_ThrowsException()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await Assert.ThrowsAnyAsync<Exception>(() => codeUnderTest.NextTransmissionList(30));
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task NextTransmissionList_WithValidInput_UpdatesDataLayer()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.NextTransmissionList(1);
+
+            _dataLayer.Verify(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>()), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task NextTransmisionList_WithValidId_InvokesTransmissionListServicePlay()
+        {
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            await codeUnderTest.NextTransmissionList(1);
+
+            _listService.Verify(mock => mock.NextTransmissionList(), Times.Once);
+        }
+        #endregion
+
         #region Update
         [Fact]
         [Trait("TestType", "UnitTest")]

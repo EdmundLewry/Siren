@@ -4,6 +4,7 @@
     {
         TransmissionList TransmissionList { get; set; }
         void PlayTransmissionList();
+        void NextTransmissionList();
         void StopTransmissionList();
         void OnTransmissionListChanged(int changeIndex = 0);
     }
