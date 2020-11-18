@@ -93,14 +93,19 @@ namespace CBS.Siren
             TransmissionList.CurrentEventId = effectedEvent.Id;
         }
 
-        private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
+        private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent affectedEvent)
         {
-            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
-            effectedEvent.ActualEndTime = Clock.Now;
+            SetEventAsPlayed(affectedEvent);
             if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
             {
                 TransmissionList.State = TransmissionListState.Stopped;
             }
+        }
+
+        private void SetEventAsPlayed(TransmissionListEvent affectedEvent)
+        {
+            UpdateTransmissionListEventStatus(affectedEvent, TransmissionListEventState.Status.PLAYED);
+            affectedEvent.ActualEndTime = Clock.Now;
         }
         
         private void OnTransmissionListEventReset(TransmissionListEvent effectedEvent)
@@ -142,31 +147,47 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            int startIndex = TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+            int startIndex = GetCurrentEventIndex();
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, startIndex);
 
             DeliverDeviceLists(deviceLists);
-            if(deviceLists.Any())
+            if (deviceLists.Any())
             {
                 TransmissionList.State = TransmissionListState.Playing;
             }
         }
 
-        public void NextTransmissionList()
+        private int GetCurrentEventIndex()
         {
-            //TODO: Should AddEvent be updated to set the current event to the first event if none is selected? Yeah 
+            return TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+        }
 
-            //if we're playing 
-                //Update the ActualEnd of the current event
-            //if we aren't playing
-                //set the next event as the current event id?
+        public void NextTransmissionList()
+        {            
+            if(TransmissionList.Events.Count == 0)
+            {
+                return;
+            }
 
-            //If we're past the last event
-                //Stop List and return
+            if(TransmissionList.State == TransmissionListState.Playing)
+            {
+                TransmissionListEvent currentEvent =  GetTransmissionListEventById(TransmissionList.CurrentEventId.Value);
+                SetEventAsPlayed(currentEvent);
+            }
 
-            //Schedule the list using the next event as the start index
-            //Deliver to device lists
-            throw new NotImplementedException();
+            int currentPosition = GetCurrentEventIndex();
+            int nextEventPosition = ++currentPosition;
+
+            if(nextEventPosition >= TransmissionList.Events.Count)
+            {
+                StopTransmissionList();
+                return;
+            }
+
+            TransmissionList.CurrentEventId = TransmissionList.Events[nextEventPosition].Id;
+
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, nextEventPosition);
+            DeliverDeviceLists(deviceLists);
         }
 
         public void StopTransmissionList()
@@ -210,8 +231,14 @@ namespace CBS.Siren
             //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
+                TransmissionList.CurrentEventId = null;
                 TransmissionList.State = TransmissionListState.Stopped;
                 return;
+            }
+
+            if(TransmissionList.CurrentEventId is null)
+            {
+                TransmissionList.CurrentEventId = TransmissionList.Events[0].Id;
             }
 
             //I wonder if we want to do some sort of dry run scheduling implementation?

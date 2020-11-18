@@ -87,18 +87,20 @@ namespace CBS.Siren.Test
             TransmissionListEventUpsertDTO creationDTO = GetListEventCreationDTO();
             var eventCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
 
-            _ = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
-
-            HttpResponseMessage response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1");
-
+            HttpResponseMessage response = await clientUnderTest.PostAsync("api/1/automation/transmissionlist/1/events", eventCreationData);
             string content = await response.Content.ReadAsStringAsync();
+            TransmissionListEventDetailDTO returnedEvent = content.DeserializeJson<TransmissionListEventDetailDTO>();
+
+            response = await clientUnderTest.GetAsync("api/1/automation/transmissionlist/1");
+
+            content = await response.Content.ReadAsStringAsync();
             _output.WriteLine($"Content read as: {content}, Response status code: {response.StatusCode}");
             TransmissionListDetailDTO returnedList = content.DeserializeJson<TransmissionListDetailDTO>();
 
             Assert.NotNull(returnedList);
             Assert.Equal("Stopped", returnedList.ListState);
             Assert.Single(returnedList.Events);
-            Assert.Null(returnedList.CurrentEventId);
+            Assert.Equal(returnedEvent.Id, returnedList.CurrentEventId);
         }
         #endregion
 
