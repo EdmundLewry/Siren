@@ -84,12 +84,16 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventIsValid_ReportsStartAfterPreviousEvent()
+        public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventIsValid_ReportsStartAfterPreviousEventWithPreroll()
         {
             Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
             timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 00:00:00"));
 
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null) 
+            { 
+                State = TransmissionListState.Stopped 
+            };
+
             TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
             {
                 Id = 1,
@@ -111,15 +115,57 @@ namespace CBS.Siren.Test
 
             Assert.Equal(target, startTime);
         }
-        
+
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventHasEndTime_ReportsStartAfterPreviousEvent()
+        public void CalculateStartTime_WhenPrecedingEventHasEndTimeWithinPrerollAndListStopped_ReportsStartAfterPreviousEventWithPreroll()
+        {
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 14:45:00"));
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null)
+            {
+                State = TransmissionListState.Stopped
+            };
+            TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
+            {
+                Id = 1,
+                ExpectedDuration = new TimeSpan(0, 30, 0),
+                ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00"),
+                ActualEndTime = DateTimeOffset.Parse("01/01/2020 14:45:00")
+            };
+
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy()
+            {
+                Clock = timeSourceProvider.Object
+            };
+            Mock<IDevice> device1 = new Mock<IDevice>();
+            device1.Setup(mockDevice => mockDevice.Model).Returns(new DeviceModel() { DeviceProperties = new DeviceProperties() { Preroll = TimeSpan.FromSeconds(20) } });
+            Mock<IEventFeature> feature1 = new Mock<IEventFeature>();
+            feature1.Setup(mock => mock.Device).Returns(device1.Object);
+            List<IEventFeature> features = new List<IEventFeature>() { feature1.Object };
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, features) { Id = 2 };
+
+            list.Events.Add(precedingEvent);
+            list.Events.Add(listEvent);
+
+            DateTimeOffset target = DateTimeOffset.Parse("01/01/2020 14:45:20");
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
+
+            Assert.Equal(target, startTime);
+        }
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventHasEndTimeAndListRunning_ReportsStartAfterPreviousEvent()
         {
             Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
             timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 00:00:00"));
 
-            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null) 
+            {
+                State = TransmissionListState.Playing
+            };
             TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
             {
                 Id = 1,

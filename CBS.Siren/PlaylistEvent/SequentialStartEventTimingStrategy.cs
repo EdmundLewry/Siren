@@ -49,19 +49,28 @@ namespace CBS.Siren
                 return relatedEvent.ActualStartTime.Value;
             }
 
+            bool scheduleWithPreroll = true;
             DateTimeOffset calculatedStartTime = Clock.Now;
             if (precedingEvent != null)
             {
                 calculatedStartTime = precedingEvent.ActualEndTime ?? precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
+                scheduleWithPreroll = ShouldScheduleWithPreroll(list, precedingEvent);
             }
 
             TimeSpan largestPreroll = CalculateLargestDevicePreroll(relatedEvent);
-            if(StartIsWithinPreroll(calculatedStartTime, largestPreroll))
+            if(scheduleWithPreroll && StartIsWithinPreroll(calculatedStartTime, largestPreroll))
             {
                 calculatedStartTime = Clock.Now + largestPreroll;
             }
 
             return calculatedStartTime;
+        }
+
+        private bool ShouldScheduleWithPreroll(TransmissionList list, TransmissionListEvent precedingEvent)
+        {
+            //If the preceding event has an actual endtime, and we're running, then we can't use preroll as we need to
+            //try to start immediately.
+            return list.State != TransmissionListState.Playing || !precedingEvent.ActualEndTime.HasValue;
         }
 
         private bool StartIsWithinPreroll(DateTimeOffset calculatedStartTime, TimeSpan largestPreroll)
