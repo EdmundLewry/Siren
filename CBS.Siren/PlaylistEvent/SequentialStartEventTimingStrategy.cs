@@ -52,7 +52,7 @@ namespace CBS.Siren
             DateTimeOffset calculatedStartTime = Clock.Now;
             if (precedingEvent != null)
             {
-                calculatedStartTime = precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
+                calculatedStartTime = precedingEvent.ActualEndTime ?? precedingEvent.ExpectedStartTime + precedingEvent.ExpectedDuration;
             }
 
             TimeSpan largestPreroll = CalculateLargestDevicePreroll(relatedEvent);

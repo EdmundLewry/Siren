@@ -114,6 +114,37 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
+        public void CalculateStartTime_WhenRelatedEventIsValidAndPrecedingEventHasEndTime_ReportsStartAfterPreviousEvent()
+        {
+            Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
+            timeSourceProvider.Setup(mock => mock.Now).Returns(DateTimeOffset.Parse("01/01/2020 00:00:00"));
+
+            TransmissionList list = new TransmissionList(new List<TransmissionListEvent>(), null);
+            TransmissionListEvent precedingEvent = new TransmissionListEvent(null, new List<IEventFeature>())
+            {
+                Id = 1,
+                ExpectedDuration = new TimeSpan(0, 30, 0),
+                ExpectedStartTime = DateTimeOffset.Parse("01/01/2020 14:30:00"),
+                ActualEndTime = DateTimeOffset.Parse("01/01/2020 14:45:00")
+            };
+
+            SequentialStartEventTimingStrategy strategy = new SequentialStartEventTimingStrategy()
+            {
+                Clock = timeSourceProvider.Object
+            };
+            TransmissionListEvent listEvent = new TransmissionListEvent(strategy, new List<IEventFeature>()) { Id = 2 };
+
+            list.Events.Add(precedingEvent);
+            list.Events.Add(listEvent);
+
+            DateTimeOffset target = DateTimeOffset.Parse("01/01/2020 14:45:00");
+            DateTimeOffset startTime = strategy.CalculateStartTime(listEvent.Id, list);
+
+            Assert.Equal(target, startTime);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
         public void CalculateStartTime_WhenCalculatedTimeIsLessThanPrerollInFuture_ReturnsNowPlusLargestPreroll()
         {
             Mock<ITimeSourceProvider> timeSourceProvider = new Mock<ITimeSourceProvider>();
