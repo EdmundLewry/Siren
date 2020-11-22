@@ -100,7 +100,7 @@ namespace CBS.Siren
         {
             var timing = new { 
                 StartTime = transmissionEvent.ExpectedStartTime.ToTimecodeString(),
-                Duration = feature.Duration.ToTimecodeString(),
+                Duration = feature.Duration.ToTimecodeString(), //This has a bug. If the event has ended, our feature duration won't match what the real duration may have been
                 EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(feature.Duration.TotalSeconds).ToTimecodeString()
             };
 

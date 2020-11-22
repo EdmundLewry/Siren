@@ -78,6 +78,10 @@ export class TranmissionlistEventsListComponent implements OnInit {
     }, error => console.error(error));
   }
   
+  public requestDebugRefresh(): void {
+    this.retrieveListInformation();
+  }
+  
   public requestListNext(): void {
     this.http.post(`/proxy/api/1/automation/transmissionlist/${this.listId}/next`, this.httpOptions).subscribe(result => {
       this.retrieveListInformation();

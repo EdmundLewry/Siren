@@ -241,6 +241,8 @@ namespace CBS.Siren
                 TransmissionList.CurrentEventId = TransmissionList.Events[0].Id;
             }
 
+            Logger.LogDebug("Transmission List has changed, current form: {0}", TransmissionList);
+
             //I wonder if we want to do some sort of dry run scheduling implementation?
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore/*, changeIndex*/);
 
@@ -253,7 +255,10 @@ namespace CBS.Siren
 
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
         {
-            deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
+            deviceLists.ToList().ForEach((pair) => {
+                Logger.LogDebug("Requesting device list change to '{0}', list: {1}", pair.Key?.Model?.Name, pair.Value);
+                pair.Key.ActiveList = pair.Value;
+            });
             UpdateDeviceSubscriptions();
         }
 

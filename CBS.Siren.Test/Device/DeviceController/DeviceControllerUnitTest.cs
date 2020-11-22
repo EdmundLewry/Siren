@@ -200,9 +200,8 @@ namespace CBS.Siren.Test.Device
 
             deviceController.ActiveDeviceList = generatedList;
 
-            DateTimeOffset newStartTime = Clock.Now.AddSeconds(2);
             DateTimeOffset newEndTime = Clock.Now.AddSeconds(20);
-            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(newStartTime, newEndTime);
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(originalStartTime, newEndTime);
             deviceListEvent.Id = generatedList.Events[0].Id;
             DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent, generatedList.Events[1] });
             deviceController.ActiveDeviceList = updateList;

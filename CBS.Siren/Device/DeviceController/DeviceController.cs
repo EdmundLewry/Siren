@@ -40,7 +40,7 @@ namespace CBS.Siren.Device
         {
             lock (_deviceListLock)
             {
-                if(value is null)
+                if (value is null)
                 {
                     Reset();
                     _logger.LogInformation($"Device List has been reset");
@@ -57,21 +57,65 @@ namespace CBS.Siren.Device
                 {
                     DeviceList incomingList = new DeviceList(value);
                     int replacePosition = FindReplacePosition(incomingList);
+                    int previousCurrentEventId = CurrentEvent.Id;
                     PrepareListsForReplace(incomingList, replacePosition);
 
                     incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
                     _activeDeviceList.Events.AddRange(incomingList.Events);
+
+                    if (CurrentEvent.Id != previousCurrentEventId)
+                    {
+                        _eventHasStarted = false;
+                    }
                 }
 
             }
             _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
+            _logger.LogDebug("Device List has been set to {0}", _activeDeviceList);
         }
+
+        //private void UpdateActiveDeviceList(DeviceList value)
+        //{
+        //    lock (_deviceListLock)
+        //    {
+        //        if(value is null)
+        //        {
+        //            Reset();
+        //            _logger.LogInformation($"Device List has been reset");
+        //            return;
+        //        }
+
+        //        DeviceList deviceList = MatchDeviceListEventStates(value);
+        //        Reset();
+
+        //        _activeDeviceList = deviceList;
+        //        _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
+        //        EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
+        //    }
+        //    _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
+        //    _logger.LogDebug("Device List has been set to {0}", _activeDeviceList);
+        //}
 
         private void Reset()
         {
             EventIndex = INVALID_INDEX;
             _eventHasStarted = false;
             _activeDeviceList = null;
+        }
+
+        private DeviceList MatchDeviceListEventStates(DeviceList value)
+        {
+            DeviceList incomingList = new DeviceList(value);
+            _activeDeviceList.Events.ForEach(listEvent =>
+            {
+                int index = incomingList.Events.FindIndex(targetEvent => targetEvent.Id == listEvent.Id);
+                if(index >= 0)
+                {
+                    incomingList.Events[index].EventState = listEvent.EventState;
+                }
+            });
+
+            return incomingList;
         }
 
         private void PrepareListsForReplace(DeviceList value, int replacePosition)
@@ -82,12 +126,15 @@ namespace CBS.Siren.Device
                 return;
             }
 
-            if (replacePosition == EventIndex)
-            {
-                UpdateCurrentEventDetails(value, replacePosition);
-                //Move the replace position on as we've already processed the first event
-                replacePosition++;
-            }
+            //This is a problem when we next because the first event will change. Effectively the rule of don't touch the first event isn't right
+            //We need to know why the change occurred. If it's because the lists differ, we should just do the replace as normal. If it's because the
+            //details have changed, we need to update and skip.
+            //if (replacePosition == EventIndex)
+            //{
+            //    UpdateCurrentEventDetails(value, replacePosition);
+            //    //Move the replace position on as we've already processed the first event
+            //    replacePosition++;
+            //}
 
             if (replacePosition < _activeDeviceList.Events.Count)
             {
@@ -134,7 +181,18 @@ namespace CBS.Siren.Device
             {
                 lock(_deviceListLock)
                 {
-                    if(ListIsPlaying())
+                    bool listPlaying = false;
+
+                    try
+                    {
+                        listPlaying = ListIsPlaying();
+                    }
+                    catch(Exception e)
+                    {
+                        _logger.LogError("Exception while checking for list playing! EventIndex - {0} - {1}", EventIndex, e);
+                        throw;
+                    }
+                    if(listPlaying)
                     {
                         if(CheckForEventEnd())
                         {
