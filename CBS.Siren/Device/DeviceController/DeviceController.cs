@@ -96,6 +96,10 @@ namespace CBS.Siren.Device
                     }
                 });
                 EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
+                if(CurrentEvent.EventState.CurrentStatus == DeviceListEventStatus.PLAYING)
+                {
+                    _eventHasStarted = true;
+                }
             }
             _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
             _logger.LogDebug("Device List has been set to {0}", _activeDeviceList);

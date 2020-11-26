@@ -246,6 +246,8 @@ namespace CBS.Siren
 
         public void OnTransmissionListChanged(int changeIndex = 0)
         {
+            Logger.LogDebug("Transmission List has received a change from index {0}", changeIndex);
+
             //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
