@@ -147,7 +147,23 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
+            if(TransmissionList.State == TransmissionListState.Playing)
+            {
+                Logger.LogDebug("Transmission List is already playing. Play request ignored");
+                return;
+            }
+
             int startIndex = GetCurrentEventIndex();
+            if(TransmissionList.Events[startIndex].EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED)
+            {
+                ++startIndex;
+                if(TransmissionList.Events.Count <= startIndex)
+                {
+                    Logger.LogDebug("Current event has completed playing out and there's no subsequent event. Play request ignored.");
+                    return;
+                }
+                Logger.LogDebug("Current event has finished playing out. Will play list from next event (Id: {0})", TransmissionList.Events[startIndex].Id);
+            }
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, startIndex);
 
             DeliverDeviceLists(deviceLists);
@@ -176,7 +192,7 @@ namespace CBS.Siren
             }
 
             int currentPosition = GetCurrentEventIndex();
-            int nextEventPosition = ++currentPosition;
+            int nextEventPosition = currentPosition + 1;
 
             if(nextEventPosition >= TransmissionList.Events.Count)
             {
@@ -184,9 +200,11 @@ namespace CBS.Siren
                 return;
             }
 
+            //TODO: Maybe we don't actually want this. Originally, I had this so that we could next multiple times easily
+            //However, I think we need to take into account transitions here, so we should probably let the current event work as normal
             TransmissionList.CurrentEventId = TransmissionList.Events[nextEventPosition].Id;
 
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, nextEventPosition);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, currentPosition);
             DeliverDeviceLists(deviceLists);
         }
 
@@ -243,8 +261,9 @@ namespace CBS.Siren
 
             Logger.LogDebug("Transmission List has changed, current form: {0}", TransmissionList);
 
+            changeIndex = GetCurrentEventIndex();
             //I wonder if we want to do some sort of dry run scheduling implementation?
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore/*, changeIndex*/);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
 
             if(TransmissionList?.State == TransmissionListState.Playing)
             {
