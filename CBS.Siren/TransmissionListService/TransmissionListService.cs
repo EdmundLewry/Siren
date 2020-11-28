@@ -200,8 +200,9 @@ namespace CBS.Siren
                 return;
             }
 
-            //TODO: Maybe we don't actually want this. Originally, I had this so that we could next multiple times easily
-            //However, I think we need to take into account transitions here, so we should probably let the current event work as normal
+            //When we come to implement transitions, this could be an issue. As we may want the current event
+            //to remain while fades are happening or something.
+            //Currently, this feels nice as you can click Next multiple times.
             TransmissionList.CurrentEventId = TransmissionList.Events[nextEventPosition].Id;
 
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, currentPosition);
