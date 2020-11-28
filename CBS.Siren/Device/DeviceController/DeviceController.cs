@@ -36,44 +36,6 @@ namespace CBS.Siren.Device
             DeviceListEventStore = deviceListEventStore;
         }
 
-        //private void UpdateActiveDeviceList(DeviceList value)
-        //{
-        //    lock (_deviceListLock)
-        //    {
-        //        if (value is null)
-        //        {
-        //            Reset();
-        //            _logger.LogInformation($"Device List has been reset");
-        //            return;
-        //        }
-
-        //        if (_activeDeviceList == null)
-        //        {
-        //            _activeDeviceList = new DeviceList(value);
-        //            _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
-        //            EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
-        //        }
-        //        else
-        //        {
-        //            DeviceList incomingList = new DeviceList(value);
-        //            int replacePosition = FindReplacePosition(incomingList);
-        //            int previousCurrentEventId = CurrentEvent.Id;
-        //            PrepareListsForReplace(incomingList, replacePosition);
-
-        //            incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
-        //            _activeDeviceList.Events.AddRange(incomingList.Events);
-
-        //            if (CurrentEvent.Id != previousCurrentEventId)
-        //            {
-        //                _eventHasStarted = false;
-        //            }
-        //        }
-
-        //    }
-        //    _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
-        //    _logger.LogDebug("Device List has been set to {0}", _activeDeviceList);
-        //}
-
         private void UpdateActiveDeviceList(DeviceList value)
         {
             lock (_deviceListLock)
@@ -126,63 +88,6 @@ namespace CBS.Siren.Device
 
             return incomingList;
         }
-
-        //private void PrepareListsForReplace(DeviceList value, int replacePosition)
-        //{
-        //    if (replacePosition == -1)
-        //    {
-        //        value.Events.RemoveRange(0, _activeDeviceList.Events.Count);
-        //        return;
-        //    }
-
-        //    //This is a problem when we next because the first event will change. Effectively the rule of don't touch the first event isn't right
-        //    //We need to know why the change occurred. If it's because the lists differ, we should just do the replace as normal. If it's because the
-        //    //details have changed, we need to update and skip.
-        //    //if (replacePosition == EventIndex)
-        //    //{
-        //    //    UpdateCurrentEventDetails(value, replacePosition);
-        //    //    //Move the replace position on as we've already processed the first event
-        //    //    replacePosition++;
-        //    //}
-
-        //    if (replacePosition < _activeDeviceList.Events.Count)
-        //    {
-        //        _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
-        //    }
-        //    if (replacePosition <= value.Events.Count)
-        //    {
-        //        value.Events.RemoveRange(0, replacePosition);
-        //    }
-        //}
-
-        //private void UpdateCurrentEventDetails(DeviceList incomingList, int replacePosition)
-        //{
-        //    //Currently, you can only update the end time of the current event
-        //    _activeDeviceList.Events[replacePosition].EndTime = incomingList.Events[0].EndTime;
-        //}
-
-        //private int FindReplacePosition(DeviceList incomingList)
-        //{
-        //    for (int i = 0; i < _activeDeviceList.Events.Count; ++i)
-        //    {
-        //        if (ListsDiverge(incomingList, i) || EventDiverges(incomingList, i))
-        //        {
-        //            return i;
-        //        }
-        //    }
-
-        //    return -1;
-        //}
-
-        //private bool ListsDiverge(DeviceList incomingList, int eventIndex)
-        //{
-        //    return  eventIndex >= incomingList.Events.Count || _activeDeviceList.Events[eventIndex].Id != incomingList.Events[eventIndex].Id;
-        //}
-        //private bool EventDiverges(DeviceList incomingList, int eventIndex)
-        //{
-        //    return _activeDeviceList.Events[eventIndex].StartTime != incomingList.Events[eventIndex].StartTime ||
-        //           _activeDeviceList.Events[eventIndex].EndTime != incomingList.Events[eventIndex].EndTime;
-        //}
 
         public async Task Run(CancellationToken token)
         {
