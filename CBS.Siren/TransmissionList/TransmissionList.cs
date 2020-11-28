@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CBS.Siren
 {
@@ -7,7 +8,7 @@ namespace CBS.Siren
         public int Id { get; set; } = 0;
         public IPlaylist SourceList { get; set; }
         public List<TransmissionListEvent> Events { get; set;  }
-        public int? CurrentEventId { get; set; }
+        public int? CurrentEventId { get; set; } = null;
         public TransmissionListState State { get; set; } = TransmissionListState.Stopped;
 
         public TransmissionList() : this(new List<TransmissionListEvent>()) {}
@@ -16,6 +17,7 @@ namespace CBS.Siren
         {
             SourceList = list;
             Events = events;
+            CurrentEventId = events.Any() ? events[0].Id : CurrentEventId;
         }
 
         public override string ToString()

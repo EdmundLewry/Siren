@@ -23,9 +23,9 @@ namespace CBS.Siren.Test.Device
         private DeviceList GenerateTestDeviceList(int count = 1)
         {
             List<DeviceListEvent> events = new List<DeviceListEvent>();
-            for(int i=0; i<count; ++i)
+            for(int i=1; i<=count; ++i)
             {
-                events.Add(GenerateDeviceListEvent(Clock.Now.AddMilliseconds(50), Clock.Now.AddSeconds(1)));
+                events.Add(GenerateDeviceListEvent(Clock.Now.AddMilliseconds(50*i), Clock.Now.AddSeconds(i)));
             }
 
             return new DeviceList(events);
@@ -200,9 +200,8 @@ namespace CBS.Siren.Test.Device
 
             deviceController.ActiveDeviceList = generatedList;
 
-            DateTimeOffset newStartTime = Clock.Now.AddSeconds(2);
             DateTimeOffset newEndTime = Clock.Now.AddSeconds(20);
-            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(newStartTime, newEndTime);
+            DeviceListEvent deviceListEvent = GenerateDeviceListEvent(originalStartTime, newEndTime);
             deviceListEvent.Id = generatedList.Events[0].Id;
             DeviceList updateList = new DeviceList(new List<DeviceListEvent>() { deviceListEvent, generatedList.Events[1] });
             deviceController.ActiveDeviceList = updateList;
@@ -270,6 +269,79 @@ namespace CBS.Siren.Test.Device
             Assert.Equal(deviceController, evt.Sender);
             Assert.Equal(expectedArgs.AffectedEvent.Id, evt.Arguments.AffectedEvent.Id);
 
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task DeviceController_WhenListIsSetWithNewInitialEvent_EmitsEventStartEvent()
+        {
+            IDeviceController deviceController = CreateDeviceController();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TIMEOUT);
+
+            DeviceList deviceList = GenerateTestDeviceList();
+            DeviceList replacementList = GenerateTestDeviceList();
+
+            int count = 0;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>(
+                (sender, args) => {
+                    count++;
+                    if (count == 1)
+                    {
+                        deviceController.ActiveDeviceList = replacementList;
+                    }
+                }
+            );
+
+            deviceController.OnEventStarted += eventHandler;
+            deviceController.ActiveDeviceList = deviceList;
+            await deviceController.Run(cancellationTokenSource.Token);
+
+            Assert.Equal(2, count);
+
+            deviceController.OnEventStarted -= eventHandler;
+            if (cancellationTokenSource.Token.CanBeCanceled)
+            {
+                cancellationTokenSource.Cancel();
+            }
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task DeviceController_WhenListIsSetWithSameInitialEvent_DoesNotEmitStartAgain()
+        {
+            IDeviceController deviceController = CreateDeviceController();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(5000);
+
+            DeviceList deviceList = new DeviceList(new List<DeviceListEvent>(){
+                GenerateDeviceListEvent(Clock.Now.AddMilliseconds(50), Clock.Now.AddMinutes(2))
+            });
+            DeviceList replacementList = new DeviceList(deviceList);
+            replacementList.Events.Add(GenerateDeviceListEvent(Clock.Now.AddMinutes(2), Clock.Now.AddMinutes(3)));
+
+            int count = 0;
+            EventHandler<DeviceEventChangedEventArgs> eventHandler = new EventHandler<DeviceEventChangedEventArgs>(
+                (sender, args) => {
+                    count++;
+                    if (count == 1)
+                    {
+                        deviceController.ActiveDeviceList = replacementList;
+                    }
+                }
+            );
+
+            deviceController.OnEventStarted += eventHandler;
+            deviceController.ActiveDeviceList = deviceList;
+            await deviceController.Run(cancellationTokenSource.Token);
+
+            Assert.Equal(1, count);
+
+            deviceController.OnEventStarted -= eventHandler;
             if (cancellationTokenSource.Token.CanBeCanceled)
             {
                 cancellationTokenSource.Cancel();

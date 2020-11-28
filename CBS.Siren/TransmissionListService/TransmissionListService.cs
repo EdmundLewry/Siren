@@ -93,14 +93,19 @@ namespace CBS.Siren
             TransmissionList.CurrentEventId = effectedEvent.Id;
         }
 
-        private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent effectedEvent)
+        private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent affectedEvent)
         {
-            UpdateTransmissionListEventStatus(effectedEvent, TransmissionListEventState.Status.PLAYED);
-            effectedEvent.ActualEndTime = Clock.Now;
+            SetEventAsPlayed(affectedEvent);
             if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
             {
                 TransmissionList.State = TransmissionListState.Stopped;
             }
+        }
+
+        private void SetEventAsPlayed(TransmissionListEvent affectedEvent)
+        {
+            UpdateTransmissionListEventStatus(affectedEvent, TransmissionListEventState.Status.PLAYED);
+            affectedEvent.ActualEndTime = Clock.Now;
         }
         
         private void OnTransmissionListEventReset(TransmissionListEvent effectedEvent)
@@ -142,14 +147,65 @@ namespace CBS.Siren
 
         public void PlayTransmissionList()
         {
-            int startIndex = TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+            if(TransmissionList.State == TransmissionListState.Playing)
+            {
+                Logger.LogDebug("Transmission List is already playing. Play request ignored");
+                return;
+            }
+
+            int startIndex = GetCurrentEventIndex();
+            if(TransmissionList.Events[startIndex].EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED)
+            {
+                ++startIndex;
+                if(TransmissionList.Events.Count <= startIndex)
+                {
+                    Logger.LogDebug("Current event has completed playing out and there's no subsequent event. Play request ignored.");
+                    return;
+                }
+                Logger.LogDebug("Current event has finished playing out. Will play list from next event (Id: {0})", TransmissionList.Events[startIndex].Id);
+            }
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, startIndex);
 
             DeliverDeviceLists(deviceLists);
-            if(deviceLists.Any())
+            if (deviceLists.Any())
             {
                 TransmissionList.State = TransmissionListState.Playing;
             }
+        }
+
+        private int GetCurrentEventIndex()
+        {
+            return TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
+        }
+
+        public void NextTransmissionList()
+        {            
+            if(TransmissionList.Events.Count == 0)
+            {
+                return;
+            }
+
+            if(TransmissionList.State == TransmissionListState.Playing)
+            {
+                TransmissionListEvent currentEvent =  GetTransmissionListEventById(TransmissionList.CurrentEventId.Value);
+                SetEventAsPlayed(currentEvent);
+            }
+
+            int currentPosition = GetCurrentEventIndex();
+            int nextEventPosition = currentPosition + 1;
+
+            if(nextEventPosition >= TransmissionList.Events.Count)
+            {
+                StopTransmissionList();
+                return;
+            }
+
+            //TODO: Maybe we don't actually want this. Originally, I had this so that we could next multiple times easily
+            //However, I think we need to take into account transitions here, so we should probably let the current event work as normal
+            TransmissionList.CurrentEventId = TransmissionList.Events[nextEventPosition].Id;
+
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, currentPosition);
+            DeliverDeviceLists(deviceLists);
         }
 
         public void StopTransmissionList()
@@ -190,14 +246,26 @@ namespace CBS.Siren
 
         public void OnTransmissionListChanged(int changeIndex = 0)
         {
+            Logger.LogDebug("Transmission List has received a change from index {0}", changeIndex);
+
+            //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
+                TransmissionList.CurrentEventId = null;
                 TransmissionList.State = TransmissionListState.Stopped;
                 return;
             }
 
+            if(TransmissionList.CurrentEventId is null)
+            {
+                TransmissionList.CurrentEventId = TransmissionList.Events[0].Id;
+            }
+
+            Logger.LogDebug("Transmission List has changed, current form: {0}", TransmissionList);
+
+            changeIndex = GetCurrentEventIndex();
             //I wonder if we want to do some sort of dry run scheduling implementation?
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore/*, changeIndex*/);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
 
             if(TransmissionList?.State == TransmissionListState.Playing)
             {
@@ -208,7 +276,10 @@ namespace CBS.Siren
 
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
         {
-            deviceLists.ToList().ForEach((pair) => pair.Key.ActiveList = pair.Value);
+            deviceLists.ToList().ForEach((pair) => {
+                Logger.LogDebug("Requesting device list change to '{0}', list: {1}", pair.Key?.Model?.Name, pair.Value);
+                pair.Key.ActiveList = pair.Value;
+            });
             UpdateDeviceSubscriptions();
         }
 

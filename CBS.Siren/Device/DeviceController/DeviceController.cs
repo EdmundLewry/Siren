@@ -40,31 +40,31 @@ namespace CBS.Siren.Device
         {
             lock (_deviceListLock)
             {
-                if(value is null)
+                if (value is null || value.Events.Count == 0)
                 {
                     Reset();
                     _logger.LogInformation($"Device List has been reset");
                     return;
                 }
 
-                if (_activeDeviceList == null)
-                {
-                    _activeDeviceList = new DeviceList(value);
-                    _activeDeviceList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
-                    EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
-                }
-                else
-                {
-                    DeviceList incomingList = new DeviceList(value);
-                    int replacePosition = FindReplacePosition(incomingList);
-                    PrepareListsForReplace(incomingList, replacePosition);
+                DeviceList deviceList = MatchDeviceListEventStates(value);
+                Reset();
 
-                    incomingList.Events.ForEach(listEvent => listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED);
-                    _activeDeviceList.Events.AddRange(incomingList.Events);
+                _activeDeviceList = deviceList;
+                _activeDeviceList.Events.ForEach(listEvent => {
+                    if(listEvent.EventState.CurrentStatus == DeviceListEventStatus.UNSCHEDULED)
+                    {
+                        listEvent.EventState.CurrentStatus = DeviceListEventStatus.CUED;
+                    }
+                });
+                EventIndex = _activeDeviceList.Events.Count > 0 ? 0 : INVALID_INDEX;
+                if(CurrentEvent.EventState.CurrentStatus == DeviceListEventStatus.PLAYING)
+                {
+                    _eventHasStarted = true;
                 }
-
             }
             _logger.LogInformation($"Device List with {_activeDeviceList.Events.Count} events has been set");
+            _logger.LogDebug("Device List has been set to {0}", _activeDeviceList);
         }
 
         private void Reset()
@@ -74,58 +74,19 @@ namespace CBS.Siren.Device
             _activeDeviceList = null;
         }
 
-        private void PrepareListsForReplace(DeviceList value, int replacePosition)
+        private DeviceList MatchDeviceListEventStates(DeviceList value)
         {
-            if (replacePosition == -1)
+            DeviceList incomingList = new DeviceList(value);
+            _activeDeviceList?.Events.ForEach(listEvent =>
             {
-                value.Events.RemoveRange(0, _activeDeviceList.Events.Count);
-                return;
-            }
-
-            if (replacePosition == EventIndex)
-            {
-                UpdateCurrentEventDetails(value, replacePosition);
-                //Move the replace position on as we've already processed the first event
-                replacePosition++;
-            }
-
-            if (replacePosition < _activeDeviceList.Events.Count)
-            {
-                _activeDeviceList.Events.RemoveRange(replacePosition, _activeDeviceList.Events.Count - replacePosition);
-            }
-            if (replacePosition <= value.Events.Count)
-            {
-                value.Events.RemoveRange(0, replacePosition);
-            }
-        }
-
-        private void UpdateCurrentEventDetails(DeviceList incomingList, int replacePosition)
-        {
-            //Currently, you can only update the end time of the current event
-            _activeDeviceList.Events[replacePosition].EndTime = incomingList.Events[0].EndTime;
-        }
-
-        private int FindReplacePosition(DeviceList incomingList)
-        {
-            for (int i = 0; i < _activeDeviceList.Events.Count; ++i)
-            {
-                if (ListsDiverge(incomingList, i) || EventDiverges(incomingList, i))
+                int index = incomingList.Events.FindIndex(targetEvent => targetEvent.Id == listEvent.Id);
+                if(index >= 0)
                 {
-                    return i;
+                    incomingList.Events[index].EventState = listEvent.EventState;
                 }
-            }
+            });
 
-            return -1;
-        }
-
-        private bool ListsDiverge(DeviceList incomingList, int eventIndex)
-        {
-            return  eventIndex >= incomingList.Events.Count || _activeDeviceList.Events[eventIndex].Id != incomingList.Events[eventIndex].Id;
-        }
-        private bool EventDiverges(DeviceList incomingList, int eventIndex)
-        {
-            return _activeDeviceList.Events[eventIndex].StartTime != incomingList.Events[eventIndex].StartTime ||
-                   _activeDeviceList.Events[eventIndex].EndTime != incomingList.Events[eventIndex].EndTime;
+            return incomingList;
         }
 
         public async Task Run(CancellationToken token)
@@ -134,7 +95,18 @@ namespace CBS.Siren.Device
             {
                 lock(_deviceListLock)
                 {
-                    if(ListIsPlaying())
+                    bool listPlaying = false;
+
+                    try
+                    {
+                        listPlaying = ListIsPlaying();
+                    }
+                    catch(Exception e)
+                    {
+                        _logger.LogError("Exception while checking for list playing! EventIndex - {0} - {1}", EventIndex, e);
+                        throw;
+                    }
+                    if(listPlaying)
                     {
                         if(CheckForEventEnd())
                         {

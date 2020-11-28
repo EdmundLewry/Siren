@@ -98,10 +98,11 @@ namespace CBS.Siren
 
         private string GenerateEventData(TransmissionListEvent transmissionEvent, IEventFeature feature)
         {
-            var timing = new { 
+            TimeSpan deviceListEventDuration = CaclulateDeviceListEventDuration(transmissionEvent, feature);
+            var timing = new {
                 StartTime = transmissionEvent.ExpectedStartTime.ToTimecodeString(),
-                Duration = feature.Duration.ToTimecodeString(),
-                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(feature.Duration.TotalSeconds).ToTimecodeString()
+                Duration = deviceListEventDuration.ToTimecodeString(),
+                EndTime = transmissionEvent.ExpectedStartTime.AddSeconds(deviceListEventDuration.TotalSeconds).ToTimecodeString()
             };
 
             var source = new {
@@ -115,6 +116,17 @@ namespace CBS.Siren
             };
 
             return eventData.SerializeToJson();
+        }
+
+        private TimeSpan CaclulateDeviceListEventDuration(TransmissionListEvent transmissionEvent, IEventFeature feature)
+        {
+            //If we have actual Start/End Times, it means the schedule has defined a duration for the event
+            //So we should use that. When features start having different start times, this will need adjusting
+            if(!transmissionEvent.ActualStartTime.HasValue || !transmissionEvent.ActualEndTime.HasValue)
+            {
+                return feature.Duration;
+            }
+            return (transmissionEvent.ActualEndTime - transmissionEvent.ActualStartTime).Value;
         }
     }
 }

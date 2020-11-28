@@ -150,7 +150,7 @@ namespace CBS.Siren.Test
         
         [Fact]
         [Trait("TestType", "UnitTest")]
-        public void ScheduleTransmissionList_ShouldCreateOneDeviceListEventsWithCorrectData()
+        public void ScheduleTransmissionList_ShouldCreateDeviceListEventWithCorrectData()
         {
             var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
             mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
@@ -179,6 +179,33 @@ namespace CBS.Siren.Test
             Assert.Equal(750, TimeSpanExtensions.FromTimecodeString(sourceDataElement.GetProperty("eom").GetString()).TotalFrames());
             
             Assert.Equal(event1.Id, deviceListEvent.RelatedTransmissionListEventId);
+        }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void ScheduleTransmissionList_WhenTransmissionListEventHasActualEnd_ShouldCreateDeviceListEventWithDurationFromEndTime()
+        {
+            var mockDeviceEventStore = new Mock<IDeviceListEventStore>();
+            mockDeviceEventStore.Setup(mockDeviceEventStore => mockDeviceEventStore.CreateDeviceListEvent(It.IsAny<string>(), It.IsAny<int>()))
+                                  .Returns((string s, int id) => new DeviceListEvent(s, id));
+
+            DateTimeOffset endTime = transmissionList.Events[0].ExpectedStartTime + TimeSpan.FromSeconds(10);
+            transmissionList.Events[0].ActualStartTime = transmissionList.Events[0].ExpectedStartTime;
+            transmissionList.Events[0].ActualEndTime = endTime;
+
+            SimpleScheduler simpleChannelScheduler = new SimpleScheduler();
+            Dictionary<IDevice, DeviceList> lists = simpleChannelScheduler.ScheduleTransmissionList(transmissionList, mockDeviceEventStore.Object);
+
+            DeviceList deviceOneList = lists[mockDevice1.Object];
+            DeviceListEvent deviceListEvent = deviceOneList.Events[0];
+
+            JsonElement eventDataJson = JsonDocument.Parse(deviceListEvent.EventData).RootElement;
+            
+            JsonElement timingElement = eventDataJson.GetProperty("timing");
+            Assert.Equal(event1.ExpectedStartTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("startTime").GetString()));
+            Assert.Equal(TimeSpan.FromSeconds(10), TimeSpanExtensions.FromTimecodeString(timingElement.GetProperty("duration").GetString()));
+
+            Assert.Equal(endTime, DateTimeExtensions.FromTimecodeString(timingElement.GetProperty("endTime").GetString()));
         }
 
         [Fact]

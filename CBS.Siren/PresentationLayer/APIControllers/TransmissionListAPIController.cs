@@ -99,6 +99,22 @@ namespace CBS.Siren.Controllers
             }
         }
         
+        [HttpPost("{id}/next")]
+        public async Task<ActionResult> NextTransmissionListById(int id)
+        {
+            try
+            {
+                Logger.LogDebug("Received request to Next list with id {0}", id);
+                await _handler.NextTransmissionList(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to Next list with given id {0}, {1}", id, e.Message);
+                return NotFound(id);
+            }
+        }
+        
         [HttpPost("{id}/stop")]
         public async Task<ActionResult> StopTransmissionListById(int id)
         {
