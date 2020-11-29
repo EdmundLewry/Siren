@@ -114,6 +114,8 @@ cdkDropList
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
       cdkDrag [cdkDragData]="row"
+      [cdkDragDisabled]="!canDragListEvent(row)"
+      [class.movable-event]="canDragListEvent(row)"
       [class.current-event]="transmissionList.currentEventId == row.id">
     <div class="drop-placeholder" *cdkDragPlaceholder></div>
   </tr>
