@@ -260,7 +260,7 @@ namespace CBS.Siren
                 return;
             }
 
-            if(TransmissionList?.State == TransmissionListState.Stopped && changeIndex <= GetCurrentEventIndex())
+            if(TransmissionList?.State == TransmissionListState.Stopped && ListChangeCouldEffectCurrentEvent(changeIndex))
             {
                 TransmissionList.CurrentEventId = FindNextEventToPlay()?.Id;
             }
@@ -276,6 +276,20 @@ namespace CBS.Siren
                 DeliverDeviceLists(deviceLists);
             }
 
+        }
+
+        private bool ListChangeCouldEffectCurrentEvent(int changeIndex)
+        {
+            try
+            {
+                return changeIndex <= GetCurrentEventIndex();
+            }
+            catch(ArgumentException)
+            {
+                //An argument exception has occurred, so we couldn't find an event
+                //for that index. Assume that we need to update the Current index
+                return true;
+            }
         }
 
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)

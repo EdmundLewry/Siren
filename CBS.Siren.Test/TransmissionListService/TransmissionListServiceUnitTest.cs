@@ -1126,6 +1126,43 @@ namespace CBS.Siren.Test
 
             Assert.Equal(event3.Id, transmissionList.CurrentEventId);
         }
+        
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public void OnTransmissionListChanged_WhenCurrentEventWasDeleted_SetsCurrentEventToNextEventToPlay()
+        {
+            var mockDevice = new Mock<IDevice>();
+
+            Dictionary<IDevice, DeviceList> deviceLists = new Dictionary<IDevice, DeviceList>()
+            {
+                [mockDevice.Object] = new DeviceList(new List<DeviceListEvent>() { new DeviceListEvent(""), new DeviceListEvent("") })
+            };
+            var mockScheduler = new Mock<IScheduler>();
+            mockScheduler.Setup(mock => mock.ScheduleTransmissionList(It.IsAny<TransmissionList>(), It.IsAny<IDeviceListEventStore>(), It.IsAny<int>())).Returns(deviceLists);
+
+            TransmissionListEvent event1 = new TransmissionListEvent(null, new List<IEventFeature>()) { Id = 1 };
+            event1.EventState.CurrentStatus = TransmissionListEventState.Status.PLAYED;
+            TransmissionListEvent event2 = new TransmissionListEvent(null, new List<IEventFeature>()) { Id = 2 };
+            event2.EventState.CurrentStatus = TransmissionListEventState.Status.PLAYED;
+            TransmissionListEvent event4 = new TransmissionListEvent(null, new List<IEventFeature>()) { Id = 4 };
+            event4.EventState.CurrentStatus = TransmissionListEventState.Status.CUED;
+            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>() { event1, event2, event4 })
+            {
+                State = TransmissionListState.Stopped,
+                CurrentEventId = 3
+            };
+            using TransmissionListService serviceUnderTest = new TransmissionListService(mockScheduler.Object,
+                                                                                         new Mock<IDeviceListEventWatcher>().Object,
+                                                                                         new Mock<IDeviceListEventStore>().Object,
+                                                                                         new Mock<ILogger<TransmissionListService>>().Object)
+            {
+                TransmissionList = transmissionList
+            };
+
+            serviceUnderTest.OnTransmissionListChanged(2);
+
+            Assert.Equal(event4.Id, transmissionList.CurrentEventId);
+        }
 
         [Fact]
         [Trait("TestType", "UnitTest")]
