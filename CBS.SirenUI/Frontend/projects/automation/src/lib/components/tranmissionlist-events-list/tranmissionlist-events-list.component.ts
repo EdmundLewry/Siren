@@ -196,4 +196,8 @@ export class TranmissionlistEventsListComponent implements OnInit {
   public canDragListEvent(listEvent: TransmissionListEvent): boolean {
     return listEvent.eventState != "PLAYING" && listEvent.eventState != "PLAYED";
   }
+  
+  public canDeleteListEvent(listEvent: TransmissionListEvent): boolean {
+    return listEvent.eventState != "PLAYING";
+  }
 }

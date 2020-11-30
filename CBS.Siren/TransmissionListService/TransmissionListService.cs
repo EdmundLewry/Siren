@@ -96,7 +96,7 @@ namespace CBS.Siren
         private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent affectedEvent)
         {
             SetEventAsPlayed(affectedEvent);
-            if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
+            if(_transmissionList.Events.Last().Id == affectedEvent.Id)
             {
                 TransmissionList.State = TransmissionListState.Stopped;
             }

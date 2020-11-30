@@ -511,6 +511,27 @@ namespace CBS.Siren.Test
             Assert.Equal(createdEvent.Id, savedList.Events[1].Id);
         }
         
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task ChangeEventPosition_OnEventWithState_ResetsState()
+        {
+            _transmissionList.Events[0].EventState.CurrentStatus = TransmissionListEventState.Status.PLAYED;
+            _transmissionList.Events[0].ActualStartTime = DateTimeOffset.Parse("12/02/2020 12:00:00");
+            _transmissionList.Events[0].ActualEndTime = DateTimeOffset.Parse("12/02/2020 12:00:00");
+            TransmissionList savedList = null;
+            _dataLayer.Setup(mock => mock.AddUpdateTransmissionLists(It.IsAny<TransmissionList[]>())).Callback((TransmissionList[] lists) => { savedList = lists[0]; });
+
+            TransmissionListHandler codeUnderTest = CreateHandlerUnderTest();
+
+            TransmissionListEvent createdEvent = await codeUnderTest.ChangeEventPosition(1, _transmissionList.Events[0].Id, 0, 1);
+
+            Assert.Equal(2, savedList.Events.Count);
+            Assert.Equal(createdEvent.Id, savedList.Events[1].Id);
+            Assert.Equal(TransmissionListEventState.Status.UNSCHEDULED, createdEvent.EventState.CurrentStatus);
+            Assert.Null(createdEvent.ActualStartTime);
+            Assert.Null(createdEvent.ActualEndTime);
+        }
+        
         [Theory]
         [Trait("TestType", "UnitTest")]
         [InlineData(0, 1, 0)]

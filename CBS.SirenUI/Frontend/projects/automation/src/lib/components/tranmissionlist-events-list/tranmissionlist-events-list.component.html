@@ -104,8 +104,11 @@ cdkDropList
         <div class="button-wrapper">
           <button mat-menu-item class="more-option-insert-below" (click)="requestAddNewEvent(row, RelativePosition.Below)">Insert Above Below</button>
         </div>
-        <div class="button-wrapper">
-          <button mat-menu-item class="more-option-delete" (click)="requestDeleteConfirmation(row)">Delete</button>
+        <div class="button-wrapper" [matTooltipDisabled]="canDeleteListEvent(row)" matTooltip="Can't delete currently playing event">
+          <button mat-menu-item 
+                  class="more-option-delete" 
+                  [disabled]="!canDeleteListEvent(row)"
+                  (click)="requestDeleteConfirmation(row)">Delete</button>
         </div>
       </mat-menu>
     </td>

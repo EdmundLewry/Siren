@@ -159,6 +159,11 @@ namespace CBS.Siren.Application
             }
 
             TransmissionListEvent transmissionListEvent = transmissionList.Events[previousPosition];
+            //I feel like all of this is state. Should probably combine this into an immutable value object?
+            transmissionListEvent.EventState = new TransmissionListEventState();
+            transmissionListEvent.ActualStartTime = null;
+            transmissionListEvent.ActualEndTime = null;
+
             transmissionList.Events.RemoveAt(previousPosition);
             transmissionList.Events.Insert(targetPosition, transmissionListEvent);
             await DataLayer.AddUpdateTransmissionLists(transmissionList);
