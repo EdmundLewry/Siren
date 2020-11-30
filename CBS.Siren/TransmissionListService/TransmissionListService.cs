@@ -177,6 +177,10 @@ namespace CBS.Siren
         {
             return TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
         }
+        private TransmissionListEvent FindNextEventToPlay()
+        {
+            return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.EventState.CurrentStatus != TransmissionListEventState.Status.PLAYED);
+        }
 
         public void NextTransmissionList()
         {            
@@ -249,7 +253,6 @@ namespace CBS.Siren
         {
             Logger.LogDebug("Transmission List has received a change from index {0}", changeIndex);
 
-            //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
                 TransmissionList.CurrentEventId = null;
@@ -257,16 +260,16 @@ namespace CBS.Siren
                 return;
             }
 
-            if(TransmissionList.CurrentEventId is null)
+            if(TransmissionList?.State == TransmissionListState.Stopped && changeIndex <= GetCurrentEventIndex())
             {
-                TransmissionList.CurrentEventId = TransmissionList.Events[0].Id;
+                TransmissionList.CurrentEventId = FindNextEventToPlay()?.Id;
             }
 
             Logger.LogDebug("Transmission List has changed, current form: {0}", TransmissionList);
 
-            changeIndex = GetCurrentEventIndex();
+            int scheduleFromIndex = GetCurrentEventIndex();
             //I wonder if we want to do some sort of dry run scheduling implementation?
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, scheduleFromIndex);
 
             if(TransmissionList?.State == TransmissionListState.Playing)
             {
