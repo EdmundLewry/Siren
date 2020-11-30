@@ -96,7 +96,7 @@ namespace CBS.Siren
         private void OnTransmissionListEventPlayedOutSuccessfully(TransmissionListEvent affectedEvent)
         {
             SetEventAsPlayed(affectedEvent);
-            if(_transmissionList.Events.All((listEvent) => listEvent.EventState.CurrentStatus == TransmissionListEventState.Status.PLAYED))
+            if(_transmissionList.Events.Last().Id == affectedEvent.Id)
             {
                 TransmissionList.State = TransmissionListState.Stopped;
             }
@@ -177,6 +177,10 @@ namespace CBS.Siren
         {
             return TransmissionList.CurrentEventId is null ? 0 : TransmissionList.GetEventPositionById(TransmissionList.CurrentEventId.Value);
         }
+        private TransmissionListEvent FindNextEventToPlay()
+        {
+            return TransmissionList.Events.FirstOrDefault(listEvent => listEvent.EventState.CurrentStatus != TransmissionListEventState.Status.PLAYED);
+        }
 
         public void NextTransmissionList()
         {            
@@ -200,8 +204,9 @@ namespace CBS.Siren
                 return;
             }
 
-            //TODO: Maybe we don't actually want this. Originally, I had this so that we could next multiple times easily
-            //However, I think we need to take into account transitions here, so we should probably let the current event work as normal
+            //When we come to implement transitions, this could be an issue. As we may want the current event
+            //to remain while fades are happening or something.
+            //Currently, this feels nice as you can click Next multiple times.
             TransmissionList.CurrentEventId = TransmissionList.Events[nextEventPosition].Id;
 
             Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, currentPosition);
@@ -248,7 +253,6 @@ namespace CBS.Siren
         {
             Logger.LogDebug("Transmission List has received a change from index {0}", changeIndex);
 
-            //TODO: What happens if we move an event that has already played out?
             if(!TransmissionList.Events.Any())
             {
                 TransmissionList.CurrentEventId = null;
@@ -256,22 +260,36 @@ namespace CBS.Siren
                 return;
             }
 
-            if(TransmissionList.CurrentEventId is null)
+            if(TransmissionList?.State == TransmissionListState.Stopped && ListChangeCouldEffectCurrentEvent(changeIndex))
             {
-                TransmissionList.CurrentEventId = TransmissionList.Events[0].Id;
+                TransmissionList.CurrentEventId = FindNextEventToPlay()?.Id;
             }
 
             Logger.LogDebug("Transmission List has changed, current form: {0}", TransmissionList);
 
-            changeIndex = GetCurrentEventIndex();
+            int scheduleFromIndex = GetCurrentEventIndex();
             //I wonder if we want to do some sort of dry run scheduling implementation?
-            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, changeIndex);
+            Dictionary<IDevice, DeviceList> deviceLists = Scheduler.ScheduleTransmissionList(TransmissionList, DeviceListEventStore, scheduleFromIndex);
 
             if(TransmissionList?.State == TransmissionListState.Playing)
             {
                 DeliverDeviceLists(deviceLists);
             }
 
+        }
+
+        private bool ListChangeCouldEffectCurrentEvent(int changeIndex)
+        {
+            try
+            {
+                return changeIndex <= GetCurrentEventIndex();
+            }
+            catch(ArgumentException)
+            {
+                //An argument exception has occurred, so we couldn't find an event
+                //for that index. Assume that we need to update the Current index
+                return true;
+            }
         }
 
         private void DeliverDeviceLists(Dictionary<IDevice, DeviceList> deviceLists)
