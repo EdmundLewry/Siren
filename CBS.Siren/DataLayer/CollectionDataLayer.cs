@@ -11,10 +11,13 @@ namespace CBS.Siren.Data
     {
         private int _nextListId = 0;
         private int _nextDeviceId = 0;
-        private int _nextInstanceeId = 0;
+        private int _nextMediaInstanceId = 0;
+        private int _nextChannelId = 0;
+
         private Dictionary<int, TransmissionList> StoredTransmissionLists { get; set; } = new Dictionary<int, TransmissionList>();
         private Dictionary<int, MediaInstance> StoredMediaInstances { get; set; } = new Dictionary<int, MediaInstance>();
         private Dictionary<int, DeviceModel> StoredDevices { get; set; } = new Dictionary<int, DeviceModel>();
+        private Dictionary<int, Channel> StoredChannels { get; set; } = new Dictionary<int, Channel>();
 
         public Task<IEnumerable<TransmissionList>> TransmissionLists()
         {
@@ -78,7 +81,7 @@ namespace CBS.Siren.Data
                     continue;
                 }
 
-                mediaInstance.Id = ++_nextInstanceeId;
+                mediaInstance.Id = ++_nextMediaInstanceId;
                 StoredMediaInstances.Add(mediaInstance.Id, mediaInstance);
                 addedUpdatedInstances.Add(mediaInstance);
             }
@@ -116,6 +119,33 @@ namespace CBS.Siren.Data
             }
 
             return Task.FromResult(addedUpdatedDevices);
+        }
+
+        public Task<IEnumerable<Channel>> Channels()
+        {
+            return Task.FromResult<IEnumerable<Channel>>(StoredChannels.Values);
+        }
+
+        public Task<List<Channel>> AddUpdateChannels(params Channel[] channels)
+        {
+            List<Channel> addedUpdatedChannels = new List<Channel>();
+
+            foreach (var channel in channels)
+            {
+                Channel foundChannel = StoredChannels.GetValueOrDefault(channel.Id);
+                if (foundChannel != null)
+                {
+                    foundChannel.Name = string.IsNullOrWhiteSpace(channel.Name) ? foundChannel.Name : channel.Name;
+                    addedUpdatedChannels.Add(foundChannel);
+                    continue;
+                }
+
+                channel.Id = ++_nextChannelId;
+                StoredChannels.Add(channel.Id, channel);
+                addedUpdatedChannels.Add(channel);
+            }
+
+            return Task.FromResult(addedUpdatedChannels);
         }
     }
 }

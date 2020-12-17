@@ -31,7 +31,10 @@ namespace CBS.Siren.Application
             List<IDevice> devices = deviceModels.Select(model => deviceManager.GetDevice(model.Id)).ToList();
             VideoChain chainConfiguration = new VideoChain(devices);
 
-            return new Channel(chainConfiguration);
+            return new Channel { 
+                Name = "DefaultChannel",
+                ChainConfiguration = chainConfiguration
+            };
         }
 
         public async Task<TransmissionList> GetListById(int id)

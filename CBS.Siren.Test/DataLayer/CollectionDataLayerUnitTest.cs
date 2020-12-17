@@ -139,5 +139,29 @@ namespace CBS.Siren.Test
             Assert.Equal(updatedName, instances[0].Name);
         }
         #endregion
+
+        #region Channel
+
+        [Fact]
+        [Trait("TestType", "UnitTest")]
+        public async Task AddUpdateChannel_WhenChannelDoesNotExist_CreatesNewChannel()
+        {
+            Channel channel = new Channel() { 
+                Name = "FirstChannel"
+            };
+            CollectionDataLayer codeUnderTest = new CollectionDataLayer();
+            _ = await codeUnderTest.AddUpdateChannels(channel);
+
+            Channel expectedChannel = new Channel()
+            {
+                Name = "SecondChannel"
+            };
+            _ = await codeUnderTest.AddUpdateChannels(expectedChannel);
+
+            List<Channel> channels = (await codeUnderTest.Channels()).ToList();
+            Assert.Equal(2, channels.Count);
+        }
+
+        #endregion
     }
 }

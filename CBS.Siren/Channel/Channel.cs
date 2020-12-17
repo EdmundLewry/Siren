@@ -7,11 +7,8 @@ namespace CBS.Siren
      */
     public class Channel
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
         public IVideoChain ChainConfiguration { get; set; }
-        
-        public Channel(IVideoChain channelConfig)
-        {
-            ChainConfiguration = channelConfig;
-        }
     }
 }

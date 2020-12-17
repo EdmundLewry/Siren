@@ -1,13 +1,13 @@
 using AutoMapper;
 using CBS.Siren.Application;
 using CBS.Siren.Data;
+using CBS.Siren.DataLayer;
 using CBS.Siren.Device;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 
 namespace CBS.Siren
 {
@@ -27,6 +27,7 @@ namespace CBS.Siren
             services.AddAutoMapper(typeof(Startup));
             
             services.AddTransient<SirenApplication>();
+            services.AddTransient<IDataLayerInitializer, DataLayerInitializer>();
             services.AddSingleton<IDataLayer, CollectionDataLayer>();
             services.AddSingleton<IDeviceManager, DeviceManager>();
             services.AddSingleton<ITransmissionListServiceStore, TransmissionListServiceStore>();
@@ -36,6 +37,7 @@ namespace CBS.Siren
             services.AddTransient<IScheduler, SimpleScheduler>();
             services.AddTransient<IDeviceFactory, DeviceFactory>();
             services.AddTransient<IDeviceListEventWatcher, DeviceListEventWatcher>();
+            services.AddTransient<IChannelHandler, ChannelHandler>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -50,20 +52,9 @@ namespace CBS.Siren
             IDeviceManager deviceManager = app.ApplicationServices.GetService<IDeviceManager>();
             deviceManager.AddDevice("DemoDevice", new DeviceProperties() { Preroll = TimeSpan.FromSeconds(5) });
 
-            IDataLayer dataLayer = app.ApplicationServices.GetService<IDataLayer>();
-            dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0,0,30)));
-
-            /* For this early stage we're just going to create a single transmission list to work on.
-            This is because sat this stage of the application, it's not possible to add transmission lists
-            to channels */
-            InitializeTransmissionList(dataLayer);
-        }
-
-        private void InitializeTransmissionList(IDataLayer dataLayer)
-        {
-            TransmissionList transmissionList = new TransmissionList(new List<TransmissionListEvent>(), null);
-            
-            dataLayer.AddUpdateTransmissionLists(transmissionList);
+            //Should I do this?
+            IDataLayerInitializer dataLayerInitializer = app.ApplicationServices.GetService<IDataLayerInitializer>();
+            dataLayerInitializer?.Seed();
         }
     }
 }

@@ -8,6 +8,7 @@ export * from "./iplayout-strategy";
 export * from "./itiming-strategy";
 export * from "./itransmission-list-details";
 export * from "./itransmission-list-event-feature";
+export * from "./ichannel";
 
 export * from "./feature-types.enum";
 export * from "./playout-strategy-types.enum";

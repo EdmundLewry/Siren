@@ -14,5 +14,8 @@ namespace CBS.Siren.Data
         Task<IEnumerable<DeviceModel>> Devices();
         Task<List<DeviceModel>> AddUpdateDevices(params DeviceModel[] devices);
         Task<List<MediaInstance>> AddUpdateMediaInstances(params MediaInstance[] instances);
+
+        Task<IEnumerable<Channel>> Channels();
+        Task<List<Channel>> AddUpdateChannels(params Channel[] channels);
     }
 }

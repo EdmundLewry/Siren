@@ -1,1 +1,50 @@
-<p>channel-list works!</p>
+<div class="header">
+    <h1>Channels</h1>
+    <span class="menu-spacer"></span>
+    <button mat-button color="primary" (click)="requestAddNewChannel()">
+        <mat-icon matTooltip="Create New Channel">add_box</mat-icon>
+    </button>
+</div>
+
+<table mat-table #table [dataSource]="dataSource" class="compact hoverable">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>Id</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.id}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let row">
+      {{row.name}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="listCount">
+    <th mat-header-cell *matHeaderCellDef>List Count</th>
+    <td mat-cell *matCellDef="let row">
+        {{row.healthyListCount}}/{{row.listCount}}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="options">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let row" class="more-wrapper" [matMenuTriggerFor]="menu" (click)="$event.stopPropagation();">
+      <button mat-icon-button>
+        <mat-icon class="more-icon">more_horiz</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <div class="button-wrapper">
+          <button mat-menu-item class="more-option-update" [disabled]="true">Update</button>
+        </div>
+        <div class="button-wrapper">
+          <button mat-menu-item class="more-option-delete" [disabled]="true">Delete</button>
+        </div>
+      </mat-menu>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

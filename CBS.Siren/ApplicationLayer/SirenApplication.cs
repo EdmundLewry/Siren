@@ -146,7 +146,10 @@ namespace CBS.Siren.Application
             List<IDevice> devices = new List<IDevice>() { device };
             VideoChain chainConfiguration = new VideoChain(devices);
 
-            return new Channel(chainConfiguration);
+            return new Channel{
+                Name = "DefaultChannel",
+                ChainConfiguration = chainConfiguration 
+            };
         }
     }
 }
