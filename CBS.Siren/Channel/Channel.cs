@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace CBS.Siren
 {
     /*
@@ -10,5 +12,6 @@ namespace CBS.Siren
         public int Id { get; set; }
         public string Name { get; set; }
         public IVideoChain ChainConfiguration { get; set; }
+        public List<TransmissionList> TransmissionLists { get; set; }
     }
 }

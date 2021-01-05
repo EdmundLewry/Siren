@@ -33,23 +33,23 @@ export class ChannelListComponent implements OnInit {
   }
 
   private retrieveChannelInformation(): void {
-    this.dataSource.data = [
-      {
-        id: 1,
-        name: "test 1",
-        listCount: 2,
-        healthyListCount: 2
-      },
-      {
-        id: 2,
-        name: "test 2",
-        listCount: 2,
-        healthyListCount: 0
-      },
-    ];
-    // this.http.get<Channel[]>(`/proxy/api/1/automation/channels`, this.httpOptions).subscribe(result => {
-    //   this.dataSource.data = result;
-    // }, error => console.error(error));
+    // this.dataSource.data = [
+    //   {
+    //     id: 1,
+    //     name: "test 1",
+    //     listCount: 2,
+    //     healthyListCount: 2
+    //   },
+    //   {
+    //     id: 2,
+    //     name: "test 2",
+    //     listCount: 2,
+    //     healthyListCount: 0
+    //   },
+    // ];
+    this.http.get<Channel[]>(`/proxy/api/1/automation/channel`, this.httpOptions).subscribe(result => {
+      this.dataSource.data = result;
+    }, error => console.error(error));
   }
 
   public requestAddNewChannel(): void {

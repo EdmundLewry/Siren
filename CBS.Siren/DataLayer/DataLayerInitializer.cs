@@ -17,6 +17,8 @@ namespace CBS.Siren.DataLayer
         {
             _dataLayer.AddUpdateMediaInstances(new MediaInstance("TestInstance", new TimeSpan(0, 0, 30)));
 
+            _dataLayer.AddUpdateChannels(new Channel() { Name = "TestChannel" });
+
             /* For this early stage we're just going to create a single transmission list to work on.
             This is because sat this stage of the application, it's not possible to add transmission lists
             to channels */

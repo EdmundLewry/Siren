@@ -52,7 +52,6 @@ namespace CBS.Siren
             IDeviceManager deviceManager = app.ApplicationServices.GetService<IDeviceManager>();
             deviceManager.AddDevice("DemoDevice", new DeviceProperties() { Preroll = TimeSpan.FromSeconds(5) });
 
-            //Should I do this?
             IDataLayerInitializer dataLayerInitializer = app.ApplicationServices.GetService<IDataLayerInitializer>();
             dataLayerInitializer?.Seed();
         }

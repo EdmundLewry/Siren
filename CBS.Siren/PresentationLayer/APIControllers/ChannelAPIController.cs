@@ -35,19 +35,19 @@ namespace CBS.Siren.PresentationLayer.APIControllers
         }
 
         [HttpGet("{id}")]
-        public Task<ActionResult/*<ChannelDetailsDTO>*/> GetChannelById(int id)
+        public Task<ActionResult<ChannelDetailsDTO>> GetChannelById(int id)
         {
             throw new NotImplementedException();
         }
 
         [HttpPost]
-        public Task<ActionResult/*<ChannelDetailsDTO>*/> CreateChannel(/*ChannelCreationDTO*/)
+        public Task<ActionResult<ChannelDetailsDTO>> CreateChannel(/*ChannelCreationDTO*/)
         {
             throw new NotImplementedException();
         }
         
         [HttpPatch("{id}")]
-        public Task<ActionResult/*<ChannelDetailsDTO>*/> UpdateChannel(int id/*, ChannelUpdateDTO*/)
+        public Task<ActionResult<ChannelDetailsDTO>> UpdateChannel(int id/*, ChannelUpdateDTO*/)
         {
             throw new NotImplementedException();
         }
@@ -59,13 +59,13 @@ namespace CBS.Siren.PresentationLayer.APIControllers
         }
 
         [HttpPost("{id}")]
-        public Task<ActionResult/*<ChannelDetailsDTO>*/> AddListToChannel(int id /*, ListCreationDTO*/)
+        public Task<ActionResult<ChannelDetailsDTO>> AddListToChannel(int id /*, ListCreationDTO*/)
         {
             throw new NotImplementedException();
         }
         
         [HttpPost("{id}/lists/{listId}")]
-        public Task<ActionResult/*<ChannelDetailsDTO>*/> RemoveListFromChannel(int id, int listId /*, ListCreationDTO*/)
+        public Task<ActionResult<ChannelDetailsDTO>> RemoveListFromChannel(int id, int listId /*, ListCreationDTO*/)
         {
             throw new NotImplementedException();
         }
