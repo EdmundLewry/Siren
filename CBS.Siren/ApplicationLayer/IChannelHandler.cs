@@ -6,5 +6,6 @@ namespace CBS.Siren.Application
     public interface IChannelHandler
     {
         Task<IEnumerable<Channel>> GetAllChannels();
+        Task<Channel> GetChannelById(int id);
     }
 }

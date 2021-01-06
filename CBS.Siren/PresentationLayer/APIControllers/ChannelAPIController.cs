@@ -35,9 +35,19 @@ namespace CBS.Siren.PresentationLayer.APIControllers
         }
 
         [HttpGet("{id}")]
-        public Task<ActionResult<ChannelDetailsDTO>> GetChannelById(int id)
+        public async Task<ActionResult<ChannelDetailsDTO>> GetChannelById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Logger.LogDebug("Received request to Get Channel with id {0}", id);
+                var channel = await ChannelHandler.GetChannelById(id);
+                return _mapper.Map<ChannelDetailsDTO>(channel);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to get channel with given id {0}", id);
+                return NotFound(id);
+            }
         }
 
         [HttpPost]
