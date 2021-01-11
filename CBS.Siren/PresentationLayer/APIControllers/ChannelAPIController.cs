@@ -7,6 +7,7 @@ using CBS.Siren.PresentationLayer.DTOs;
 using System.Collections.Generic;
 using CBS.Siren.Application;
 using System.Linq;
+using System.Text.Json;
 
 namespace CBS.Siren.PresentationLayer.APIControllers
 {
@@ -51,9 +52,19 @@ namespace CBS.Siren.PresentationLayer.APIControllers
         }
 
         [HttpPost]
-        public Task<ActionResult<ChannelDetailsDTO>> CreateChannel(/*ChannelCreationDTO*/)
+        public async Task<ActionResult<ChannelDetailsDTO>> CreateChannel(ChannelCreationDTO channel)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Logger.LogDebug("Received request to create new channel with creation dto {0}", JsonSerializer.Serialize(channel));
+                var createdChannel = await ChannelHandler.AddChannel(channel.Name);
+                return CreatedAtAction(nameof(CreateChannel), _mapper.Map<ChannelDetailsDTO>(createdChannel));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Unable to create channel with name {0}", channel.Name, e.Message);
+                return BadRequest(channel.Name);
+            }
         }
         
         [HttpPatch("{id}")]

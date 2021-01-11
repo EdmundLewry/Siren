@@ -7,5 +7,6 @@ namespace CBS.Siren.Application
     {
         Task<IEnumerable<Channel>> GetAllChannels();
         Task<Channel> GetChannelById(int id);
+        Task<Channel> AddChannel(string channelName);
     }
 }

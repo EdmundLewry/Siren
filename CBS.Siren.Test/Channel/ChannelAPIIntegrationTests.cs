@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -92,6 +93,60 @@ namespace CBS.Siren.Test
             Assert.NotNull(returnedChannel);
             Assert.Equal(1, returnedChannel.Id);
             Assert.Equal("TestChannel", returnedChannel.Name);
+        }
+        #endregion
+
+        #region Create
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task CreateChannel_WhenCreationHasNoName_ReturnsBadRequest()
+        {
+            WebApplicationFactoryBuilder<Startup> factoryBuilder = new WebApplicationFactoryBuilder<Startup>();
+
+            using WebApplicationFactory<Startup> factory = factoryBuilder.CreateWebApplicationFactory(typeof(ChannelDataLayerInitializer));
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            ChannelCreationDTO creationDTO = new ChannelCreationDTO() { Name = "" };
+            var channelCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync(ApiRoute, channelCreationData);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task CreateChannel_WhenNameAlreadyExists_ReturnsBadRequest()
+        {
+            WebApplicationFactoryBuilder<Startup> factoryBuilder = new WebApplicationFactoryBuilder<Startup>();
+
+            using WebApplicationFactory<Startup> factory = factoryBuilder.CreateWebApplicationFactory(typeof(ChannelDataLayerInitializer));
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            ChannelCreationDTO creationDTO = new ChannelCreationDTO() { Name = "TestChannel" };
+            var channelCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync(ApiRoute, channelCreationData);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+        
+        [Fact]
+        [Trait("TestType", "IntegrationTest")]
+        public async Task CreateChannel_WhenInputIsValid_ReturnsCreatedChannel()
+        {
+            WebApplicationFactoryBuilder<Startup> factoryBuilder = new WebApplicationFactoryBuilder<Startup>();
+
+            using WebApplicationFactory<Startup> factory = factoryBuilder.CreateWebApplicationFactory(typeof(ChannelDataLayerInitializer));
+            using HttpClient clientUnderTest = factory.CreateClient();
+
+            ChannelCreationDTO creationDTO = new ChannelCreationDTO() { Name = "TestChannelSecond" };
+            var channelCreationData = new StringContent(creationDTO.SerializeToJson(), Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await clientUnderTest.PostAsync(ApiRoute, channelCreationData);
+
+            string content = await response.Content.ReadAsStringAsync();
+            ChannelDetailsDTO returnedChannel = content.DeserializeJson<ChannelDetailsDTO>();
+
+            Assert.Equal("TestChannelSecond", returnedChannel.Name);
         }
         #endregion
     }
