@@ -22,13 +22,15 @@ import { TranmissionlistEventsListComponent } from './tranmissionlist-events-lis
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component'
 import { TransmissionListEventEditDialog } from './transmission-list-event-edit-dialog/transmission-list-event-edit-dialog.component';
 import { ChannelListComponent } from './channel-list/channel-list.component';
+import { ChannelEditDialog } from './channel-edit-dialog/channel-edit-dialog.component';
 
 @NgModule({
   declarations: [
     TranmissionlistEventsListComponent,
     ConfirmationDialogComponent,
     TransmissionListEventEditDialog,
-    ChannelListComponent
+    ChannelListComponent,
+    ChannelEditDialog
   ],
   imports: [
     RouterModule,

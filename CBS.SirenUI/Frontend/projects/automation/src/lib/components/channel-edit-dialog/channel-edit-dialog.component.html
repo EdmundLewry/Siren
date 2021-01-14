@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>{{isUpdating ? 'Update' : 'Create'}} Channel</h2>
+<form [formGroup]="channelForm">
+    <div mat-dialog-content>
+        <mat-form-field color="accent">
+            <mat-label>Channel Name</mat-label>
+            <input matInput type="text" formControlName="channelName">
+        </mat-form-field>
+
+        <div mat-dialog-actions>
+            <button mat-button (click)="onNoClick()">Cancel</button>
+            <button mat-raised-button type="submit" color="primary" [mat-dialog-close]="getResult()" cdkFocusInitial>{{isUpdating ? 'Update' : 'Create'}}</button>
+        </div>
+    </div>
+</form>

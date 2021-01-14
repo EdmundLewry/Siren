@@ -3,6 +3,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { Channel } from '../../interfaces/ichannel';
+import { ChannelCreationData } from '../../interfaces/interfaces';
+import { ChannelEditDialog } from '../channel-edit-dialog/channel-edit-dialog.component';
 
 @Component({
   selector: 'lib-channel-list',
@@ -22,6 +24,8 @@ export class ChannelListComponent implements OnInit {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
   
+  private readonly channelEndpoint = '/proxy/api/1/automation/channel';
+
   @ViewChild('table') table: MatTable<Channel>
   
   constructor(private http: HttpClient,
@@ -33,26 +37,24 @@ export class ChannelListComponent implements OnInit {
   }
 
   private retrieveChannelInformation(): void {
-    // this.dataSource.data = [
-    //   {
-    //     id: 1,
-    //     name: "test 1",
-    //     listCount: 2,
-    //     healthyListCount: 2
-    //   },
-    //   {
-    //     id: 2,
-    //     name: "test 2",
-    //     listCount: 2,
-    //     healthyListCount: 0
-    //   },
-    // ];
-    this.http.get<Channel[]>(`/proxy/api/1/automation/channel`, this.httpOptions).subscribe(result => {
+    this.http.get<Channel[]>(this.channelEndpoint, this.httpOptions).subscribe(result => {
       this.dataSource.data = result;
     }, error => console.error(error));
   }
 
   public requestAddNewChannel(): void {
-    
+    this.dialog.open(ChannelEditDialog, {
+      width: '800px',
+      data: null
+    })
+    .afterClosed()
+    .subscribe((creationData: ChannelCreationData) => {
+      if(creationData == null) return;
+
+      this.http.post<Channel>(this.channelEndpoint, creationData).subscribe(response => {
+        this.retrieveChannelInformation();
+      },
+      error => console.error(error));
+    });
   }
 }

@@ -43,8 +43,8 @@ namespace CBS.Siren.Application
 
         public async Task<Channel> AddChannel(string channelName)
         {
-            await ValidateNewChannelDetails(channelName);
-            
+            IEnumerable<Channel> existingChannels = await DataLayer.Channels();
+            ValidateNewChannelDetails(channelName, existingChannels);
 
             Channel createdChannel = GenerateChannel(channelName, DeviceManager);
             List<Channel> channels = await DataLayer.AddUpdateChannels(createdChannel);
@@ -56,14 +56,13 @@ namespace CBS.Siren.Application
             return channels.First();
         }
 
-        private async Task ValidateNewChannelDetails(string channelName)
+        private void ValidateNewChannelDetails(string channelName, IEnumerable<Channel> existingChannels)
         {
             if (string.IsNullOrWhiteSpace(channelName))
             {
                 throw new ArgumentException($"Channel must not be empty", nameof(channelName));
             }
 
-            IEnumerable<Channel> existingChannels = await DataLayer.Channels();
             if (existingChannels.Any((channel) => channel.Name == channelName))
             {
                 throw new ArgumentException($"Channel with name {channelName} already exists", nameof(channelName));
